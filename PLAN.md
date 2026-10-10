@@ -785,6 +785,13 @@ Tests (5) cover dictionary parity, placeholder substitution (`{count}`, `{operat
 The panel and diff body still draw with inline styles over `--dsw-alias-*` tokens; AGENTS.md convention 6 asks for CSS Modules. The work is bounded but touches the build: the client bundle must compile `*.module.css` into a class map plus an injected `<style data-plugin="…">` tag (the shipped preset does this with lightningcss). Plan: add `lightningcss` as a dev dependency, write a small tsdown plugin that emits the virtual module, create `GitBody.module.css` and `GitDiffBody.module.css` with token-based rules, and convert the components' style objects to class names, using the shipped `Button`/`PathLabel` primitives where they fit without changing behaviour.
 
 ---
+### 18.3 The styling bug, and the probe that found it
+
+The first CSS Modules build gave every stylesheet the *same* tag id (the package name), so the last sheet to materialize overwrote the others — the GUI showed a completely unstyled panel while the bundle looked correct on inspection. Each sheet now carries `<package>/<path>` as its tag id and sets `data-plugin-css`, matching the shipped bundles' shape.
+
+`scripts/probe-bundle.mjs` made it visible: it evaluates the built bundle in jsdom with stub services and reports the loader rows, the registered tab types and slots, every injected stylesheet with its id and size, and how many rendered class attributes are defined in the panel's own sheet (37 of 39 today; the other two belong to the shipped icon primitives). Run it after any styling build.
+
+---
 ## Appendix A — research artifacts produced for this plan
 
 | Path | What it is |
