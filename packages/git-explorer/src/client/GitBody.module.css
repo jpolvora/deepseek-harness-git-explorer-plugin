@@ -13,8 +13,8 @@
  * beside the conversation. Buttons inherit it (ont: inherit), so one value covers the chrome.
  */
 .panel {
-  font-size: 0.94em;
-  line-height: 1.45;
+  font-size: 0.88em;
+  line-height: 1.4;
   padding: 10px 12px;
 }
 
