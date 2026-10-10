@@ -2,7 +2,7 @@ import * as React from 'react';
 // Our own generated Host-for-Client Remote projection. Importing it through the
 // package's `./remote` export is a package self-reference: the bundler inlines it (and
 // its zod schemas) exactly as the shipped remote assembly inlines the ones it mounts.
-import { TYPERT_REMOTE } from '@jpolv/dsh-git-explorer/remote';
+import { TYPERT_REMOTE } from 'dsh-plugin-git-explorer/remote';
 import { GIT_DIFF_ID, GIT_DIFF_TAB_KIND, GIT_EXPLORER_ID, GIT_TAB_KIND, } from '../types.js';
 import { GitBody } from './GitBody.js';
 import { GitDiffBody } from './GitDiffBody.js';

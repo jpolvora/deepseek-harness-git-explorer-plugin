@@ -5280,46 +5280,46 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		}
 		//#endregion
 		//#region lib/typert.remote-client.js
-		let _jpolv_dsh_git_explorer_git_commit_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_commit_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_commit_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_commit_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_commit_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_commit_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_commit_parameter_2$schema$value;
-		const _jpolv_dsh_git_explorer_git_commit_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_commit_parameter_2$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_commit_parameter_3$schema$value;
-		const _jpolv_dsh_git_explorer_git_commit_parameter_3$schema = () => _jpolv_dsh_git_explorer_git_commit_parameter_3$schema$value ??= boolean();
-		let _jpolv_dsh_git_explorer_git_commit_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_commit_result$schema = () => _jpolv_dsh_git_explorer_git_commit_result$schema$value ??= object({
+		let dsh_plugin_git_explorer_git_commit_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_commit_parameter_0$schema = () => dsh_plugin_git_explorer_git_commit_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_commit_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_commit_parameter_1$schema = () => dsh_plugin_git_explorer_git_commit_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_commit_parameter_2$schema$value;
+		const dsh_plugin_git_explorer_git_commit_parameter_2$schema = () => dsh_plugin_git_explorer_git_commit_parameter_2$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_commit_parameter_3$schema$value;
+		const dsh_plugin_git_explorer_git_commit_parameter_3$schema = () => dsh_plugin_git_explorer_git_commit_parameter_3$schema$value ??= boolean();
+		let dsh_plugin_git_explorer_git_commit_result$schema$value;
+		const dsh_plugin_git_explorer_git_commit_result$schema = () => dsh_plugin_git_explorer_git_commit_result$schema$value ??= object({
 			"ok": boolean(),
 			"detail": string()
 		});
-		let _jpolv_dsh_git_explorer_git_discard_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_discard_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_discard_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_discard_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_discard_parameter_2$schema$value;
-		const _jpolv_dsh_git_explorer_git_discard_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_2$schema$value ??= array(string());
-		let _jpolv_dsh_git_explorer_git_discard_parameter_3$schema$value;
-		const _jpolv_dsh_git_explorer_git_discard_parameter_3$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_3$schema$value ??= array(string());
-		let _jpolv_dsh_git_explorer_git_discard_parameter_4$schema$value;
-		const _jpolv_dsh_git_explorer_git_discard_parameter_4$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_4$schema$value ??= boolean();
-		let _jpolv_dsh_git_explorer_git_discard_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_discard_result$schema = () => _jpolv_dsh_git_explorer_git_discard_result$schema$value ??= object({
+		let dsh_plugin_git_explorer_git_discard_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_discard_parameter_0$schema = () => dsh_plugin_git_explorer_git_discard_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_discard_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_discard_parameter_1$schema = () => dsh_plugin_git_explorer_git_discard_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_discard_parameter_2$schema$value;
+		const dsh_plugin_git_explorer_git_discard_parameter_2$schema = () => dsh_plugin_git_explorer_git_discard_parameter_2$schema$value ??= array(string());
+		let dsh_plugin_git_explorer_git_discard_parameter_3$schema$value;
+		const dsh_plugin_git_explorer_git_discard_parameter_3$schema = () => dsh_plugin_git_explorer_git_discard_parameter_3$schema$value ??= array(string());
+		let dsh_plugin_git_explorer_git_discard_parameter_4$schema$value;
+		const dsh_plugin_git_explorer_git_discard_parameter_4$schema = () => dsh_plugin_git_explorer_git_discard_parameter_4$schema$value ??= boolean();
+		let dsh_plugin_git_explorer_git_discard_result$schema$value;
+		const dsh_plugin_git_explorer_git_discard_result$schema = () => dsh_plugin_git_explorer_git_discard_result$schema$value ??= object({
 			"ok": boolean(),
 			"detail": string()
 		});
-		let _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema$value;
-		const _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema$value;
-		const _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema = () => _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema$value ??= boolean();
-		let _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema$value;
-		const _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema = () => _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema$value ??= boolean();
-		let _jpolv_dsh_git_explorer_git_fileDiff_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_fileDiff_result$schema = () => _jpolv_dsh_git_explorer_git_fileDiff_result$schema$value ??= object({
+		let dsh_plugin_git_explorer_git_fileDiff_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_fileDiff_parameter_0$schema = () => dsh_plugin_git_explorer_git_fileDiff_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_fileDiff_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_fileDiff_parameter_1$schema = () => dsh_plugin_git_explorer_git_fileDiff_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_fileDiff_parameter_2$schema$value;
+		const dsh_plugin_git_explorer_git_fileDiff_parameter_2$schema = () => dsh_plugin_git_explorer_git_fileDiff_parameter_2$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_fileDiff_parameter_3$schema$value;
+		const dsh_plugin_git_explorer_git_fileDiff_parameter_3$schema = () => dsh_plugin_git_explorer_git_fileDiff_parameter_3$schema$value ??= boolean();
+		let dsh_plugin_git_explorer_git_fileDiff_parameter_4$schema$value;
+		const dsh_plugin_git_explorer_git_fileDiff_parameter_4$schema = () => dsh_plugin_git_explorer_git_fileDiff_parameter_4$schema$value ??= boolean();
+		let dsh_plugin_git_explorer_git_fileDiff_result$schema$value;
+		const dsh_plugin_git_explorer_git_fileDiff_result$schema = () => dsh_plugin_git_explorer_git_fileDiff_result$schema$value ??= object({
 			"path": string(),
 			"root": string(),
 			"staged": boolean(),
@@ -5329,54 +5329,54 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			"oversized": boolean(),
 			"note": string()
 		});
-		let _jpolv_dsh_git_explorer_git_fileStats_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_fileStats_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_fileStats_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_fileStats_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_fileStats_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_fileStats_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_fileStats_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_fileStats_result$schema = () => _jpolv_dsh_git_explorer_git_fileStats_result$schema$value ??= array(object({
+		let dsh_plugin_git_explorer_git_fileStats_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_fileStats_parameter_0$schema = () => dsh_plugin_git_explorer_git_fileStats_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_fileStats_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_fileStats_parameter_1$schema = () => dsh_plugin_git_explorer_git_fileStats_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_fileStats_result$schema$value;
+		const dsh_plugin_git_explorer_git_fileStats_result$schema = () => dsh_plugin_git_explorer_git_fileStats_result$schema$value ??= array(object({
 			"path": string(),
 			"staged": boolean(),
 			"added": number(),
 			"removed": number(),
 			"binary": boolean()
 		}));
-		let _jpolv_dsh_git_explorer_git_log_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_log_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_log_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_log_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_log_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_log_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_log_parameter_2$schema$value;
-		const _jpolv_dsh_git_explorer_git_log_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_log_parameter_2$schema$value ??= number();
-		let _jpolv_dsh_git_explorer_git_log_parameter_3$schema$value;
-		const _jpolv_dsh_git_explorer_git_log_parameter_3$schema = () => _jpolv_dsh_git_explorer_git_log_parameter_3$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_log_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_log_result$schema = () => _jpolv_dsh_git_explorer_git_log_result$schema$value ??= array(object({
+		let dsh_plugin_git_explorer_git_log_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_log_parameter_0$schema = () => dsh_plugin_git_explorer_git_log_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_log_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_log_parameter_1$schema = () => dsh_plugin_git_explorer_git_log_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_log_parameter_2$schema$value;
+		const dsh_plugin_git_explorer_git_log_parameter_2$schema = () => dsh_plugin_git_explorer_git_log_parameter_2$schema$value ??= number();
+		let dsh_plugin_git_explorer_git_log_parameter_3$schema$value;
+		const dsh_plugin_git_explorer_git_log_parameter_3$schema = () => dsh_plugin_git_explorer_git_log_parameter_3$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_log_result$schema$value;
+		const dsh_plugin_git_explorer_git_log_result$schema = () => dsh_plugin_git_explorer_git_log_result$schema$value ??= array(object({
 			"hash": string(),
 			"short": string(),
 			"author": string(),
 			"date": string(),
 			"subject": string()
 		}));
-		let _jpolv_dsh_git_explorer_git_patch_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_patch_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_patch_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_patch_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_patch_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_patch_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_patch_parameter_2$schema$value;
-		const _jpolv_dsh_git_explorer_git_patch_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_patch_parameter_2$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_patch_parameter_3$schema$value;
-		const _jpolv_dsh_git_explorer_git_patch_parameter_3$schema = () => _jpolv_dsh_git_explorer_git_patch_parameter_3$schema$value ??= boolean();
-		let _jpolv_dsh_git_explorer_git_patch_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_patch_result$schema = () => _jpolv_dsh_git_explorer_git_patch_result$schema$value ??= object({
+		let dsh_plugin_git_explorer_git_patch_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_patch_parameter_0$schema = () => dsh_plugin_git_explorer_git_patch_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_patch_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_patch_parameter_1$schema = () => dsh_plugin_git_explorer_git_patch_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_patch_parameter_2$schema$value;
+		const dsh_plugin_git_explorer_git_patch_parameter_2$schema = () => dsh_plugin_git_explorer_git_patch_parameter_2$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_patch_parameter_3$schema$value;
+		const dsh_plugin_git_explorer_git_patch_parameter_3$schema = () => dsh_plugin_git_explorer_git_patch_parameter_3$schema$value ??= boolean();
+		let dsh_plugin_git_explorer_git_patch_result$schema$value;
+		const dsh_plugin_git_explorer_git_patch_result$schema = () => dsh_plugin_git_explorer_git_patch_result$schema$value ??= object({
 			"path": string(),
 			"patch": string(),
 			"note": string()
 		});
-		let _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_ping_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_ping_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_ping_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_ping_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_ping_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_ping_result$schema = () => _jpolv_dsh_git_explorer_git_ping_result$schema$value ??= object({
+		let dsh_plugin_git_explorer_git_ping_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_ping_parameter_0$schema = () => dsh_plugin_git_explorer_git_ping_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_ping_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_ping_parameter_1$schema = () => dsh_plugin_git_explorer_git_ping_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_ping_result$schema$value;
+		const dsh_plugin_git_explorer_git_ping_result$schema = () => dsh_plugin_git_explorer_git_ping_result$schema$value ??= object({
 			"ok": literal(true),
 			"packageVersion": string(),
 			"gitVersion": union([literal(null), string()]),
@@ -5397,23 +5397,23 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			]).optional(),
 			"note": union([_undefined(), string()]).optional()
 		});
-		let _jpolv_dsh_git_explorer_git_stage_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_stage_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_stage_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_stage_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_stage_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_stage_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_stage_parameter_2$schema$value;
-		const _jpolv_dsh_git_explorer_git_stage_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_stage_parameter_2$schema$value ??= array(string());
-		let _jpolv_dsh_git_explorer_git_stage_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_stage_result$schema = () => _jpolv_dsh_git_explorer_git_stage_result$schema$value ??= object({
+		let dsh_plugin_git_explorer_git_stage_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_stage_parameter_0$schema = () => dsh_plugin_git_explorer_git_stage_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_stage_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_stage_parameter_1$schema = () => dsh_plugin_git_explorer_git_stage_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_stage_parameter_2$schema$value;
+		const dsh_plugin_git_explorer_git_stage_parameter_2$schema = () => dsh_plugin_git_explorer_git_stage_parameter_2$schema$value ??= array(string());
+		let dsh_plugin_git_explorer_git_stage_result$schema$value;
+		const dsh_plugin_git_explorer_git_stage_result$schema = () => dsh_plugin_git_explorer_git_stage_result$schema$value ??= object({
 			"ok": boolean(),
 			"detail": string()
 		});
-		let _jpolv_dsh_git_explorer_git_status_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_status_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_status_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_status_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_status_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_status_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_status_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_status_result$schema = () => _jpolv_dsh_git_explorer_git_status_result$schema$value ??= object({
+		let dsh_plugin_git_explorer_git_status_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_status_parameter_0$schema = () => dsh_plugin_git_explorer_git_status_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_status_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_status_parameter_1$schema = () => dsh_plugin_git_explorer_git_status_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_status_result$schema$value;
+		const dsh_plugin_git_explorer_git_status_result$schema = () => dsh_plugin_git_explorer_git_status_result$schema$value ??= object({
 			"isRepo": boolean(),
 			"root": union([literal(null), string()]),
 			"rootSource": union([
@@ -5507,22 +5507,22 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			"skipped": array(string()),
 			"note": string()
 		});
-		let _jpolv_dsh_git_explorer_git_unstage_parameter_0$schema$value;
-		const _jpolv_dsh_git_explorer_git_unstage_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_unstage_parameter_0$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_unstage_parameter_1$schema$value;
-		const _jpolv_dsh_git_explorer_git_unstage_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_unstage_parameter_1$schema$value ??= string();
-		let _jpolv_dsh_git_explorer_git_unstage_parameter_2$schema$value;
-		const _jpolv_dsh_git_explorer_git_unstage_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_unstage_parameter_2$schema$value ??= array(string());
-		let _jpolv_dsh_git_explorer_git_unstage_result$schema$value;
-		const _jpolv_dsh_git_explorer_git_unstage_result$schema = () => _jpolv_dsh_git_explorer_git_unstage_result$schema$value ??= object({
+		let dsh_plugin_git_explorer_git_unstage_parameter_0$schema$value;
+		const dsh_plugin_git_explorer_git_unstage_parameter_0$schema = () => dsh_plugin_git_explorer_git_unstage_parameter_0$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_unstage_parameter_1$schema$value;
+		const dsh_plugin_git_explorer_git_unstage_parameter_1$schema = () => dsh_plugin_git_explorer_git_unstage_parameter_1$schema$value ??= string();
+		let dsh_plugin_git_explorer_git_unstage_parameter_2$schema$value;
+		const dsh_plugin_git_explorer_git_unstage_parameter_2$schema = () => dsh_plugin_git_explorer_git_unstage_parameter_2$schema$value ??= array(string());
+		let dsh_plugin_git_explorer_git_unstage_result$schema$value;
+		const dsh_plugin_git_explorer_git_unstage_result$schema = () => dsh_plugin_git_explorer_git_unstage_result$schema$value ??= object({
 			"ok": boolean(),
 			"detail": string()
 		});
 		const TYPERT_REMOTE = {
-			package: "@jpolv/dsh-git-explorer",
+			package: "dsh-plugin-git-explorer",
 			descriptors: [
 				{
-					id: "@jpolv/dsh-git-explorer#git/commit",
+					id: "dsh-plugin-git-explorer#git/commit",
 					service: "git",
 					namespace: "git",
 					method: "commit",
@@ -5534,8 +5534,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/commit:sessionId",
-								create: _jpolv_dsh_git_explorer_git_commit_parameter_0$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/commit:sessionId",
+								create: dsh_plugin_git_explorer_git_commit_parameter_0$schema
 							}
 						},
 						{
@@ -5544,8 +5544,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/commit:requestRoot",
-								create: _jpolv_dsh_git_explorer_git_commit_parameter_1$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/commit:requestRoot",
+								create: dsh_plugin_git_explorer_git_commit_parameter_1$schema
 							}
 						},
 						{
@@ -5554,8 +5554,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/commit:message",
-								create: _jpolv_dsh_git_explorer_git_commit_parameter_2$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/commit:message",
+								create: dsh_plugin_git_explorer_git_commit_parameter_2$schema
 							}
 						},
 						{
@@ -5564,16 +5564,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/commit:amend",
-								create: _jpolv_dsh_git_explorer_git_commit_parameter_3$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/commit:amend",
+								create: dsh_plugin_git_explorer_git_commit_parameter_3$schema
 							}
 						}
 					],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer/types#GitMutationResult",
-						create: _jpolv_dsh_git_explorer_git_commit_result$schema
+						typeSymbol: "dsh-plugin-git-explorer/types#GitMutationResult",
+						create: dsh_plugin_git_explorer_git_commit_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -5582,7 +5582,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 				},
 				{
-					id: "@jpolv/dsh-git-explorer#git/discard",
+					id: "dsh-plugin-git-explorer#git/discard",
 					service: "git",
 					namespace: "git",
 					method: "discard",
@@ -5594,8 +5594,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:sessionId",
-								create: _jpolv_dsh_git_explorer_git_discard_parameter_0$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/discard:sessionId",
+								create: dsh_plugin_git_explorer_git_discard_parameter_0$schema
 							}
 						},
 						{
@@ -5604,8 +5604,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:requestRoot",
-								create: _jpolv_dsh_git_explorer_git_discard_parameter_1$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/discard:requestRoot",
+								create: dsh_plugin_git_explorer_git_discard_parameter_1$schema
 							}
 						},
 						{
@@ -5614,8 +5614,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:trackedPaths",
-								create: _jpolv_dsh_git_explorer_git_discard_parameter_2$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/discard:trackedPaths",
+								create: dsh_plugin_git_explorer_git_discard_parameter_2$schema
 							}
 						},
 						{
@@ -5624,8 +5624,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:untrackedPaths",
-								create: _jpolv_dsh_git_explorer_git_discard_parameter_3$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/discard:untrackedPaths",
+								create: dsh_plugin_git_explorer_git_discard_parameter_3$schema
 							}
 						},
 						{
@@ -5634,16 +5634,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:confirmed",
-								create: _jpolv_dsh_git_explorer_git_discard_parameter_4$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/discard:confirmed",
+								create: dsh_plugin_git_explorer_git_discard_parameter_4$schema
 							}
 						}
 					],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer/types#GitMutationResult",
-						create: _jpolv_dsh_git_explorer_git_discard_result$schema
+						typeSymbol: "dsh-plugin-git-explorer/types#GitMutationResult",
+						create: dsh_plugin_git_explorer_git_discard_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -5652,7 +5652,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 				},
 				{
-					id: "@jpolv/dsh-git-explorer#git/fileDiff",
+					id: "dsh-plugin-git-explorer#git/fileDiff",
 					service: "git",
 					namespace: "git",
 					method: "fileDiff",
@@ -5664,8 +5664,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/fileDiff:sessionId",
-								create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/fileDiff:sessionId",
+								create: dsh_plugin_git_explorer_git_fileDiff_parameter_0$schema
 							}
 						},
 						{
@@ -5674,8 +5674,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/fileDiff:requestRoot",
-								create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/fileDiff:requestRoot",
+								create: dsh_plugin_git_explorer_git_fileDiff_parameter_1$schema
 							}
 						},
 						{
@@ -5684,8 +5684,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/fileDiff:path",
-								create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/fileDiff:path",
+								create: dsh_plugin_git_explorer_git_fileDiff_parameter_2$schema
 							}
 						},
 						{
@@ -5694,8 +5694,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/fileDiff:staged",
-								create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/fileDiff:staged",
+								create: dsh_plugin_git_explorer_git_fileDiff_parameter_3$schema
 							}
 						},
 						{
@@ -5704,16 +5704,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/fileDiff:untracked",
-								create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/fileDiff:untracked",
+								create: dsh_plugin_git_explorer_git_fileDiff_parameter_4$schema
 							}
 						}
 					],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer/types#GitFileDiff",
-						create: _jpolv_dsh_git_explorer_git_fileDiff_result$schema
+						typeSymbol: "dsh-plugin-git-explorer/types#GitFileDiff",
+						create: dsh_plugin_git_explorer_git_fileDiff_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -5722,7 +5722,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 				},
 				{
-					id: "@jpolv/dsh-git-explorer#git/fileStats",
+					id: "dsh-plugin-git-explorer#git/fileStats",
 					service: "git",
 					namespace: "git",
 					method: "fileStats",
@@ -5733,8 +5733,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						source: "json",
 						codec: {
 							mode: "strict",
-							typeSymbol: "@jpolv/dsh-git-explorer#git/fileStats:sessionId",
-							create: _jpolv_dsh_git_explorer_git_fileStats_parameter_0$schema
+							typeSymbol: "dsh-plugin-git-explorer#git/fileStats:sessionId",
+							create: dsh_plugin_git_explorer_git_fileStats_parameter_0$schema
 						}
 					}, {
 						name: "requestRoot",
@@ -5742,15 +5742,15 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						source: "json",
 						codec: {
 							mode: "strict",
-							typeSymbol: "@jpolv/dsh-git-explorer#git/fileStats:requestRoot",
-							create: _jpolv_dsh_git_explorer_git_fileStats_parameter_1$schema
+							typeSymbol: "dsh-plugin-git-explorer#git/fileStats:requestRoot",
+							create: dsh_plugin_git_explorer_git_fileStats_parameter_1$schema
 						}
 					}],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer#git/fileStats:result",
-						create: _jpolv_dsh_git_explorer_git_fileStats_result$schema
+						typeSymbol: "dsh-plugin-git-explorer#git/fileStats:result",
+						create: dsh_plugin_git_explorer_git_fileStats_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -5759,7 +5759,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 				},
 				{
-					id: "@jpolv/dsh-git-explorer#git/log",
+					id: "dsh-plugin-git-explorer#git/log",
 					service: "git",
 					namespace: "git",
 					method: "log",
@@ -5771,8 +5771,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/log:sessionId",
-								create: _jpolv_dsh_git_explorer_git_log_parameter_0$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/log:sessionId",
+								create: dsh_plugin_git_explorer_git_log_parameter_0$schema
 							}
 						},
 						{
@@ -5781,8 +5781,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/log:requestRoot",
-								create: _jpolv_dsh_git_explorer_git_log_parameter_1$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/log:requestRoot",
+								create: dsh_plugin_git_explorer_git_log_parameter_1$schema
 							}
 						},
 						{
@@ -5791,8 +5791,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/log:limit",
-								create: _jpolv_dsh_git_explorer_git_log_parameter_2$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/log:limit",
+								create: dsh_plugin_git_explorer_git_log_parameter_2$schema
 							}
 						},
 						{
@@ -5801,16 +5801,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/log:path",
-								create: _jpolv_dsh_git_explorer_git_log_parameter_3$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/log:path",
+								create: dsh_plugin_git_explorer_git_log_parameter_3$schema
 							}
 						}
 					],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer#git/log:result",
-						create: _jpolv_dsh_git_explorer_git_log_result$schema
+						typeSymbol: "dsh-plugin-git-explorer#git/log:result",
+						create: dsh_plugin_git_explorer_git_log_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -5819,7 +5819,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 				},
 				{
-					id: "@jpolv/dsh-git-explorer#git/patch",
+					id: "dsh-plugin-git-explorer#git/patch",
 					service: "git",
 					namespace: "git",
 					method: "patch",
@@ -5831,8 +5831,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/patch:sessionId",
-								create: _jpolv_dsh_git_explorer_git_patch_parameter_0$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/patch:sessionId",
+								create: dsh_plugin_git_explorer_git_patch_parameter_0$schema
 							}
 						},
 						{
@@ -5841,8 +5841,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/patch:requestRoot",
-								create: _jpolv_dsh_git_explorer_git_patch_parameter_1$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/patch:requestRoot",
+								create: dsh_plugin_git_explorer_git_patch_parameter_1$schema
 							}
 						},
 						{
@@ -5851,8 +5851,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/patch:path",
-								create: _jpolv_dsh_git_explorer_git_patch_parameter_2$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/patch:path",
+								create: dsh_plugin_git_explorer_git_patch_parameter_2$schema
 							}
 						},
 						{
@@ -5861,16 +5861,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/patch:staged",
-								create: _jpolv_dsh_git_explorer_git_patch_parameter_3$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/patch:staged",
+								create: dsh_plugin_git_explorer_git_patch_parameter_3$schema
 							}
 						}
 					],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer/types#GitPatch",
-						create: _jpolv_dsh_git_explorer_git_patch_result$schema
+						typeSymbol: "dsh-plugin-git-explorer/types#GitPatch",
+						create: dsh_plugin_git_explorer_git_patch_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -5879,7 +5879,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 				},
 				{
-					id: "@jpolv/dsh-git-explorer#git/ping",
+					id: "dsh-plugin-git-explorer#git/ping",
 					service: "git",
 					namespace: "git",
 					method: "ping",
@@ -5890,8 +5890,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						source: "json",
 						codec: {
 							mode: "strict",
-							typeSymbol: "@jpolv/dsh-git-explorer#git/ping:sessionId",
-							create: _jpolv_dsh_git_explorer_git_ping_parameter_0$schema
+							typeSymbol: "dsh-plugin-git-explorer#git/ping:sessionId",
+							create: dsh_plugin_git_explorer_git_ping_parameter_0$schema
 						}
 					}, {
 						name: "requestRoot",
@@ -5899,15 +5899,15 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						source: "json",
 						codec: {
 							mode: "strict",
-							typeSymbol: "@jpolv/dsh-git-explorer#git/ping:requestRoot",
-							create: _jpolv_dsh_git_explorer_git_ping_parameter_1$schema
+							typeSymbol: "dsh-plugin-git-explorer#git/ping:requestRoot",
+							create: dsh_plugin_git_explorer_git_ping_parameter_1$schema
 						}
 					}],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer/types#GitPingResult",
-						create: _jpolv_dsh_git_explorer_git_ping_result$schema
+						typeSymbol: "dsh-plugin-git-explorer/types#GitPingResult",
+						create: dsh_plugin_git_explorer_git_ping_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -5916,7 +5916,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 				},
 				{
-					id: "@jpolv/dsh-git-explorer#git/stage",
+					id: "dsh-plugin-git-explorer#git/stage",
 					service: "git",
 					namespace: "git",
 					method: "stage",
@@ -5928,8 +5928,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/stage:sessionId",
-								create: _jpolv_dsh_git_explorer_git_stage_parameter_0$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/stage:sessionId",
+								create: dsh_plugin_git_explorer_git_stage_parameter_0$schema
 							}
 						},
 						{
@@ -5938,8 +5938,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/stage:requestRoot",
-								create: _jpolv_dsh_git_explorer_git_stage_parameter_1$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/stage:requestRoot",
+								create: dsh_plugin_git_explorer_git_stage_parameter_1$schema
 							}
 						},
 						{
@@ -5948,16 +5948,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/stage:paths",
-								create: _jpolv_dsh_git_explorer_git_stage_parameter_2$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/stage:paths",
+								create: dsh_plugin_git_explorer_git_stage_parameter_2$schema
 							}
 						}
 					],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer/types#GitMutationResult",
-						create: _jpolv_dsh_git_explorer_git_stage_result$schema
+						typeSymbol: "dsh-plugin-git-explorer/types#GitMutationResult",
+						create: dsh_plugin_git_explorer_git_stage_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -5966,7 +5966,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 				},
 				{
-					id: "@jpolv/dsh-git-explorer#git/status",
+					id: "dsh-plugin-git-explorer#git/status",
 					service: "git",
 					namespace: "git",
 					method: "status",
@@ -5977,8 +5977,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						source: "json",
 						codec: {
 							mode: "strict",
-							typeSymbol: "@jpolv/dsh-git-explorer#git/status:sessionId",
-							create: _jpolv_dsh_git_explorer_git_status_parameter_0$schema
+							typeSymbol: "dsh-plugin-git-explorer#git/status:sessionId",
+							create: dsh_plugin_git_explorer_git_status_parameter_0$schema
 						}
 					}, {
 						name: "requestRoot",
@@ -5986,15 +5986,15 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						source: "json",
 						codec: {
 							mode: "strict",
-							typeSymbol: "@jpolv/dsh-git-explorer#git/status:requestRoot",
-							create: _jpolv_dsh_git_explorer_git_status_parameter_1$schema
+							typeSymbol: "dsh-plugin-git-explorer#git/status:requestRoot",
+							create: dsh_plugin_git_explorer_git_status_parameter_1$schema
 						}
 					}],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer/types#GitStatusSummary",
-						create: _jpolv_dsh_git_explorer_git_status_result$schema
+						typeSymbol: "dsh-plugin-git-explorer/types#GitStatusSummary",
+						create: dsh_plugin_git_explorer_git_status_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -6003,7 +6003,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 				},
 				{
-					id: "@jpolv/dsh-git-explorer#git/unstage",
+					id: "dsh-plugin-git-explorer#git/unstage",
 					service: "git",
 					namespace: "git",
 					method: "unstage",
@@ -6015,8 +6015,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/unstage:sessionId",
-								create: _jpolv_dsh_git_explorer_git_unstage_parameter_0$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/unstage:sessionId",
+								create: dsh_plugin_git_explorer_git_unstage_parameter_0$schema
 							}
 						},
 						{
@@ -6025,8 +6025,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/unstage:requestRoot",
-								create: _jpolv_dsh_git_explorer_git_unstage_parameter_1$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/unstage:requestRoot",
+								create: dsh_plugin_git_explorer_git_unstage_parameter_1$schema
 							}
 						},
 						{
@@ -6035,16 +6035,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							source: "json",
 							codec: {
 								mode: "strict",
-								typeSymbol: "@jpolv/dsh-git-explorer#git/unstage:paths",
-								create: _jpolv_dsh_git_explorer_git_unstage_parameter_2$schema
+								typeSymbol: "dsh-plugin-git-explorer#git/unstage:paths",
+								create: dsh_plugin_git_explorer_git_unstage_parameter_2$schema
 							}
 						}
 					],
 					cancellation: { parameter: "signal" },
 					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer/types#GitMutationResult",
-						create: _jpolv_dsh_git_explorer_git_unstage_result$schema
+						typeSymbol: "dsh-plugin-git-explorer/types#GitMutationResult",
+						create: dsh_plugin_git_explorer_git_unstage_result$schema
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
@@ -6155,53 +6155,53 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		//#region \0dsh-css:L:\source\deepseek-harness-git-explorer-plugin\packages\git-explorer\src\client\GitBody.module.css.mjs
 		const css$2 = "._7vE8PW_panel {\n  padding: 10px 12px;\n  font-size: .88em;\n  line-height: 1.4;\n}\n\n._7vE8PW_panelHeader {\n  justify-content: space-between;\n  align-items: flex-start;\n  gap: 8px;\n  display: flex;\n}\n\n._7vE8PW_boundaryError {\n  color: var(--dsw-alias-state-error-primary);\n  padding: 10px 12px;\n}\n\n._7vE8PW_branchColumn {\n  flex-direction: column;\n  gap: 2px;\n  min-width: 0;\n  display: flex;\n}\n\n._7vE8PW_branchRow {\n  flex-wrap: wrap;\n  align-items: baseline;\n  gap: 6px;\n  display: flex;\n}\n\n._7vE8PW_strong {\n  font-weight: 600;\n}\n\n._7vE8PW_secondary {\n  color: var(--dsw-alias-label-secondary);\n}\n\n._7vE8PW_tertiary {\n  color: var(--dsw-alias-label-tertiary);\n}\n\n._7vE8PW_tertiaryBreak {\n  color: var(--dsw-alias-label-tertiary);\n  word-break: break-all;\n}\n\n._7vE8PW_tertiaryPadded {\n  color: var(--dsw-alias-label-tertiary);\n  flex-shrink: 0;\n  padding-left: 6px;\n}\n\n._7vE8PW_warn {\n  color: var(--dsw-alias-state-warn-label);\n}\n\n._7vE8PW_errorText {\n  color: var(--dsw-alias-state-error-primary);\n}\n\n._7vE8PW_breakAll {\n  word-break: break-all;\n}\n\n._7vE8PW_ellipsis {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  overflow: hidden;\n}\n\n._7vE8PW_growEllipsis {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  flex: 1;\n  overflow: hidden;\n}\n\n._7vE8PW_glyphSlot {\n  flex-shrink: 0;\n  width: 16px;\n}\n\n._7vE8PW_treeTop {\n  padding-top: 4px;\n}\n\n._7vE8PW_groupBlock {\n  padding-top: 6px;\n}\n\n._7vE8PW_row {\n  box-sizing: border-box;\n  color: inherit;\n  cursor: pointer;\n  font: inherit;\n  padding: 1px 4px;\n  padding-left: calc(4px + var(--indent, 0) * 14px);\n  text-align: left;\n  background: none;\n  border: none;\n  border-radius: 4px;\n  align-items: center;\n  gap: 4px;\n  width: 100%;\n  display: flex;\n}\n\n._7vE8PW_row:hover {\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n\n._7vE8PW_groupHeader {\n  gap: 4px;\n}\n\n._7vE8PW_countBadge {\n  background: var(--dsw-alias-bg-layer-3);\n  color: var(--dsw-alias-label-secondary);\n  border-radius: 8px;\n  margin-left: 4px;\n  padding: 0 6px;\n  font-size: .85em;\n}\n\n._7vE8PW_bulkAction {\n  color: var(--dsw-alias-label-secondary);\n  cursor: pointer;\n  font: inherit;\n  background: none;\n  border: none;\n  margin-left: auto;\n  padding: 0 2px;\n}\n\n._7vE8PW_iconAction {\n  color: var(--dsw-alias-label-secondary);\n  cursor: pointer;\n  background: none;\n  border: none;\n  padding: 0 2px;\n  display: flex;\n}\n\n._7vE8PW_statusLetter {\n  flex-shrink: 0;\n  padding-left: 6px;\n}\n\n._7vE8PW_toneModified, ._7vE8PW_toneTypechange {\n  color: var(--dsw-alias-state-warn-label);\n}\n\n._7vE8PW_toneAdded, ._7vE8PW_toneUntracked {\n  color: var(--dsw-alias-state-success-primary);\n}\n\n._7vE8PW_toneDeleted, ._7vE8PW_toneConflicted {\n  color: var(--dsw-alias-state-error-primary);\n}\n\n._7vE8PW_toneRenamed, ._7vE8PW_toneCopied {\n  color: var(--dsw-alias-state-business-primary);\n}\n\n._7vE8PW_outlineButton {\n  border: 1px solid var(--dsw-alias-border-l3);\n  color: var(--dsw-alias-label-primary);\n  cursor: pointer;\n  font: inherit;\n  background: none;\n  border-radius: 4px;\n  flex-shrink: 0;\n  padding: 1px 8px;\n}\n\n._7vE8PW_dangerButton {\n  background: var(--dsw-alias-state-error-primary);\n  color: var(--dsw-alias-label-primary-inverted);\n  cursor: pointer;\n  font: inherit;\n  border: none;\n  border-radius: 4px;\n  margin-left: auto;\n  padding: 1px 8px;\n}\n\n._7vE8PW_commitBox {\n  flex-direction: column;\n  gap: 4px;\n  padding-top: 8px;\n  display: flex;\n}\n\n._7vE8PW_commitInput {\n  background: var(--dsw-alias-bg-layer-2);\n  border: 1px solid var(--dsw-alias-border-l3);\n  box-sizing: border-box;\n  color: inherit;\n  font: inherit;\n  resize: vertical;\n  border-radius: 4px;\n  width: 100%;\n  padding: 4px 6px;\n}\n\n._7vE8PW_commitRow {\n  align-items: center;\n  gap: 8px;\n  display: flex;\n}\n\n._7vE8PW_commitButton {\n  background: var(--dsw-alias-state-business-primary);\n  color: var(--dsw-alias-label-primary-inverted);\n  cursor: pointer;\n  font: inherit;\n  border: none;\n  border-radius: 4px;\n  padding: 3px 12px;\n  font-weight: 600;\n}\n\n._7vE8PW_commitButtonDisabled {\n  background: var(--dsw-alias-bg-layer-3);\n  color: var(--dsw-alias-label-secondary);\n  cursor: default;\n  font: inherit;\n  border: none;\n  border-radius: 4px;\n  padding: 3px 12px;\n  font-weight: 600;\n}\n\n._7vE8PW_amendLabel {\n  color: var(--dsw-alias-label-secondary);\n  align-items: center;\n  gap: 4px;\n  display: flex;\n}\n\n._7vE8PW_commitHint {\n  color: var(--dsw-alias-label-tertiary);\n  margin-left: auto;\n}\n\n._7vE8PW_noticeOk {\n  color: var(--dsw-alias-state-success-primary);\n  padding-top: 6px;\n}\n\n._7vE8PW_noticeError {\n  color: var(--dsw-alias-state-error-primary);\n  padding-top: 6px;\n}\n\n._7vE8PW_confirmBar {\n  background: var(--dsw-alias-bg-layer-2);\n  border: 1px solid var(--dsw-alias-border-l3);\n  border-radius: 4px;\n  align-items: center;\n  gap: 8px;\n  margin-top: 6px;\n  padding: 4px 6px;\n  display: flex;\n}\n\n._7vE8PW_diagnostics {\n  border-top: 1px solid var(--dsw-alias-border-l3);\n  color: var(--dsw-alias-label-tertiary);\n  margin-top: 10px;\n  padding-top: 10px;\n}\n\n._7vE8PW_diagRow {\n  gap: 8px;\n  padding: 1px 0;\n  display: flex;\n}\n\n._7vE8PW_diagLabel {\n  color: var(--dsw-alias-label-tertiary);\n  min-width: 104px;\n}\n";
 		const classes$2 = {
-			"commitInput": "_7vE8PW_commitInput",
-			"toneAdded": "_7vE8PW_toneAdded",
-			"breakAll": "_7vE8PW_breakAll",
-			"errorText": "_7vE8PW_errorText",
-			"panel": "_7vE8PW_panel",
-			"secondary": "_7vE8PW_secondary",
-			"toneRenamed": "_7vE8PW_toneRenamed",
-			"toneTypechange": "_7vE8PW_toneTypechange",
-			"toneModified": "_7vE8PW_toneModified",
-			"toneDeleted": "_7vE8PW_toneDeleted",
-			"toneCopied": "_7vE8PW_toneCopied",
-			"commitRow": "_7vE8PW_commitRow",
-			"countBadge": "_7vE8PW_countBadge",
-			"bulkAction": "_7vE8PW_bulkAction",
-			"commitBox": "_7vE8PW_commitBox",
-			"commitButton": "_7vE8PW_commitButton",
-			"branchColumn": "_7vE8PW_branchColumn",
-			"tertiaryPadded": "_7vE8PW_tertiaryPadded",
-			"branchRow": "_7vE8PW_branchRow",
-			"dangerButton": "_7vE8PW_dangerButton",
-			"groupHeader": "_7vE8PW_groupHeader",
-			"groupBlock": "_7vE8PW_groupBlock",
-			"statusLetter": "_7vE8PW_statusLetter",
-			"commitHint": "_7vE8PW_commitHint",
-			"growEllipsis": "_7vE8PW_growEllipsis",
-			"tertiary": "_7vE8PW_tertiary",
-			"diagnostics": "_7vE8PW_diagnostics",
-			"tertiaryBreak": "_7vE8PW_tertiaryBreak",
 			"strong": "_7vE8PW_strong",
-			"treeTop": "_7vE8PW_treeTop",
-			"glyphSlot": "_7vE8PW_glyphSlot",
-			"row": "_7vE8PW_row",
-			"panelHeader": "_7vE8PW_panelHeader",
-			"warn": "_7vE8PW_warn",
-			"iconAction": "_7vE8PW_iconAction",
-			"boundaryError": "_7vE8PW_boundaryError",
-			"toneUntracked": "_7vE8PW_toneUntracked",
-			"outlineButton": "_7vE8PW_outlineButton",
+			"commitRow": "_7vE8PW_commitRow",
+			"commitButton": "_7vE8PW_commitButton",
 			"amendLabel": "_7vE8PW_amendLabel",
+			"statusLetter": "_7vE8PW_statusLetter",
+			"treeTop": "_7vE8PW_treeTop",
+			"groupBlock": "_7vE8PW_groupBlock",
+			"commitButtonDisabled": "_7vE8PW_commitButtonDisabled",
 			"noticeOk": "_7vE8PW_noticeOk",
-			"noticeError": "_7vE8PW_noticeError",
+			"diagnostics": "_7vE8PW_diagnostics",
+			"boundaryError": "_7vE8PW_boundaryError",
+			"toneRenamed": "_7vE8PW_toneRenamed",
+			"diagLabel": "_7vE8PW_diagLabel",
+			"toneUntracked": "_7vE8PW_toneUntracked",
+			"warn": "_7vE8PW_warn",
+			"confirmBar": "_7vE8PW_confirmBar",
+			"commitBox": "_7vE8PW_commitBox",
+			"glyphSlot": "_7vE8PW_glyphSlot",
+			"errorText": "_7vE8PW_errorText",
+			"toneModified": "_7vE8PW_toneModified",
+			"dangerButton": "_7vE8PW_dangerButton",
+			"tertiary": "_7vE8PW_tertiary",
+			"panel": "_7vE8PW_panel",
+			"diagRow": "_7vE8PW_diagRow",
+			"toneAdded": "_7vE8PW_toneAdded",
+			"growEllipsis": "_7vE8PW_growEllipsis",
+			"row": "_7vE8PW_row",
 			"ellipsis": "_7vE8PW_ellipsis",
 			"toneConflicted": "_7vE8PW_toneConflicted",
-			"commitButtonDisabled": "_7vE8PW_commitButtonDisabled",
-			"confirmBar": "_7vE8PW_confirmBar",
-			"diagRow": "_7vE8PW_diagRow",
-			"diagLabel": "_7vE8PW_diagLabel"
+			"toneCopied": "_7vE8PW_toneCopied",
+			"secondary": "_7vE8PW_secondary",
+			"breakAll": "_7vE8PW_breakAll",
+			"panelHeader": "_7vE8PW_panelHeader",
+			"commitHint": "_7vE8PW_commitHint",
+			"branchRow": "_7vE8PW_branchRow",
+			"commitInput": "_7vE8PW_commitInput",
+			"tertiaryPadded": "_7vE8PW_tertiaryPadded",
+			"noticeError": "_7vE8PW_noticeError",
+			"tertiaryBreak": "_7vE8PW_tertiaryBreak",
+			"countBadge": "_7vE8PW_countBadge",
+			"groupHeader": "_7vE8PW_groupHeader",
+			"toneDeleted": "_7vE8PW_toneDeleted",
+			"toneTypechange": "_7vE8PW_toneTypechange",
+			"branchColumn": "_7vE8PW_branchColumn",
+			"outlineButton": "_7vE8PW_outlineButton",
+			"iconAction": "_7vE8PW_iconAction",
+			"bulkAction": "_7vE8PW_bulkAction"
 		};
 		const tagId$2 = "dsh-plugin-git-explorer/src/client/GitBody.module.css";
 		if (typeof document !== "undefined") {
@@ -7184,15 +7184,15 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		//#region \0dsh-css:L:\source\deepseek-harness-git-explorer-plugin\packages\git-explorer\src\client\GitDiffBody.module.css.mjs
 		const css$1 = "._7TTuGW_diffBody {\n  min-width: 0;\n  padding: 10px 12px;\n}\n\n._7TTuGW_diffLoading {\n  padding: 10px 12px;\n}\n\n._7TTuGW_diffError {\n  color: var(--dsw-alias-state-error-primary);\n  padding: 10px 12px;\n}\n\n._7TTuGW_diffHeader {\n  color: var(--dsw-alias-label-secondary);\n  padding-bottom: 6px;\n}\n\n._7TTuGW_diffHeaderWarn {\n  color: var(--dsw-alias-state-warn-label);\n  padding-bottom: 6px;\n}\n\n._7TTuGW_diffTitleRow {\n  align-items: baseline;\n  gap: 8px;\n  padding-bottom: 6px;\n  display: flex;\n}\n\n._7TTuGW_diffPath {\n  word-break: break-all;\n  font-weight: 600;\n}\n\n._7TTuGW_diffTotals {\n  color: var(--dsw-alias-label-secondary);\n  margin-left: auto;\n}\n\n._7TTuGW_secondary {\n  color: var(--dsw-alias-label-secondary);\n}\n\n._7TTuGW_outlineButton {\n  border: 1px solid var(--dsw-alias-border-l3);\n  color: var(--dsw-alias-label-primary);\n  cursor: pointer;\n  font: inherit;\n  background: none;\n  border-radius: 4px;\n  flex-shrink: 0;\n  padding: 1px 8px;\n}\n";
 		const classes$1 = {
+			"diffLoading": "_7TTuGW_diffLoading",
+			"diffBody": "_7TTuGW_diffBody",
 			"diffTotals": "_7TTuGW_diffTotals",
+			"diffHeaderWarn": "_7TTuGW_diffHeaderWarn",
+			"diffHeader": "_7TTuGW_diffHeader",
+			"diffError": "_7TTuGW_diffError",
+			"diffTitleRow": "_7TTuGW_diffTitleRow",
 			"diffPath": "_7TTuGW_diffPath",
 			"outlineButton": "_7TTuGW_outlineButton",
-			"diffHeader": "_7TTuGW_diffHeader",
-			"diffLoading": "_7TTuGW_diffLoading",
-			"diffError": "_7TTuGW_diffError",
-			"diffBody": "_7TTuGW_diffBody",
-			"diffTitleRow": "_7TTuGW_diffTitleRow",
-			"diffHeaderWarn": "_7TTuGW_diffHeaderWarn",
 			"secondary": "_7TTuGW_secondary"
 		};
 		const tagId$1 = "dsh-plugin-git-explorer/src/client/GitDiffBody.module.css";

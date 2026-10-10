@@ -146,7 +146,7 @@ export default defineConfig({
     // The package's own generated Remote projection must be inlined: it is not a
     // platform module, and the page has no other way to obtain its schemas. `zod`
     // comes with it (the shipped remote assembly inlines it the same way).
-    alwaysBundle: [/^@jpolv\/dsh-git-explorer(\/|$)/, 'zod'],
+    alwaysBundle: [/^dsh-plugin-git-explorer(\/|$)/, 'zod'],
   },
   plugins: [cssModules()],
   outputOptions: {

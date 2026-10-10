@@ -1,8 +1,8 @@
 {
-  "name": "@jpolv/dsh-git-explorer",
+  "name": "dsh-plugin-git-explorer",
   "version": "0.1.0-m6",
   "private": true,
-  "description": "Build project for the Git Explorer DSH plugin: the Cordis/Typert project the published root package points at. Never installed on its own.",
+  "description": "Build project for the Git Explorer DSH plugin: the Cordis/Typert project the published root package points at. It carries the installed package's name on purpose — the Typert loader binds generated artifacts to the mounting package (PLAN.md §19) — and is never installed on its own.",
   "type": "module",
   "license": "MIT",
   "main": "lib/index.js",
