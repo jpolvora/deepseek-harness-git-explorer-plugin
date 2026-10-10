@@ -748,6 +748,8 @@ Three small additions on top of a working panel, each verified by tests rather t
 
 Tests now total **55** (16 parser, 8 tree, 6 numstat, 6 diff, 19 panel).
 
+**Verified in the running GUI** (commit `d0e1883`): rows carry `+N −M` counts, a half-written commit message survives a reload, and a freshly opened comparison tab offers **Open file**. One caveat worth knowing: a tab's navigation parameters are captured when it opens, so a comparison tab opened *before* this build carries no workspace root and shows no button — clicking the file again opens a fresh tab with them.
+
 ---
 
 ## Appendix A — research artifacts produced for this plan
