@@ -8,8 +8,13 @@
 
 /* ---- panel shell ---------------------------------------------------------- */
 
+/*
+ * The panel's type scale: a touch below the app's base size so a dense change list still fits
+ * beside the conversation. Buttons inherit it (ont: inherit), so one value covers the chrome.
+ */
 .panel {
-  line-height: 1.5;
+  font-size: 0.94em;
+  line-height: 1.45;
   padding: 10px 12px;
 }
 
