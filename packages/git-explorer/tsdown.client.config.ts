@@ -15,7 +15,14 @@
  *  - `require` resolves the page's frozen module table, so those requests must never
  *    be bundled. Everything else under `@deepseek-ai/` is a shared row for the same
  *    reason.
+ *  - `*.module.css` is compiled by the plugin below: the page loads one JavaScript
+ *    artifact per plugin, so a stylesheet has to travel inside it. The plugin lives in
+ *    this file because tsdown's config loader does not resolve a relative `.ts` import.
  */
+import { existsSync, readFileSync } from 'node:fs'
+import { sep } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import { transform } from 'lightningcss'
 import { defineConfig } from 'tsdown'
 
 const PACKAGE_NAME = '@jpolv/dsh-git-explorer'
@@ -32,6 +39,82 @@ const FROZEN_MODULE_TABLE = new Set([
   '@deepseek-ai/dsh-client-ui-primitives',
   '@deepseek-ai/dsh-client-ui-dockkit',
 ])
+
+/** The virtual-id prefix that keeps module CSS away from the bundler's CSS pipeline. */
+const CSS_VIRTUAL_PREFIX = '\0dsh-css:'
+
+/**
+ * The virtual-id suffix. It must NOT be `.css`: tsdown's own guard claims those ids and
+ * fails the build with "'@tsdown/css' is not installed".
+ */
+const CSS_VIRTUAL_SUFFIX = '.mjs'
+
+/**
+ * Compile one stylesheet into a module carrying its class map and its own style tag.
+ *
+ * @param filename - the stylesheet's absolute path, used for hashing and diagnostics.
+ * @param source - the stylesheet's text.
+ * @returns the module source.
+ */
+function emitCssModule(filename: string, source: string): string {
+  const compiled = transform({
+    filename,
+    code: Buffer.from(source),
+    cssModules: true,
+    minify: false,
+    sourceMap: false,
+  })
+  const classes: Record<string, string> = {}
+  for (const [original, entry] of Object.entries(compiled.exports)) classes[original] = entry.name
+  return [
+    `const css = ${JSON.stringify(compiled.code.toString())};`,
+    `const classes = ${JSON.stringify(classes)};`,
+    `const tagId = ${JSON.stringify(PACKAGE_NAME)};`,
+    'if (typeof document !== "undefined") {',
+    '  let tag = document.querySelector(`style[data-plugin="${tagId}"]`);',
+    '  if (tag === null) {',
+    '    tag = document.createElement("style");',
+    '    tag.setAttribute("data-plugin", tagId);',
+    '    document.head.appendChild(tag);',
+    '  }',
+    '  if (tag.textContent !== css) tag.textContent = css;',
+    '}',
+    'export default classes;',
+    '',
+  ].join('\n')
+}
+
+/**
+ * The CSS Modules plugin for this bundle.
+ *
+ * The importer is the *compiled* JavaScript under `lib/types/`, while the stylesheets
+ * live beside the sources: this repository mirrors `lib/types/**` from `src/**`, so the
+ * path is mapped back before it is read. A stylesheet that really does sit next to the
+ * compiled output is still found, because the original path is tried too.
+ *
+ * @returns a rolldown-compatible plugin.
+ */
+function cssModules() {
+  return {
+    name: 'dsh-css-modules',
+    resolveId(source: string, importer: string | undefined) {
+      if (!source.endsWith('.module.css')) return null
+      const absolute = importer === undefined
+        ? source
+        : fileURLToPath(new URL(source, pathToFileURL(importer)))
+      const fromSource = absolute
+        .replace(`${sep}lib${sep}types${sep}`, `${sep}src${sep}`)
+        .replaceAll('/', sep)
+      const resolved = existsSync(fromSource) ? fromSource : absolute
+      return `${CSS_VIRTUAL_PREFIX}${resolved}${CSS_VIRTUAL_SUFFIX}`
+    },
+    load(id: string) {
+      if (!id.startsWith(CSS_VIRTUAL_PREFIX) || !id.endsWith(CSS_VIRTUAL_SUFFIX)) return null
+      const filename = id.slice(CSS_VIRTUAL_PREFIX.length, id.length - CSS_VIRTUAL_SUFFIX.length)
+      return emitCssModule(filename, readFileSync(filename, 'utf8'))
+    },
+  }
+}
 
 export default defineConfig({
   entry: { client: 'lib/types/client/index.js' },
@@ -51,6 +134,7 @@ export default defineConfig({
     // comes with it (the shipped remote assembly inlines it the same way).
     alwaysBundle: [/^@jpolv\/dsh-git-explorer(\/|$)/, 'zod'],
   },
+  plugins: [cssModules()],
   outputOptions: {
     entryFileNames: 'client.js',
     banner: `window.__ModuleLoader__.load({ id: ${JSON.stringify(PACKAGE_NAME)}, factory: (require) => {`,

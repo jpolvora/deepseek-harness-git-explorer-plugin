@@ -1,1 +1,1 @@
-{"version":3,"file":"GitTitle.js","sourceRoot":"","sources":["../../../src/client/GitTitle.tsx"],"names":[],"mappings":";AASA;;;;GAIG;AACH,MAAM,UAAU,QAAQ;IACtB,OAAO,iCAAgB,CAAA;AACzB,CAAC"}
+{"version":3,"file":"GitTitle.js","sourceRoot":"","sources":["../../../src/client/GitTitle.tsx"],"names":[],"mappings":";AAQA,OAAO,MAAM,MAAM,uBAAuB,CAAA;AAE1C;;;;GAIG;AACH,MAAM,UAAU,QAAQ;IACtB,OAAO,eAAM,SAAS,EAAE,MAAM,CAAC,KAAK,oBAAY,CAAA;AAClD,CAAC"}

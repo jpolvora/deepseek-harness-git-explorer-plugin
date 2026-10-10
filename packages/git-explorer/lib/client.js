@@ -6152,6 +6152,68 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			return toNodes(root);
 		}
 		//#endregion
+		//#region \0dsh-css:L:\source\deepseek-harness-git-explorer-plugin\packages\git-explorer\src\client\GitBody.module.css.mjs
+		const css$2 = "._7vE8PW_panel {\n  padding: 10px 12px;\n  line-height: 1.5;\n}\n\n._7vE8PW_panelHeader {\n  justify-content: space-between;\n  align-items: flex-start;\n  gap: 8px;\n  display: flex;\n}\n\n._7vE8PW_boundaryError {\n  color: var(--dsw-alias-state-error-primary);\n  padding: 10px 12px;\n}\n\n._7vE8PW_branchColumn {\n  flex-direction: column;\n  gap: 2px;\n  min-width: 0;\n  display: flex;\n}\n\n._7vE8PW_branchRow {\n  flex-wrap: wrap;\n  align-items: baseline;\n  gap: 6px;\n  display: flex;\n}\n\n._7vE8PW_strong {\n  font-weight: 600;\n}\n\n._7vE8PW_secondary {\n  color: var(--dsw-alias-label-secondary);\n}\n\n._7vE8PW_tertiary {\n  color: var(--dsw-alias-label-tertiary);\n}\n\n._7vE8PW_tertiaryBreak {\n  color: var(--dsw-alias-label-tertiary);\n  word-break: break-all;\n}\n\n._7vE8PW_tertiaryPadded {\n  color: var(--dsw-alias-label-tertiary);\n  flex-shrink: 0;\n  padding-left: 6px;\n}\n\n._7vE8PW_warn {\n  color: var(--dsw-alias-state-warn-label);\n}\n\n._7vE8PW_errorText {\n  color: var(--dsw-alias-state-error-primary);\n}\n\n._7vE8PW_breakAll {\n  word-break: break-all;\n}\n\n._7vE8PW_ellipsis {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  overflow: hidden;\n}\n\n._7vE8PW_growEllipsis {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  flex: 1;\n  overflow: hidden;\n}\n\n._7vE8PW_glyphSlot {\n  flex-shrink: 0;\n  width: 16px;\n}\n\n._7vE8PW_treeTop {\n  padding-top: 4px;\n}\n\n._7vE8PW_groupBlock {\n  padding-top: 6px;\n}\n\n._7vE8PW_row {\n  box-sizing: border-box;\n  color: inherit;\n  cursor: pointer;\n  font: inherit;\n  padding: 1px 4px;\n  padding-left: calc(4px + var(--indent, 0) * 14px);\n  text-align: left;\n  background: none;\n  border: none;\n  border-radius: 4px;\n  align-items: center;\n  gap: 4px;\n  width: 100%;\n  display: flex;\n}\n\n._7vE8PW_row:hover {\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n\n._7vE8PW_groupHeader {\n  gap: 4px;\n}\n\n._7vE8PW_countBadge {\n  background: var(--dsw-alias-bg-layer-3);\n  color: var(--dsw-alias-label-secondary);\n  border-radius: 8px;\n  margin-left: 4px;\n  padding: 0 6px;\n  font-size: .85em;\n}\n\n._7vE8PW_bulkAction {\n  color: var(--dsw-alias-label-secondary);\n  cursor: pointer;\n  font: inherit;\n  background: none;\n  border: none;\n  margin-left: auto;\n  padding: 0 2px;\n}\n\n._7vE8PW_iconAction {\n  color: var(--dsw-alias-label-secondary);\n  cursor: pointer;\n  background: none;\n  border: none;\n  padding: 0 2px;\n  display: flex;\n}\n\n._7vE8PW_statusLetter {\n  flex-shrink: 0;\n  padding-left: 6px;\n}\n\n._7vE8PW_toneModified, ._7vE8PW_toneTypechange {\n  color: var(--dsw-alias-state-warn-label);\n}\n\n._7vE8PW_toneAdded, ._7vE8PW_toneUntracked {\n  color: var(--dsw-alias-state-success-primary);\n}\n\n._7vE8PW_toneDeleted, ._7vE8PW_toneConflicted {\n  color: var(--dsw-alias-state-error-primary);\n}\n\n._7vE8PW_toneRenamed, ._7vE8PW_toneCopied {\n  color: var(--dsw-alias-state-business-primary);\n}\n\n._7vE8PW_outlineButton {\n  border: 1px solid var(--dsw-alias-border-l3);\n  color: var(--dsw-alias-label-primary);\n  cursor: pointer;\n  font: inherit;\n  background: none;\n  border-radius: 4px;\n  flex-shrink: 0;\n  padding: 1px 8px;\n}\n\n._7vE8PW_dangerButton {\n  background: var(--dsw-alias-state-error-primary);\n  color: var(--dsw-alias-label-primary-inverted);\n  cursor: pointer;\n  font: inherit;\n  border: none;\n  border-radius: 4px;\n  margin-left: auto;\n  padding: 1px 8px;\n}\n\n._7vE8PW_commitBox {\n  flex-direction: column;\n  gap: 4px;\n  padding-top: 8px;\n  display: flex;\n}\n\n._7vE8PW_commitInput {\n  background: var(--dsw-alias-bg-layer-2);\n  border: 1px solid var(--dsw-alias-border-l3);\n  box-sizing: border-box;\n  color: inherit;\n  font: inherit;\n  resize: vertical;\n  border-radius: 4px;\n  width: 100%;\n  padding: 4px 6px;\n}\n\n._7vE8PW_commitRow {\n  align-items: center;\n  gap: 8px;\n  display: flex;\n}\n\n._7vE8PW_commitButton {\n  background: var(--dsw-alias-state-business-primary);\n  color: var(--dsw-alias-label-primary-inverted);\n  cursor: pointer;\n  font: inherit;\n  border: none;\n  border-radius: 4px;\n  padding: 3px 12px;\n  font-weight: 600;\n}\n\n._7vE8PW_commitButtonDisabled {\n  background: var(--dsw-alias-bg-layer-3);\n  color: var(--dsw-alias-label-secondary);\n  cursor: default;\n  font: inherit;\n  border: none;\n  border-radius: 4px;\n  padding: 3px 12px;\n  font-weight: 600;\n}\n\n._7vE8PW_amendLabel {\n  color: var(--dsw-alias-label-secondary);\n  align-items: center;\n  gap: 4px;\n  display: flex;\n}\n\n._7vE8PW_commitHint {\n  color: var(--dsw-alias-label-tertiary);\n  margin-left: auto;\n}\n\n._7vE8PW_noticeOk {\n  color: var(--dsw-alias-state-success-primary);\n  padding-top: 6px;\n}\n\n._7vE8PW_noticeError {\n  color: var(--dsw-alias-state-error-primary);\n  padding-top: 6px;\n}\n\n._7vE8PW_confirmBar {\n  background: var(--dsw-alias-bg-layer-2);\n  border: 1px solid var(--dsw-alias-border-l3);\n  border-radius: 4px;\n  align-items: center;\n  gap: 8px;\n  margin-top: 6px;\n  padding: 4px 6px;\n  display: flex;\n}\n\n._7vE8PW_diagnostics {\n  border-top: 1px solid var(--dsw-alias-border-l3);\n  color: var(--dsw-alias-label-tertiary);\n  margin-top: 10px;\n  padding-top: 10px;\n}\n\n._7vE8PW_diagRow {\n  gap: 8px;\n  padding: 1px 0;\n  display: flex;\n}\n\n._7vE8PW_diagLabel {\n  color: var(--dsw-alias-label-tertiary);\n  min-width: 104px;\n}\n";
+		const classes$2 = {
+			"boundaryError": "_7vE8PW_boundaryError",
+			"commitBox": "_7vE8PW_commitBox",
+			"diagRow": "_7vE8PW_diagRow",
+			"toneCopied": "_7vE8PW_toneCopied",
+			"countBadge": "_7vE8PW_countBadge",
+			"noticeOk": "_7vE8PW_noticeOk",
+			"growEllipsis": "_7vE8PW_growEllipsis",
+			"breakAll": "_7vE8PW_breakAll",
+			"toneConflicted": "_7vE8PW_toneConflicted",
+			"noticeError": "_7vE8PW_noticeError",
+			"groupBlock": "_7vE8PW_groupBlock",
+			"statusLetter": "_7vE8PW_statusLetter",
+			"panel": "_7vE8PW_panel",
+			"toneAdded": "_7vE8PW_toneAdded",
+			"panelHeader": "_7vE8PW_panelHeader",
+			"strong": "_7vE8PW_strong",
+			"treeTop": "_7vE8PW_treeTop",
+			"bulkAction": "_7vE8PW_bulkAction",
+			"branchColumn": "_7vE8PW_branchColumn",
+			"toneRenamed": "_7vE8PW_toneRenamed",
+			"warn": "_7vE8PW_warn",
+			"iconAction": "_7vE8PW_iconAction",
+			"confirmBar": "_7vE8PW_confirmBar",
+			"ellipsis": "_7vE8PW_ellipsis",
+			"tertiaryPadded": "_7vE8PW_tertiaryPadded",
+			"groupHeader": "_7vE8PW_groupHeader",
+			"row": "_7vE8PW_row",
+			"commitInput": "_7vE8PW_commitInput",
+			"diagnostics": "_7vE8PW_diagnostics",
+			"dangerButton": "_7vE8PW_dangerButton",
+			"outlineButton": "_7vE8PW_outlineButton",
+			"toneModified": "_7vE8PW_toneModified",
+			"secondary": "_7vE8PW_secondary",
+			"diagLabel": "_7vE8PW_diagLabel",
+			"glyphSlot": "_7vE8PW_glyphSlot",
+			"errorText": "_7vE8PW_errorText",
+			"tertiaryBreak": "_7vE8PW_tertiaryBreak",
+			"tertiary": "_7vE8PW_tertiary",
+			"toneUntracked": "_7vE8PW_toneUntracked",
+			"branchRow": "_7vE8PW_branchRow",
+			"toneTypechange": "_7vE8PW_toneTypechange",
+			"commitButton": "_7vE8PW_commitButton",
+			"commitHint": "_7vE8PW_commitHint",
+			"toneDeleted": "_7vE8PW_toneDeleted",
+			"commitRow": "_7vE8PW_commitRow",
+			"commitButtonDisabled": "_7vE8PW_commitButtonDisabled",
+			"amendLabel": "_7vE8PW_amendLabel"
+		};
+		const tagId$2 = "@jpolv/dsh-git-explorer";
+		if (typeof document !== "undefined") {
+			let tag = document.querySelector(`style[data-plugin="${tagId$2}"]`);
+			if (tag === null) {
+				tag = document.createElement("style");
+				tag.setAttribute("data-plugin", tagId$2);
+				document.head.appendChild(tag);
+			}
+			if (tag.textContent !== css$2) tag.textContent = css$2;
+		}
+		//#endregion
 		//#region lib/types/client/locales.js
 		/**
 		* The panel's words, in English and Chinese.
@@ -6321,62 +6383,54 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			conflicted: "U",
 			untracked: "U"
 		};
-		/** The tone each status letter carries, matching VS Code's reading of the states. */
-		const STATUS_TONE = {
-			modified: "var(--dsw-alias-state-warn-label)",
-			added: "var(--dsw-alias-state-success-primary)",
-			deleted: "var(--dsw-alias-state-error-primary)",
-			renamed: "var(--dsw-alias-state-business-primary)",
-			copied: "var(--dsw-alias-state-business-primary)",
-			typechange: "var(--dsw-alias-state-warn-label)",
-			conflicted: "var(--dsw-alias-state-error-primary)",
-			untracked: "var(--dsw-alias-state-success-primary)"
+		/**
+		* One class name from the stylesheet.
+		*
+		* The lookup is by key because `noUncheckedIndexedAccess` types every index result as
+		* possibly absent; falling back to the key keeps a missing rule visible in the DOM rather
+		* than rendering the string "undefined".
+		*
+		* @param name - the selector's name in the stylesheet.
+		* @returns the hashed class name.
+		*/
+		function cls(name) {
+			return classes$2[name] ?? name;
+		}
+		/** The class each status letter carries, matching VS Code's reading of the states. */
+		const TONE_CLASS = {
+			modified: cls("toneModified"),
+			added: cls("toneAdded"),
+			deleted: cls("toneDeleted"),
+			renamed: cls("toneRenamed"),
+			copied: cls("toneCopied"),
+			typechange: cls("toneTypechange"),
+			conflicted: cls("toneConflicted"),
+			untracked: cls("toneUntracked")
 		};
-		/** The muted tokens the panel draws its secondary text with. */
-		const SECONDARY = "var(--dsw-alias-label-secondary)";
-		const TERTIARY = "var(--dsw-alias-label-tertiary)";
-		/** Indent one nesting level. */
-		const INDENT_PX = 14;
 		/** The localStorage key holding this tab's collapsed groups and directories. */
 		const COLLAPSE_KEY_PREFIX = "dsh.git-explorer.collapsed.v1.";
 		/** One label/value diagnostic line. */
 		function Row({ label, value }) {
 			return (0, react_jsx_runtime.jsxs)("div", {
-				style: {
-					display: "flex",
-					gap: "8px",
-					padding: "1px 0"
-				},
+				className: classes$2.diagRow,
 				children: [(0, react_jsx_runtime.jsx)("span", {
-					style: {
-						minWidth: "104px",
-						color: TERTIARY
-					},
+					className: classes$2.diagLabel,
 					children: label
 				}), (0, react_jsx_runtime.jsx)("span", {
-					style: { wordBreak: "break-all" },
+					className: classes$2.breakAll,
 					children: value
 				})]
 			});
 		}
-		/** The shared geometry of one tree row. */
-		function rowStyle(depth, hovered) {
-			return {
-				display: "flex",
-				alignItems: "center",
-				gap: "4px",
-				width: "100%",
-				padding: "1px 4px",
-				paddingLeft: `${String(4 + depth * INDENT_PX)}px`,
-				background: hovered ? "var(--dsw-alias-interactive-bg-hover)" : "transparent",
-				border: "none",
-				borderRadius: "4px",
-				color: "inherit",
-				cursor: "pointer",
-				font: "inherit",
-				textAlign: "left",
-				boxSizing: "border-box"
-			};
+		/**
+		* The one value JavaScript still contributes to a row's look: its nesting depth, which
+		* the stylesheet turns into padding through `--indent`.
+		*
+		* @param depth - how deep the row sits in the tree.
+		* @returns the custom property the row class reads.
+		*/
+		function indentStyle(depth) {
+			return { ["--indent"]: depth };
 		}
 		/** A borderless icon control, sized for a tree row. */
 		function IconAction({ title, icon: Icon, run }) {
@@ -6388,14 +6442,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					event.stopPropagation();
 					run();
 				},
-				style: {
-					background: "transparent",
-					border: "none",
-					color: SECONDARY,
-					cursor: "pointer",
-					display: "flex",
-					padding: "0 2px"
-				},
+				className: classes$2.iconAction,
 				children: (0, react_jsx_runtime.jsx)(Icon, { size: 14 })
 			});
 		}
@@ -6410,16 +6457,13 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				onClick: () => {
 					onToggle(node.path);
 				},
-				style: rowStyle(depth, false),
+				className: classes$2.row,
+				style: indentStyle(depth),
 				children: [
 					(0, react_jsx_runtime.jsx)(Chevron, { size: 16 }),
 					(0, react_jsx_runtime.jsx)(Folder, { size: 16 }),
 					(0, react_jsx_runtime.jsx)("span", {
-						style: {
-							overflow: "hidden",
-							textOverflow: "ellipsis",
-							whiteSpace: "nowrap"
-						},
+						className: classes$2.ellipsis,
 						children: node.name
 					})
 				]
@@ -6430,7 +6474,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		function FileRow({ node, depth, hovered, onHover, actions, onOpen, counts }) {
 			const change = node.change;
 			if (change === void 0) return (0, react_jsx_runtime.jsx)("div", {
-				style: rowStyle(depth, false),
+				className: classes$2.row,
+				style: indentStyle(depth),
 				children: (0, react_jsx_runtime.jsx)("span", { children: node.name })
 			});
 			return (0, react_jsx_runtime.jsxs)("div", {
@@ -6443,46 +6488,28 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				onMouseLeave: () => {
 					onHover(void 0);
 				},
-				style: rowStyle(depth, hovered),
+				className: classes$2.row,
+				style: indentStyle(depth),
 				children: [
-					(0, react_jsx_runtime.jsx)("span", { style: {
-						width: 16,
-						flexShrink: 0
-					} }),
+					(0, react_jsx_runtime.jsx)("span", { className: classes$2.glyphSlot }),
 					(0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.FileTypeIcon, {
 						kind: (0, _deepseek_ai_dsh_client_ui_primitives.classifyFileType)(node.name),
 						size: 16
 					}),
 					(0, react_jsx_runtime.jsx)("span", {
-						style: {
-							flex: 1,
-							overflow: "hidden",
-							textOverflow: "ellipsis",
-							whiteSpace: "nowrap"
-						},
+						className: classes$2.growEllipsis,
 						children: node.name
 					}),
 					change.origPath === void 0 ? null : (0, react_jsx_runtime.jsx)("span", {
-						style: {
-							color: TERTIARY,
-							flexShrink: 0
-						},
+						className: classes$2.tertiary,
 						children: change.origPath.split("/").pop()
 					}),
 					counts === void 0 || counts.binary ? null : (0, react_jsx_runtime.jsx)("span", {
-						style: {
-							color: TERTIARY,
-							flexShrink: 0,
-							paddingLeft: "6px"
-						},
+						className: classes$2.tertiaryPadded,
 						children: `+${String(counts.added)} −${String(counts.removed)}`
 					}),
 					hovered ? actions.map((action) => (0, react_jsx_runtime.jsx)(IconAction, { ...action }, action.title)) : (0, react_jsx_runtime.jsx)("span", {
-						style: {
-							color: STATUS_TONE[change.status],
-							flexShrink: 0,
-							paddingLeft: "6px"
-						},
+						className: `${cls("statusLetter")} ${TONE_CLASS[change.status]}`,
 						children: STATUS_LETTER[change.status]
 					})
 				]
@@ -6524,30 +6551,20 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			const isCollapsed = collapsedGroups.has(title);
 			const Chevron = isCollapsed ? _deepseek_ai_dsh_client_ui_primitives.IconChevronRightOutlineRegular : _deepseek_ai_dsh_client_ui_primitives.IconChevronDownOutlineRegular;
 			return (0, react_jsx_runtime.jsxs)("div", {
-				style: { paddingTop: "6px" },
+				className: classes$2.groupBlock,
 				children: [(0, react_jsx_runtime.jsxs)("div", {
 					onClick: () => {
 						onToggleGroup(title);
 					},
-					style: {
-						...rowStyle(0, false),
-						gap: "4px"
-					},
+					className: `${classes$2.row} ${classes$2.groupHeader}`,
 					children: [
 						(0, react_jsx_runtime.jsx)(Chevron, { size: 16 }),
 						(0, react_jsx_runtime.jsx)("span", {
-							style: { fontWeight: 600 },
+							className: classes$2.strong,
 							children: title
 						}),
 						(0, react_jsx_runtime.jsx)("span", {
-							style: {
-								background: "var(--dsw-alias-bg-layer-3)",
-								borderRadius: "8px",
-								color: SECONDARY,
-								fontSize: "0.85em",
-								marginLeft: "4px",
-								padding: "0 6px"
-							},
+							className: classes$2.countBadge,
 							children: changes.length
 						}),
 						bulk === void 0 ? null : (0, react_jsx_runtime.jsx)("button", {
@@ -6556,15 +6573,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								event.stopPropagation();
 								bulk.run();
 							},
-							style: {
-								background: "transparent",
-								border: "none",
-								color: SECONDARY,
-								cursor: "pointer",
-								font: "inherit",
-								marginLeft: "auto",
-								padding: "0 2px"
-							},
+							className: classes$2.bulkAction,
 							children: bulk.label
 						})
 					]
@@ -6585,38 +6594,25 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		function BranchLine({ status, t }) {
 			const branch = status.branch ?? (status.detached ? t("panel.detached") : status.unborn ? t("panel.unborn") : t("panel.unknownBranch"));
 			return (0, react_jsx_runtime.jsxs)("div", {
-				style: {
-					display: "flex",
-					flexDirection: "column",
-					gap: "2px",
-					minWidth: 0
-				},
+				className: classes$2.branchColumn,
 				children: [(0, react_jsx_runtime.jsxs)("div", {
-					style: {
-						display: "flex",
-						alignItems: "baseline",
-						gap: "6px",
-						flexWrap: "wrap"
-					},
+					className: classes$2.branchRow,
 					children: [
 						(0, react_jsx_runtime.jsx)("span", {
-							style: { fontWeight: 600 },
+							className: classes$2.strong,
 							children: branch
 						}),
 						status.upstream === null ? null : (0, react_jsx_runtime.jsx)("span", {
-							style: { color: SECONDARY },
+							className: classes$2.secondary,
 							children: `↑${String(status.ahead)} ↓${String(status.behind)}`
 						}),
 						status.operation === null ? null : (0, react_jsx_runtime.jsx)("span", {
-							style: { color: "var(--dsw-alias-state-warn-label)" },
+							className: classes$2.warn,
 							children: t("panel.operation", { operation: status.operation })
 						})
 					]
 				}), status.root === null ? null : (0, react_jsx_runtime.jsx)("div", {
-					style: {
-						color: TERTIARY,
-						wordBreak: "break-all"
-					},
+					className: classes$2.tertiaryBreak,
 					children: status.root
 				})]
 			});
@@ -6625,12 +6621,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit, t }) {
 			const ready = message.trim() !== "" && !busy;
 			return (0, react_jsx_runtime.jsxs)("div", {
-				style: {
-					display: "flex",
-					flexDirection: "column",
-					gap: "4px",
-					paddingTop: "8px"
-				},
+				className: classes$2.commitBox,
 				children: [(0, react_jsx_runtime.jsx)("textarea", {
 					value: message,
 					placeholder: t("commit.placeholder"),
@@ -6645,47 +6636,19 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							if (ready) onCommit();
 						}
 					},
-					style: {
-						background: "var(--dsw-alias-bg-layer-2)",
-						border: "1px solid var(--dsw-alias-border-l3)",
-						borderRadius: "4px",
-						color: "inherit",
-						font: "inherit",
-						padding: "4px 6px",
-						resize: "vertical",
-						width: "100%",
-						boxSizing: "border-box"
-					}
+					className: classes$2.commitInput
 				}), (0, react_jsx_runtime.jsxs)("div", {
-					style: {
-						display: "flex",
-						alignItems: "center",
-						gap: "8px"
-					},
+					className: classes$2.commitRow,
 					children: [
 						(0, react_jsx_runtime.jsx)("button", {
 							type: "button",
 							disabled: !ready,
 							onClick: onCommit,
-							style: {
-								background: ready ? "var(--dsw-alias-state-business-primary)" : "var(--dsw-alias-bg-layer-3)",
-								border: "none",
-								borderRadius: "4px",
-								color: ready ? "var(--dsw-alias-label-primary-inverted)" : SECONDARY,
-								cursor: ready ? "pointer" : "default",
-								font: "inherit",
-								fontWeight: 600,
-								padding: "3px 12px"
-							},
+							className: ready ? classes$2.commitButton : classes$2.commitButtonDisabled,
 							children: busy ? t("commit.busy") : amend ? t("commit.amendButton") : t("commit.button")
 						}),
 						(0, react_jsx_runtime.jsxs)("label", {
-							style: {
-								color: SECONDARY,
-								display: "flex",
-								alignItems: "center",
-								gap: "4px"
-							},
+							className: classes$2.amendLabel,
 							children: [(0, react_jsx_runtime.jsx)("input", {
 								type: "checkbox",
 								checked: amend,
@@ -6695,10 +6658,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							}), t("commit.amend")]
 						}),
 						(0, react_jsx_runtime.jsx)("span", {
-							style: {
-								color: TERTIARY,
-								marginLeft: "auto"
-							},
+							className: classes$2.commitHint,
 							children: t("commit.hint")
 						})
 					]
@@ -6710,16 +6670,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			return (0, react_jsx_runtime.jsx)("button", {
 				type: "button",
 				onClick,
-				style: {
-					background: "transparent",
-					border: "1px solid var(--dsw-alias-border-l3)",
-					borderRadius: "4px",
-					color: "var(--dsw-alias-label-primary)",
-					cursor: "pointer",
-					font: "inherit",
-					padding: "1px 8px",
-					flexShrink: 0
-				},
+				className: classes$2.outlineButton,
 				children: label
 			});
 		}
@@ -6739,10 +6690,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			}
 			render() {
 				if (this.state.failure !== null) return (0, react_jsx_runtime.jsx)("div", {
-					style: {
-						padding: "10px 12px",
-						color: "var(--dsw-alias-state-error-primary)"
-					},
+					className: classes$2.boundaryError,
 					children: fill(en["panel.failed"], { message: this.state.failure })
 				});
 				return this.props.children;
@@ -7055,20 +7003,12 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				}
 			});
 			return (0, react_jsx_runtime.jsxs)("div", {
-				style: {
-					padding: "10px 12px",
-					lineHeight: 1.5
-				},
+				className: classes$2.panel,
 				children: [
 					(0, react_jsx_runtime.jsxs)("div", {
-						style: {
-							display: "flex",
-							alignItems: "flex-start",
-							justifyContent: "space-between",
-							gap: "8px"
-						},
+						className: classes$2.panelHeader,
 						children: [status === null ? (0, react_jsx_runtime.jsx)("span", {
-							style: { fontWeight: 600 },
+							className: classes$2.strong,
 							children: t("type.label")
 						}) : (0, react_jsx_runtime.jsx)(BranchLine, {
 							status,
@@ -7102,41 +7042,20 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						}
 					}),
 					notice === null ? null : (0, react_jsx_runtime.jsx)("div", {
-						style: {
-							color: notice.ok ? "var(--dsw-alias-state-success-primary)" : "var(--dsw-alias-state-error-primary)",
-							paddingTop: "6px"
-						},
+						className: notice.ok ? classes$2.noticeOk : classes$2.noticeError,
 						children: notice.detail
 					}),
 					pendingDiscard === null ? null : (0, react_jsx_runtime.jsxs)("div", {
-						style: {
-							background: "var(--dsw-alias-bg-layer-2)",
-							border: "1px solid var(--dsw-alias-border-l3)",
-							borderRadius: "4px",
-							display: "flex",
-							alignItems: "center",
-							gap: "8px",
-							marginTop: "6px",
-							padding: "4px 6px"
-						},
+						className: classes$2.confirmBar,
 						children: [
 							(0, react_jsx_runtime.jsx)("span", {
-								style: { color: "var(--dsw-alias-state-warn-label)" },
+								className: classes$2.warn,
 								children: t("discard.confirm", { count: String(pendingDiscard.tracked.length + pendingDiscard.untracked.length) })
 							}),
 							(0, react_jsx_runtime.jsx)("button", {
 								type: "button",
 								onClick: confirmDiscard,
-								style: {
-									background: "var(--dsw-alias-state-error-primary)",
-									border: "none",
-									borderRadius: "4px",
-									color: "var(--dsw-alias-label-primary-inverted)",
-									cursor: "pointer",
-									font: "inherit",
-									marginLeft: "auto",
-									padding: "1px 8px"
-								},
+								className: classes$2.dangerButton,
 								children: t("action.discard")
 							}),
 							(0, react_jsx_runtime.jsx)("button", {
@@ -7144,37 +7063,29 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								onClick: () => {
 									setPendingDiscard(null);
 								},
-								style: {
-									background: "transparent",
-									border: "1px solid var(--dsw-alias-border-l3)",
-									borderRadius: "4px",
-									color: "var(--dsw-alias-label-primary)",
-									cursor: "pointer",
-									font: "inherit",
-									padding: "1px 8px"
-								},
+								className: classes$2.outlineButton,
 								children: t("action.cancel")
 							})
 						]
 					}),
 					(0, react_jsx_runtime.jsx)("div", {
 						role: "tree",
-						style: { paddingTop: "4px" },
+						className: classes$2.treeTop,
 						children: outcome === null ? (0, react_jsx_runtime.jsx)("div", {
-							style: { color: SECONDARY },
+							className: classes$2.secondary,
 							children: t("panel.reading")
 						}) : "unavailable" in outcome ? (0, react_jsx_runtime.jsx)("div", {
-							style: { color: "var(--dsw-alias-state-error-primary)" },
+							className: classes$2.errorText,
 							children: outcome.unavailable
 						}) : !outcome.isRepo ? (0, react_jsx_runtime.jsxs)("div", {
-							style: { color: SECONDARY },
+							className: classes$2.secondary,
 							children: [t("panel.notRepo"), outcome.note === "" ? null : (0, react_jsx_runtime.jsx)("div", {
-								style: { color: TERTIARY },
+								className: classes$2.tertiary,
 								children: outcome.note
 							})]
 						}) : (0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, { children: [
 							outcome.conflicted.length === 0 ? null : (0, react_jsx_runtime.jsx)("div", {
-								style: { color: "var(--dsw-alias-state-warn-label)" },
+								className: classes$2.warn,
 								children: `${String(outcome.conflicted.length)} ${t("panel.conflicted")}`
 							}),
 							(0, react_jsx_runtime.jsx)(Group, {
@@ -7222,18 +7133,13 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								...groupProps
 							}),
 							total === 0 ? (0, react_jsx_runtime.jsx)("div", {
-								style: { color: SECONDARY },
+								className: classes$2.secondary,
 								children: t("panel.clean")
 							}) : null
 						] })
 					}),
 					(0, react_jsx_runtime.jsxs)("div", {
-						style: {
-							paddingTop: "10px",
-							marginTop: "10px",
-							borderTop: "1px solid var(--dsw-alias-border-l3)",
-							color: TERTIARY
-						},
+						className: classes$2.diagnostics,
 						children: [
 							(0, react_jsx_runtime.jsx)(Row, {
 								label: t("diagnostics.session"),
@@ -7272,6 +7178,31 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					})
 				]
 			});
+		}
+		//#endregion
+		//#region \0dsh-css:L:\source\deepseek-harness-git-explorer-plugin\packages\git-explorer\src\client\GitDiffBody.module.css.mjs
+		const css$1 = "._7TTuGW_diffBody {\n  min-width: 0;\n  padding: 10px 12px;\n}\n\n._7TTuGW_diffLoading {\n  padding: 10px 12px;\n}\n\n._7TTuGW_diffError {\n  color: var(--dsw-alias-state-error-primary);\n  padding: 10px 12px;\n}\n\n._7TTuGW_diffHeader {\n  color: var(--dsw-alias-label-secondary);\n  padding-bottom: 6px;\n}\n\n._7TTuGW_diffHeaderWarn {\n  color: var(--dsw-alias-state-warn-label);\n  padding-bottom: 6px;\n}\n\n._7TTuGW_diffTitleRow {\n  align-items: baseline;\n  gap: 8px;\n  padding-bottom: 6px;\n  display: flex;\n}\n\n._7TTuGW_diffPath {\n  word-break: break-all;\n  font-weight: 600;\n}\n\n._7TTuGW_diffTotals {\n  color: var(--dsw-alias-label-secondary);\n  margin-left: auto;\n}\n\n._7TTuGW_secondary {\n  color: var(--dsw-alias-label-secondary);\n}\n\n._7TTuGW_outlineButton {\n  border: 1px solid var(--dsw-alias-border-l3);\n  color: var(--dsw-alias-label-primary);\n  cursor: pointer;\n  font: inherit;\n  background: none;\n  border-radius: 4px;\n  flex-shrink: 0;\n  padding: 1px 8px;\n}\n";
+		const classes$1 = {
+			"diffPath": "_7TTuGW_diffPath",
+			"diffError": "_7TTuGW_diffError",
+			"diffTotals": "_7TTuGW_diffTotals",
+			"secondary": "_7TTuGW_secondary",
+			"outlineButton": "_7TTuGW_outlineButton",
+			"diffHeaderWarn": "_7TTuGW_diffHeaderWarn",
+			"diffLoading": "_7TTuGW_diffLoading",
+			"diffBody": "_7TTuGW_diffBody",
+			"diffHeader": "_7TTuGW_diffHeader",
+			"diffTitleRow": "_7TTuGW_diffTitleRow"
+		};
+		const tagId$1 = "@jpolv/dsh-git-explorer";
+		if (typeof document !== "undefined") {
+			let tag = document.querySelector(`style[data-plugin="${tagId$1}"]`);
+			if (tag === null) {
+				tag = document.createElement("style");
+				tag.setAttribute("data-plugin", tagId$1);
+				document.head.appendChild(tag);
+			}
+			if (tag.textContent !== css$1) tag.textContent = css$1;
 		}
 		//#endregion
 		//#region lib/types/client/GitDiffBody.js
@@ -7314,10 +7245,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		/** A read-only line of chrome above the diff. */
 		function Header({ text, tone }) {
 			return (0, react_jsx_runtime.jsx)("div", {
-				style: {
-					color: tone ?? "var(--dsw-alias-label-secondary)",
-					paddingBottom: "6px"
-				},
+				className: tone === void 0 ? classes$1.diffHeader : classes$1.diffHeaderWarn,
 				children: text
 			});
 		}
@@ -7367,14 +7295,11 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				untracked
 			]);
 			if (outcome === null) return (0, react_jsx_runtime.jsx)("div", {
-				style: { padding: "10px 12px" },
+				className: classes$1.diffLoading,
 				children: (0, react_jsx_runtime.jsx)(Header, { text: t("diff.reading") })
 			});
 			if ("unavailable" in outcome) return (0, react_jsx_runtime.jsx)("div", {
-				style: {
-					padding: "10px 12px",
-					color: "var(--dsw-alias-state-error-primary)"
-				},
+				className: classes$1.diffError,
 				children: outcome.unavailable
 			});
 			const diff = outcome;
@@ -7386,35 +7311,21 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			const relative = diff.root === "" ? null : relativeToWorkspace(workspaceRoot, `${diff.root}/${diff.path}`);
 			const openable = relative !== null && sessionId !== void 0 && tabRef.current !== void 0;
 			return (0, react_jsx_runtime.jsxs)("div", {
-				style: {
-					padding: "10px 12px",
-					minWidth: 0
-				},
+				className: classes$1.diffBody,
 				children: [
 					(0, react_jsx_runtime.jsxs)("div", {
-						style: {
-							display: "flex",
-							gap: "8px",
-							alignItems: "baseline",
-							paddingBottom: "6px"
-						},
+						className: classes$1.diffTitleRow,
 						children: [
 							(0, react_jsx_runtime.jsx)("span", {
-								style: {
-									fontWeight: 600,
-									wordBreak: "break-all"
-								},
+								className: classes$1.diffPath,
 								children: diff.path
 							}),
 							(0, react_jsx_runtime.jsx)("span", {
-								style: { color: "var(--dsw-alias-label-secondary)" },
+								className: classes$1.secondary,
 								children: staged ? t("diff.stagedLabel") : t("diff.unstagedLabel")
 							}),
 							totals === null ? null : (0, react_jsx_runtime.jsx)("span", {
-								style: {
-									marginLeft: "auto",
-									color: "var(--dsw-alias-label-secondary)"
-								},
+								className: classes$1.diffTotals,
 								children: `+${String(totals.added)} −${String(totals.removed)}`
 							}),
 							openable ? (0, react_jsx_runtime.jsx)("button", {
@@ -7424,16 +7335,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 									if (actions === void 0 || relative === null || sessionId === void 0) return;
 									actions.openResource(fileAddress(sessionId, relative));
 								},
-								style: {
-									background: "transparent",
-									border: "1px solid var(--dsw-alias-border-l3)",
-									borderRadius: "4px",
-									color: "var(--dsw-alias-label-primary)",
-									cursor: "pointer",
-									flexShrink: 0,
-									font: "inherit",
-									padding: "1px 8px"
-								},
+								className: classes$1.outlineButton,
 								children: t("action.openFile")
 							}) : null
 						]
@@ -7459,6 +7361,20 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			});
 		}
 		//#endregion
+		//#region \0dsh-css:L:\source\deepseek-harness-git-explorer-plugin\packages\git-explorer\src\client\GitTitle.module.css.mjs
+		const css = ".cUEaga_title {\n  color: var(--dsw-alias-label-primary);\n  font-weight: 600;\n}\n";
+		const classes = { "title": "cUEaga_title" };
+		const tagId = "@jpolv/dsh-git-explorer";
+		if (typeof document !== "undefined") {
+			let tag = document.querySelector(`style[data-plugin="${tagId}"]`);
+			if (tag === null) {
+				tag = document.createElement("style");
+				tag.setAttribute("data-plugin", tagId);
+				document.head.appendChild(tag);
+			}
+			if (tag.textContent !== css) tag.textContent = css;
+		}
+		//#endregion
 		//#region lib/types/client/GitTitle.js
 		/**
 		* Render the chip content.
@@ -7466,7 +7382,10 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		* @returns the chip label.
 		*/
 		function GitTitle() {
-			return (0, react_jsx_runtime.jsx)("span", { children: "Git" });
+			return (0, react_jsx_runtime.jsx)("span", {
+				className: classes.title,
+				children: "Git"
+			});
 		}
 		//#endregion
 		//#region lib/types/client/index.js

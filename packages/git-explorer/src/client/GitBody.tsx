@@ -25,6 +25,7 @@ import {
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import { buildChangeTree, type ChangeTreeNode } from './change-tree.js'
 import { GIT_DIFF_TAB_KIND } from '../types.js'
+import styles from './GitBody.module.css'
 import { en, fill, translator, type Translate } from './locales.js'
 import type {
   GitChange,
@@ -107,21 +108,30 @@ const STATUS_LETTER: Record<GitFileStatus, string> = {
   untracked: 'U',
 }
 
-/** The tone each status letter carries, matching VS Code's reading of the states. */
-const STATUS_TONE: Record<GitFileStatus, string> = {
-  modified: 'var(--dsw-alias-state-warn-label)',
-  added: 'var(--dsw-alias-state-success-primary)',
-  deleted: 'var(--dsw-alias-state-error-primary)',
-  renamed: 'var(--dsw-alias-state-business-primary)',
-  copied: 'var(--dsw-alias-state-business-primary)',
-  typechange: 'var(--dsw-alias-state-warn-label)',
-  conflicted: 'var(--dsw-alias-state-error-primary)',
-  untracked: 'var(--dsw-alias-state-success-primary)',
+/**
+ * One class name from the stylesheet.
+ *
+ * The lookup is by key because `noUncheckedIndexedAccess` types every index result as
+ * possibly absent; falling back to the key keeps a missing rule visible in the DOM rather
+ * than rendering the string "undefined".
+ *
+ * @param name - the selector's name in the stylesheet.
+ * @returns the hashed class name.
+ */
+function cls(name: string): string {
+  return styles[name] ?? name
 }
-
-/** The muted tokens the panel draws its secondary text with. */
-const SECONDARY = 'var(--dsw-alias-label-secondary)'
-const TERTIARY = 'var(--dsw-alias-label-tertiary)'
+/** The class each status letter carries, matching VS Code's reading of the states. */
+const TONE_CLASS: Record<GitFileStatus, string> = {
+  modified: cls('toneModified'),
+  added: cls('toneAdded'),
+  deleted: cls('toneDeleted'),
+  renamed: cls('toneRenamed'),
+  copied: cls('toneCopied'),
+  typechange: cls('toneTypechange'),
+  conflicted: cls('toneConflicted'),
+  untracked: cls('toneUntracked'),
+}
 
 /** Indent one nesting level. */
 const INDENT_PX = 14
@@ -139,31 +149,22 @@ interface RowAction {
 /** One label/value diagnostic line. */
 function Row({ label, value }: { label: string; value: string }): React.ReactElement {
   return (
-    <div style={{ display: 'flex', gap: '8px', padding: '1px 0' }}>
-      <span style={{ minWidth: '104px', color: TERTIARY }}>{label}</span>
-      <span style={{ wordBreak: 'break-all' }}>{value}</span>
+    <div className={styles.diagRow}>
+      <span className={styles.diagLabel}>{label}</span>
+      <span className={styles.breakAll}>{value}</span>
     </div>
   )
 }
 
-/** The shared geometry of one tree row. */
-function rowStyle(depth: number, hovered: boolean): React.CSSProperties {
-  return {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    width: '100%',
-    padding: '1px 4px',
-    paddingLeft: `${String(4 + depth * INDENT_PX)}px`,
-    background: hovered ? 'var(--dsw-alias-interactive-bg-hover)' : 'transparent',
-    border: 'none',
-    borderRadius: '4px',
-    color: 'inherit',
-    cursor: 'pointer',
-    font: 'inherit',
-    textAlign: 'left',
-    boxSizing: 'border-box',
-  }
+/**
+ * The one value JavaScript still contributes to a row's look: its nesting depth, which
+ * the stylesheet turns into padding through `--indent`.
+ *
+ * @param depth - how deep the row sits in the tree.
+ * @returns the custom property the row class reads.
+ */
+function indentStyle(depth: number): React.CSSProperties {
+  return { ['--indent']: depth } as React.CSSProperties
 }
 
 /** A borderless icon control, sized for a tree row. */
@@ -177,14 +178,7 @@ function IconAction({ title, icon: Icon, run }: RowAction): React.ReactElement {
         event.stopPropagation()
         run()
       }}
-      style={{
-        background: 'transparent',
-        border: 'none',
-        color: SECONDARY,
-        cursor: 'pointer',
-        display: 'flex',
-        padding: '0 2px',
-      }}
+      className={styles.iconAction}
     >
       <Icon size={14} />
     </button>
@@ -202,10 +196,10 @@ function DirectoryRow({ node, depth, collapsed, onToggle }: {
   const Chevron = isCollapsed ? IconChevronRightOutlineRegular : IconChevronDownOutlineRegular
   const Folder = isCollapsed ? IconFolderCloseRegular : IconFolderOpenRegular
   return (
-    <div role="treeitem" aria-expanded={!isCollapsed} onClick={() => { onToggle(node.path) }} style={rowStyle(depth, false)}>
+    <div role="treeitem" aria-expanded={!isCollapsed} onClick={() => { onToggle(node.path) }} className={styles.row} style={indentStyle(depth)}>
       <Chevron size={16} />
       <Folder size={16} />
-      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{node.name}</span>
+      <span className={styles.ellipsis}>{node.name}</span>
     </div>
   )
 }
@@ -224,7 +218,7 @@ function FileRow({ node, depth, hovered, onHover, actions, onOpen, counts }: {
 }): React.ReactElement {
   const change = node.change
   if (change === undefined) {
-    return <div style={rowStyle(depth, false)}><span>{node.name}</span></div>
+    return <div className={styles.row} style={indentStyle(depth)}><span>{node.name}</span></div>
   }
   return (
     <div
@@ -233,27 +227,27 @@ function FileRow({ node, depth, hovered, onHover, actions, onOpen, counts }: {
       onClick={onOpen}
       onMouseEnter={() => { onHover(change.path) }}
       onMouseLeave={() => { onHover(undefined) }}
-      style={rowStyle(depth, hovered)}
+      className={styles.row} style={indentStyle(depth)}
     >
-      <span style={{ width: 16, flexShrink: 0 }} />
+      <span className={styles.glyphSlot} />
       <FileTypeIcon kind={classifyFileType(node.name)} size={16} />
-      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span className={styles.growEllipsis}>
         {node.name}
       </span>
       {change.origPath === undefined
         ? null
-        : <span style={{ color: TERTIARY, flexShrink: 0 }}>{change.origPath.split('/').pop()}</span>}
+        : <span className={styles.tertiary}>{change.origPath.split('/').pop()}</span>}
       {counts === undefined || counts.binary
         ? null
         : (
-          <span style={{ color: TERTIARY, flexShrink: 0, paddingLeft: '6px' }}>
+          <span className={styles.tertiaryPadded}>
             {`+${String(counts.added)} −${String(counts.removed)}`}
           </span>
         )}
       {hovered
         ? actions.map((action) => <IconAction key={action.title} {...action} />)
         : (
-          <span style={{ color: STATUS_TONE[change.status], flexShrink: 0, paddingLeft: '6px' }}>
+          <span className={`${cls('statusLetter')} ${TONE_CLASS[change.status]}`}>
             {STATUS_LETTER[change.status]}
           </span>
         )}
@@ -332,18 +326,11 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
   const isCollapsed = collapsedGroups.has(title)
   const Chevron = isCollapsed ? IconChevronRightOutlineRegular : IconChevronDownOutlineRegular
   return (
-    <div style={{ paddingTop: '6px' }}>
-      <div onClick={() => { onToggleGroup(title) }} style={{ ...rowStyle(0, false), gap: '4px' }}>
+    <div className={styles.groupBlock}>
+      <div onClick={() => { onToggleGroup(title) }} className={`${styles.row} ${styles.groupHeader}`}>
         <Chevron size={16} />
-        <span style={{ fontWeight: 600 }}>{title}</span>
-        <span style={{
-          background: 'var(--dsw-alias-bg-layer-3)',
-          borderRadius: '8px',
-          color: SECONDARY,
-          fontSize: '0.85em',
-          marginLeft: '4px',
-          padding: '0 6px',
-        }}>
+        <span className={styles.strong}>{title}</span>
+        <span className={styles.countBadge}>
           {changes.length}
         </span>
         {bulk === undefined
@@ -355,15 +342,7 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
                 event.stopPropagation()
                 bulk.run()
               }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: SECONDARY,
-                cursor: 'pointer',
-                font: 'inherit',
-                marginLeft: 'auto',
-                padding: '0 2px',
-              }}
+              className={styles.bulkAction}
             >
               {bulk.label}
             </button>
@@ -392,17 +371,17 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
 function BranchLine({ status, t }: { status: GitStatusSummary; t: Translate }): React.ReactElement {
   const branch = status.branch ?? (status.detached ? t('panel.detached') : status.unborn ? t('panel.unborn') : t('panel.unknownBranch'))
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
-        <span style={{ fontWeight: 600 }}>{branch}</span>
+    <div className={styles.branchColumn}>
+      <div className={styles.branchRow}>
+        <span className={styles.strong}>{branch}</span>
         {status.upstream === null
           ? null
-          : <span style={{ color: SECONDARY }}>{`↑${String(status.ahead)} ↓${String(status.behind)}`}</span>}
+          : <span className={styles.secondary}>{`↑${String(status.ahead)} ↓${String(status.behind)}`}</span>}
         {status.operation === null
           ? null
-          : <span style={{ color: 'var(--dsw-alias-state-warn-label)' }}>{t('panel.operation', { operation: status.operation })}</span>}
+          : <span className={styles.warn}>{t('panel.operation', { operation: status.operation })}</span>}
       </div>
-      {status.root === null ? null : <div style={{ color: TERTIARY, wordBreak: 'break-all' }}>{status.root}</div>}
+      {status.root === null ? null : <div className={styles.tertiaryBreak}>{status.root}</div>}
     </div>
   )
 }
@@ -419,7 +398,7 @@ function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit, t }: {
 }): React.ReactElement {
   const ready = message.trim() !== '' && !busy
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px' }}>
+    <div className={styles.commitBox}>
       <textarea
         value={message}
         placeholder={t('commit.placeholder')}
@@ -432,41 +411,22 @@ function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit, t }: {
             if (ready) onCommit()
           }
         }}
-        style={{
-          background: 'var(--dsw-alias-bg-layer-2)',
-          border: '1px solid var(--dsw-alias-border-l3)',
-          borderRadius: '4px',
-          color: 'inherit',
-          font: 'inherit',
-          padding: '4px 6px',
-          resize: 'vertical',
-          width: '100%',
-          boxSizing: 'border-box',
-        }}
+        className={styles.commitInput}
       />
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className={styles.commitRow}>
         <button
           type="button"
           disabled={!ready}
           onClick={onCommit}
-          style={{
-            background: ready ? 'var(--dsw-alias-state-business-primary)' : 'var(--dsw-alias-bg-layer-3)',
-            border: 'none',
-            borderRadius: '4px',
-            color: ready ? 'var(--dsw-alias-label-primary-inverted)' : SECONDARY,
-            cursor: ready ? 'pointer' : 'default',
-            font: 'inherit',
-            fontWeight: 600,
-            padding: '3px 12px',
-          }}
+          className={ready ? styles.commitButton : styles.commitButtonDisabled}
         >
           {busy ? t('commit.busy') : amend ? t('commit.amendButton') : t('commit.button')}
         </button>
-        <label style={{ color: SECONDARY, display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <label className={styles.amendLabel}>
           <input type="checkbox" checked={amend} onChange={(event) => { onAmend(event.target.checked) }} />
           {t('commit.amend')}
         </label>
-        <span style={{ color: TERTIARY, marginLeft: 'auto' }}>{t('commit.hint')}</span>
+        <span className={styles.commitHint}>{t('commit.hint')}</span>
       </div>
     </div>
   )
@@ -478,16 +438,7 @@ function Action({ label, onClick }: { label: string; onClick: () => void }): Rea
     <button
       type="button"
       onClick={onClick}
-      style={{
-        background: 'transparent',
-        border: '1px solid var(--dsw-alias-border-l3)',
-        borderRadius: '4px',
-        color: 'var(--dsw-alias-label-primary)',
-        cursor: 'pointer',
-        font: 'inherit',
-        padding: '1px 8px',
-        flexShrink: 0,
-      }}
+      className={styles.outlineButton}
     >
       {label}
     </button>
@@ -513,7 +464,7 @@ class PanelBoundary extends React.Component<{ children: React.ReactNode }, { fai
   override render(): React.ReactNode {
     if (this.state.failure !== null) {
       return (
-        <div style={{ padding: '10px 12px', color: 'var(--dsw-alias-state-error-primary)' }}>
+        <div className={styles.boundaryError}>
           {fill(en['panel.failed'], { message: this.state.failure })}
         </div>
       )
@@ -844,9 +795,9 @@ function GitPanel({
   })
 
   return (
-    <div style={{ padding: '10px 12px', lineHeight: 1.5 }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-        {status === null ? <span style={{ fontWeight: 600 }}>{t('type.label')}</span> : <BranchLine status={status} t={t} />}
+    <div className={styles.panel}>
+      <div className={styles.panelHeader}>
+        {status === null ? <span className={styles.strong}>{t('type.label')}</span> : <BranchLine status={status} t={t} />}
         <Action label={t('panel.refresh')} onClick={() => { setAttempt((value) => value + 1) }} />
       </div>
 
@@ -875,69 +826,43 @@ function GitPanel({
       )}
 
       {notice === null ? null : (
-        <div style={{ color: notice.ok ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-state-error-primary)', paddingTop: '6px' }}>
+        <div className={notice.ok ? styles.noticeOk : styles.noticeError}>
           {notice.detail}
         </div>
       )}
 
       {pendingDiscard === null ? null : (
-        <div style={{
-          background: 'var(--dsw-alias-bg-layer-2)',
-          border: '1px solid var(--dsw-alias-border-l3)',
-          borderRadius: '4px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          marginTop: '6px',
-          padding: '4px 6px',
-        }}>
-          <span style={{ color: 'var(--dsw-alias-state-warn-label)' }}>
+        <div className={styles.confirmBar}>
+          <span className={styles.warn}>
             {t('discard.confirm', { count: String(pendingDiscard.tracked.length + pendingDiscard.untracked.length) })}
           </span>
           <button
             type="button"
             onClick={confirmDiscard}
-            style={{
-              background: 'var(--dsw-alias-state-error-primary)',
-              border: 'none',
-              borderRadius: '4px',
-              color: 'var(--dsw-alias-label-primary-inverted)',
-              cursor: 'pointer',
-              font: 'inherit',
-              marginLeft: 'auto',
-              padding: '1px 8px',
-            }}
+            className={styles.dangerButton}
           >
             {t('action.discard')}
           </button>
           <button
             type="button"
             onClick={() => { setPendingDiscard(null) }}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--dsw-alias-border-l3)',
-              borderRadius: '4px',
-              color: 'var(--dsw-alias-label-primary)',
-              cursor: 'pointer',
-              font: 'inherit',
-              padding: '1px 8px',
-            }}
+            className={styles.outlineButton}
           >
             {t('action.cancel')}
           </button>
         </div>
       )}
 
-      <div role="tree" style={{ paddingTop: '4px' }}>
+      <div role="tree" className={styles.treeTop}>
         {outcome === null
-          ? <div style={{ color: SECONDARY }}>{t('panel.reading')}</div>
+          ? <div className={styles.secondary}>{t('panel.reading')}</div>
           : 'unavailable' in outcome
-            ? <div style={{ color: 'var(--dsw-alias-state-error-primary)' }}>{outcome.unavailable}</div>
+            ? <div className={styles.errorText}>{outcome.unavailable}</div>
             : !outcome.isRepo
               ? (
-                <div style={{ color: SECONDARY }}>
+                <div className={styles.secondary}>
                   {t('panel.notRepo')}
-                  {outcome.note === '' ? null : <div style={{ color: TERTIARY }}>{outcome.note}</div>}
+                  {outcome.note === '' ? null : <div className={styles.tertiary}>{outcome.note}</div>}
                 </div>
               )
               : (
@@ -945,7 +870,7 @@ function GitPanel({
                   {outcome.conflicted.length === 0
                     ? null
                     : (
-                      <div style={{ color: 'var(--dsw-alias-state-warn-label)' }}>
+                      <div className={styles.warn}>
                         {`${String(outcome.conflicted.length)} ${t('panel.conflicted')}`}
                       </div>
                     )}
@@ -985,18 +910,13 @@ function GitPanel({
                     })}
                     {...groupProps}
                   />
-                  {total === 0 ? <div style={{ color: SECONDARY }}>{t('panel.clean')}</div> : null}
+                  {total === 0 ? <div className={styles.secondary}>{t('panel.clean')}</div> : null}
                 </>
               )}
       </div>
 
       <div
-        style={{
-          paddingTop: '10px',
-          marginTop: '10px',
-          borderTop: '1px solid var(--dsw-alias-border-l3)',
-          color: TERTIARY,
-        }}
+        className={styles.diagnostics}
       >
         <Row label={t('diagnostics.session')} value={sessionId ?? '(none)'} />
         <Row label={t('diagnostics.workspace')} value={requestRoot === '' ? t('diagnostics.unknown') : requestRoot} />

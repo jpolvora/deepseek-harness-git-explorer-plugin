@@ -1,0 +1,318 @@
+/**
+ * The Git panel's stylesheet.
+ *
+ * Every colour is a `--dsw-alias-*` semantic token: the panel takes its look from the
+ * theme rather than from literals, so light and dark are the theme's business. The one
+ * value JavaScript still contributes is a row's nesting depth, passed as `--indent`.
+ */
+
+/* ---- panel shell ---------------------------------------------------------- */
+
+.panel {
+  line-height: 1.5;
+  padding: 10px 12px;
+}
+
+.panelHeader {
+  align-items: flex-start;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.boundaryError {
+  color: var(--dsw-alias-state-error-primary);
+  padding: 10px 12px;
+}
+
+/* ---- branch line --------------------------------------------------------- */
+
+.branchColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.branchRow {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.secondary {
+  color: var(--dsw-alias-label-secondary);
+}
+
+.tertiary {
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.tertiaryBreak {
+  color: var(--dsw-alias-label-tertiary);
+  word-break: break-all;
+}
+
+.tertiaryPadded {
+  color: var(--dsw-alias-label-tertiary);
+  flex-shrink: 0;
+  padding-left: 6px;
+}
+
+.warn {
+  color: var(--dsw-alias-state-warn-label);
+}
+
+.errorText {
+  color: var(--dsw-alias-state-error-primary);
+}
+
+.breakAll {
+  word-break: break-all;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.growEllipsis {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.glyphSlot {
+  flex-shrink: 0;
+  width: 16px;
+}
+
+/* ---- the tree ------------------------------------------------------------ */
+
+.treeTop {
+  padding-top: 4px;
+}
+
+.groupBlock {
+  padding-top: 6px;
+}
+
+/*
+ * One tree row. `--indent` carries the nesting depth so the component keeps passing data
+ * while the spacing stays here; the hover tone is the theme's, not a JS-computed colour.
+ */
+.row {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 4px;
+  padding: 1px 4px;
+  padding-left: calc(4px + var(--indent, 0) * 14px);
+  text-align: left;
+  width: 100%;
+}
+
+.row:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.groupHeader {
+  gap: 4px;
+}
+
+.countBadge {
+  background: var(--dsw-alias-bg-layer-3);
+  border-radius: 8px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 0.85em;
+  margin-left: 4px;
+  padding: 0 6px;
+}
+
+.bulkAction {
+  background: transparent;
+  border: none;
+  color: var(--dsw-alias-label-secondary);
+  cursor: pointer;
+  font: inherit;
+  margin-left: auto;
+  padding: 0 2px;
+}
+
+.iconAction {
+  background: transparent;
+  border: none;
+  color: var(--dsw-alias-label-secondary);
+  cursor: pointer;
+  display: flex;
+  padding: 0 2px;
+}
+
+/* ---- status letters ------------------------------------------------------ */
+
+/* The fixed geometry every status letter shares; the tone class beside it sets the colour. */
+.statusLetter {
+  flex-shrink: 0;
+  padding-left: 6px;
+}
+
+.toneModified,
+.toneTypechange {
+  color: var(--dsw-alias-state-warn-label);
+}
+
+.toneAdded,
+.toneUntracked {
+  color: var(--dsw-alias-state-success-primary);
+}
+
+.toneDeleted,
+.toneConflicted {
+  color: var(--dsw-alias-state-error-primary);
+}
+
+.toneRenamed,
+.toneCopied {
+  color: var(--dsw-alias-state-business-primary);
+}
+
+/* ---- buttons ------------------------------------------------------------- */
+
+.outlineButton {
+  background: transparent;
+  border: 1px solid var(--dsw-alias-border-l3);
+  border-radius: 4px;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  font: inherit;
+  padding: 1px 8px;
+}
+
+.dangerButton {
+  background: var(--dsw-alias-state-error-primary);
+  border: none;
+  border-radius: 4px;
+  color: var(--dsw-alias-label-primary-inverted);
+  cursor: pointer;
+  font: inherit;
+  margin-left: auto;
+  padding: 1px 8px;
+}
+
+/* ---- the commit box ------------------------------------------------------ */
+
+.commitBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+}
+
+.commitInput {
+  background: var(--dsw-alias-bg-layer-2);
+  border: 1px solid var(--dsw-alias-border-l3);
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: inherit;
+  font: inherit;
+  padding: 4px 6px;
+  resize: vertical;
+  width: 100%;
+}
+
+.commitRow {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.commitButton {
+  background: var(--dsw-alias-state-business-primary);
+  border: none;
+  border-radius: 4px;
+  color: var(--dsw-alias-label-primary-inverted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 3px 12px;
+}
+
+.commitButtonDisabled {
+  background: var(--dsw-alias-bg-layer-3);
+  border: none;
+  border-radius: 4px;
+  color: var(--dsw-alias-label-secondary);
+  cursor: default;
+  font: inherit;
+  font-weight: 600;
+  padding: 3px 12px;
+}
+
+.amendLabel {
+  align-items: center;
+  color: var(--dsw-alias-label-secondary);
+  display: flex;
+  gap: 4px;
+}
+
+.commitHint {
+  color: var(--dsw-alias-label-tertiary);
+  margin-left: auto;
+}
+
+/* ---- notices and the discard bar ----------------------------------------- */
+
+.noticeOk {
+  color: var(--dsw-alias-state-success-primary);
+  padding-top: 6px;
+}
+
+.noticeError {
+  color: var(--dsw-alias-state-error-primary);
+  padding-top: 6px;
+}
+
+.confirmBar {
+  align-items: center;
+  background: var(--dsw-alias-bg-layer-2);
+  border: 1px solid var(--dsw-alias-border-l3);
+  border-radius: 4px;
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 4px 6px;
+}
+
+/* ---- diagnostics footer -------------------------------------------------- */
+
+.diagnostics {
+  border-top: 1px solid var(--dsw-alias-border-l3);
+  color: var(--dsw-alias-label-tertiary);
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.diagRow {
+  display: flex;
+  gap: 8px;
+  padding: 1px 0;
+}
+
+.diagLabel {
+  color: var(--dsw-alias-label-tertiary);
+  min-width: 104px;
+}

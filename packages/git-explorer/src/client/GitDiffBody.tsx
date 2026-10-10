@@ -11,6 +11,7 @@
 import * as React from 'react'
 import { DiffBlock, diffTotals } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { GitFileDiffOutcome } from '../types.js'
+import styles from './GitDiffBody.module.css'
 import { translator, type Translate } from './locales.js'
 
 /** The tab-information hook the sidebar injects into every tab body. */
@@ -71,7 +72,7 @@ const LABELS = {
 
 /** A read-only line of chrome above the diff. */
 function Header({ text, tone }: { text: string; tone?: string }): React.ReactElement {
-  return <div style={{ color: tone ?? 'var(--dsw-alias-label-secondary)', paddingBottom: '6px' }}>{text}</div>
+  return <div className={tone === undefined ? styles.diffHeader : styles.diffHeaderWarn}>{text}</div>
 }
 
 /**
@@ -121,10 +122,10 @@ export function GitDiffBody({ sessionId, useTabInfo, translate, gitDiff }: GitDi
     }
   }, [path, staged, untracked])
 
-  if (outcome === null) return <div style={{ padding: '10px 12px' }}><Header text={t('diff.reading')} /></div>
+  if (outcome === null) return <div className={styles.diffLoading}><Header text={t('diff.reading')} /></div>
   if ('unavailable' in outcome) {
     return (
-      <div style={{ padding: '10px 12px', color: 'var(--dsw-alias-state-error-primary)' }}>
+      <div className={styles.diffError}>
         {outcome.unavailable}
       </div>
     )
@@ -138,16 +139,16 @@ export function GitDiffBody({ sessionId, useTabInfo, translate, gitDiff }: GitDi
   const openable = relative !== null && sessionId !== undefined && tabRef.current !== undefined
 
   return (
-    <div style={{ padding: '10px 12px', minWidth: 0 }}>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline', paddingBottom: '6px' }}>
-        <span style={{ fontWeight: 600, wordBreak: 'break-all' }}>{diff.path}</span>
-        <span style={{ color: 'var(--dsw-alias-label-secondary)' }}>
+    <div className={styles.diffBody}>
+      <div className={styles.diffTitleRow}>
+        <span className={styles.diffPath}>{diff.path}</span>
+        <span className={styles.secondary}>
           {staged ? t('diff.stagedLabel') : t('diff.unstagedLabel')}
         </span>
         {totals === null
           ? null
           : (
-            <span style={{ marginLeft: 'auto', color: 'var(--dsw-alias-label-secondary)' }}>
+            <span className={styles.diffTotals}>
               {`+${String(totals.added)} −${String(totals.removed)}`}
             </span>
           )}
@@ -160,16 +161,7 @@ export function GitDiffBody({ sessionId, useTabInfo, translate, gitDiff }: GitDi
                 if (actions === undefined || relative === null || sessionId === undefined) return
                 actions.openResource(fileAddress(sessionId, relative))
               }}
-              style={{
-                background: 'transparent',
-                border: '1px solid var(--dsw-alias-border-l3)',
-                borderRadius: '4px',
-                color: 'var(--dsw-alias-label-primary)',
-                cursor: 'pointer',
-                flexShrink: 0,
-                font: 'inherit',
-                padding: '1px 8px',
-              }}
+              className={styles.outlineButton}
             >
               {t('action.openFile')}
             </button>

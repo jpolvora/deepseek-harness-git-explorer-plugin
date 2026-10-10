@@ -1,0 +1,5 @@
+/* The tab chip: one label, sized and coloured by the product's own tokens. */
+.title {
+  color: var(--dsw-alias-label-primary);
+  font-weight: 600;
+}

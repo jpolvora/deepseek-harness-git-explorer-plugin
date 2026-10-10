@@ -11,6 +11,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  */
 import * as React from 'react';
 import { DiffBlock, diffTotals } from '@deepseek-ai/dsh-client-ui-primitives';
+import styles from './GitDiffBody.module.css';
 import { translator } from './locales.js';
 /** The workspace-relative path of an absolute path, or null when it lies outside. */
 function relativeToWorkspace(workspaceRoot, absolute) {
@@ -43,7 +44,7 @@ const LABELS = {
 };
 /** A read-only line of chrome above the diff. */
 function Header({ text, tone }) {
-    return _jsx("div", { style: { color: tone ?? 'var(--dsw-alias-label-secondary)', paddingBottom: '6px' }, children: text });
+    return _jsx("div", { className: tone === undefined ? styles.diffHeader : styles.diffHeaderWarn, children: text });
 }
 /**
  * Render the comparison.
@@ -89,9 +90,9 @@ export function GitDiffBody({ sessionId, useTabInfo, translate, gitDiff }) {
         };
     }, [path, staged, untracked]);
     if (outcome === null)
-        return _jsx("div", { style: { padding: '10px 12px' }, children: _jsx(Header, { text: t('diff.reading') }) });
+        return _jsx("div", { className: styles.diffLoading, children: _jsx(Header, { text: t('diff.reading') }) });
     if ('unavailable' in outcome) {
-        return (_jsx("div", { style: { padding: '10px 12px', color: 'var(--dsw-alias-state-error-primary)' }, children: outcome.unavailable }));
+        return (_jsx("div", { className: styles.diffError, children: outcome.unavailable }));
     }
     const diff = outcome;
     const totals = diff.binary || diff.oversized ? null : diffTotals([{ path: diff.path, oldText: diff.oldText, newText: diff.newText }]);
@@ -99,24 +100,15 @@ export function GitDiffBody({ sessionId, useTabInfo, translate, gitDiff }) {
     // the Session's workspace — so the button only appears when the file lies inside it.
     const relative = diff.root === '' ? null : relativeToWorkspace(workspaceRoot, `${diff.root}/${diff.path}`);
     const openable = relative !== null && sessionId !== undefined && tabRef.current !== undefined;
-    return (_jsxs("div", { style: { padding: '10px 12px', minWidth: 0 }, children: [_jsxs("div", { style: { display: 'flex', gap: '8px', alignItems: 'baseline', paddingBottom: '6px' }, children: [_jsx("span", { style: { fontWeight: 600, wordBreak: 'break-all' }, children: diff.path }), _jsx("span", { style: { color: 'var(--dsw-alias-label-secondary)' }, children: staged ? t('diff.stagedLabel') : t('diff.unstagedLabel') }), totals === null
+    return (_jsxs("div", { className: styles.diffBody, children: [_jsxs("div", { className: styles.diffTitleRow, children: [_jsx("span", { className: styles.diffPath, children: diff.path }), _jsx("span", { className: styles.secondary, children: staged ? t('diff.stagedLabel') : t('diff.unstagedLabel') }), totals === null
                         ? null
-                        : (_jsx("span", { style: { marginLeft: 'auto', color: 'var(--dsw-alias-label-secondary)' }, children: `+${String(totals.added)} −${String(totals.removed)}` })), openable
+                        : (_jsx("span", { className: styles.diffTotals, children: `+${String(totals.added)} −${String(totals.removed)}` })), openable
                         ? (_jsx("button", { type: "button", onClick: () => {
                                 const actions = tabRef.current?.tab.actions;
                                 if (actions === undefined || relative === null || sessionId === undefined)
                                     return;
                                 actions.openResource(fileAddress(sessionId, relative));
-                            }, style: {
-                                background: 'transparent',
-                                border: '1px solid var(--dsw-alias-border-l3)',
-                                borderRadius: '4px',
-                                color: 'var(--dsw-alias-label-primary)',
-                                cursor: 'pointer',
-                                flexShrink: 0,
-                                font: 'inherit',
-                                padding: '1px 8px',
-                            }, children: t('action.openFile') }))
+                            }, className: styles.outlineButton, children: t('action.openFile') }))
                         : null] }), diff.binary
                 ? _jsx(Header, { text: t('diff.binary'), tone: "var(--dsw-alias-state-warn-label)" })
                 : null, diff.oversized

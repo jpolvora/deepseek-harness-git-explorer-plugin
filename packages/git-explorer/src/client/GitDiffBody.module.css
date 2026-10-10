@@ -1,0 +1,63 @@
+/**
+ * The comparison view's stylesheet.
+ *
+ * Tokens only, like the panel's: the diff primitive draws the change itself, and this
+ * file draws the chrome around it — path, comparison label, totals and the notices that
+ * stand in for a diff that cannot be shown.
+ */
+
+.diffBody {
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+.diffLoading {
+  padding: 10px 12px;
+}
+
+.diffError {
+  color: var(--dsw-alias-state-error-primary);
+  padding: 10px 12px;
+}
+
+.diffHeader {
+  color: var(--dsw-alias-label-secondary);
+  padding-bottom: 6px;
+}
+
+.diffHeaderWarn {
+  color: var(--dsw-alias-state-warn-label);
+  padding-bottom: 6px;
+}
+
+.diffTitleRow {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+  padding-bottom: 6px;
+}
+
+.diffPath {
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.diffTotals {
+  color: var(--dsw-alias-label-secondary);
+  margin-left: auto;
+}
+
+.secondary {
+  color: var(--dsw-alias-label-secondary);
+}
+
+.outlineButton {
+  background: transparent;
+  border: 1px solid var(--dsw-alias-border-l3);
+  border-radius: 4px;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  font: inherit;
+  padding: 1px 8px;
+}

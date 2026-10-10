@@ -16,6 +16,7 @@ import * as React from 'react';
 import { FileTypeIcon, IconChevronDownOutlineRegular, IconChevronRightOutlineRegular, IconCloseOutlineRegular, IconFolderCloseRegular, IconFolderOpenRegular, IconPlusOutlineRegular, IconTrashOutlineRegular, classifyFileType, } from '@deepseek-ai/dsh-client-ui-primitives';
 import { buildChangeTree } from './change-tree.js';
 import { GIT_DIFF_TAB_KIND } from '../types.js';
+import styles from './GitBody.module.css';
 import { en, fill, translator } from './locales.js';
 /** How one status letter reads in the row badge. */
 const STATUS_LETTER = {
@@ -28,82 +29,76 @@ const STATUS_LETTER = {
     conflicted: 'U',
     untracked: 'U',
 };
-/** The tone each status letter carries, matching VS Code's reading of the states. */
-const STATUS_TONE = {
-    modified: 'var(--dsw-alias-state-warn-label)',
-    added: 'var(--dsw-alias-state-success-primary)',
-    deleted: 'var(--dsw-alias-state-error-primary)',
-    renamed: 'var(--dsw-alias-state-business-primary)',
-    copied: 'var(--dsw-alias-state-business-primary)',
-    typechange: 'var(--dsw-alias-state-warn-label)',
-    conflicted: 'var(--dsw-alias-state-error-primary)',
-    untracked: 'var(--dsw-alias-state-success-primary)',
+/**
+ * One class name from the stylesheet.
+ *
+ * The lookup is by key because `noUncheckedIndexedAccess` types every index result as
+ * possibly absent; falling back to the key keeps a missing rule visible in the DOM rather
+ * than rendering the string "undefined".
+ *
+ * @param name - the selector's name in the stylesheet.
+ * @returns the hashed class name.
+ */
+function cls(name) {
+    return styles[name] ?? name;
+}
+/** The class each status letter carries, matching VS Code's reading of the states. */
+const TONE_CLASS = {
+    modified: cls('toneModified'),
+    added: cls('toneAdded'),
+    deleted: cls('toneDeleted'),
+    renamed: cls('toneRenamed'),
+    copied: cls('toneCopied'),
+    typechange: cls('toneTypechange'),
+    conflicted: cls('toneConflicted'),
+    untracked: cls('toneUntracked'),
 };
-/** The muted tokens the panel draws its secondary text with. */
-const SECONDARY = 'var(--dsw-alias-label-secondary)';
-const TERTIARY = 'var(--dsw-alias-label-tertiary)';
 /** Indent one nesting level. */
 const INDENT_PX = 14;
 /** The localStorage key holding this tab's collapsed groups and directories. */
 const COLLAPSE_KEY_PREFIX = 'dsh.git-explorer.collapsed.v1.';
 /** One label/value diagnostic line. */
 function Row({ label, value }) {
-    return (_jsxs("div", { style: { display: 'flex', gap: '8px', padding: '1px 0' }, children: [_jsx("span", { style: { minWidth: '104px', color: TERTIARY }, children: label }), _jsx("span", { style: { wordBreak: 'break-all' }, children: value })] }));
+    return (_jsxs("div", { className: styles.diagRow, children: [_jsx("span", { className: styles.diagLabel, children: label }), _jsx("span", { className: styles.breakAll, children: value })] }));
 }
-/** The shared geometry of one tree row. */
-function rowStyle(depth, hovered) {
-    return {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px',
-        width: '100%',
-        padding: '1px 4px',
-        paddingLeft: `${String(4 + depth * INDENT_PX)}px`,
-        background: hovered ? 'var(--dsw-alias-interactive-bg-hover)' : 'transparent',
-        border: 'none',
-        borderRadius: '4px',
-        color: 'inherit',
-        cursor: 'pointer',
-        font: 'inherit',
-        textAlign: 'left',
-        boxSizing: 'border-box',
-    };
+/**
+ * The one value JavaScript still contributes to a row's look: its nesting depth, which
+ * the stylesheet turns into padding through `--indent`.
+ *
+ * @param depth - how deep the row sits in the tree.
+ * @returns the custom property the row class reads.
+ */
+function indentStyle(depth) {
+    return { ['--indent']: depth };
 }
 /** A borderless icon control, sized for a tree row. */
 function IconAction({ title, icon: Icon, run }) {
     return (_jsx("button", { type: "button", title: title, "aria-label": title, onClick: (event) => {
             event.stopPropagation();
             run();
-        }, style: {
-            background: 'transparent',
-            border: 'none',
-            color: SECONDARY,
-            cursor: 'pointer',
-            display: 'flex',
-            padding: '0 2px',
-        }, children: _jsx(Icon, { size: 14 }) }));
+        }, className: styles.iconAction, children: _jsx(Icon, { size: 14 }) }));
 }
 /** A directory row: chevron, folder glyph, compacted label. */
 function DirectoryRow({ node, depth, collapsed, onToggle }) {
     const isCollapsed = collapsed.has(node.path);
     const Chevron = isCollapsed ? IconChevronRightOutlineRegular : IconChevronDownOutlineRegular;
     const Folder = isCollapsed ? IconFolderCloseRegular : IconFolderOpenRegular;
-    return (_jsxs("div", { role: "treeitem", "aria-expanded": !isCollapsed, onClick: () => { onToggle(node.path); }, style: rowStyle(depth, false), children: [_jsx(Chevron, { size: 16 }), _jsx(Folder, { size: 16 }), _jsx("span", { style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, children: node.name })] }));
+    return (_jsxs("div", { role: "treeitem", "aria-expanded": !isCollapsed, onClick: () => { onToggle(node.path); }, className: styles.row, style: indentStyle(depth), children: [_jsx(Chevron, { size: 16 }), _jsx(Folder, { size: 16 }), _jsx("span", { className: styles.ellipsis, children: node.name })] }));
 }
 /** A file row: glyph, name, right-aligned line counts, status letter, hover actions, and a
  * click that opens the comparison for this file. */
 function FileRow({ node, depth, hovered, onHover, actions, onOpen, counts }) {
     const change = node.change;
     if (change === undefined) {
-        return _jsx("div", { style: rowStyle(depth, false), children: _jsx("span", { children: node.name }) });
+        return _jsx("div", { className: styles.row, style: indentStyle(depth), children: _jsx("span", { children: node.name }) });
     }
-    return (_jsxs("div", { role: "treeitem", title: change.origPath === undefined ? change.path : `${change.origPath} → ${change.path}`, onClick: onOpen, onMouseEnter: () => { onHover(change.path); }, onMouseLeave: () => { onHover(undefined); }, style: rowStyle(depth, hovered), children: [_jsx("span", { style: { width: 16, flexShrink: 0 } }), _jsx(FileTypeIcon, { kind: classifyFileType(node.name), size: 16 }), _jsx("span", { style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, children: node.name }), change.origPath === undefined
+    return (_jsxs("div", { role: "treeitem", title: change.origPath === undefined ? change.path : `${change.origPath} → ${change.path}`, onClick: onOpen, onMouseEnter: () => { onHover(change.path); }, onMouseLeave: () => { onHover(undefined); }, className: styles.row, style: indentStyle(depth), children: [_jsx("span", { className: styles.glyphSlot }), _jsx(FileTypeIcon, { kind: classifyFileType(node.name), size: 16 }), _jsx("span", { className: styles.growEllipsis, children: node.name }), change.origPath === undefined
                 ? null
-                : _jsx("span", { style: { color: TERTIARY, flexShrink: 0 }, children: change.origPath.split('/').pop() }), counts === undefined || counts.binary
+                : _jsx("span", { className: styles.tertiary, children: change.origPath.split('/').pop() }), counts === undefined || counts.binary
                 ? null
-                : (_jsx("span", { style: { color: TERTIARY, flexShrink: 0, paddingLeft: '6px' }, children: `+${String(counts.added)} −${String(counts.removed)}` })), hovered
+                : (_jsx("span", { className: styles.tertiaryPadded, children: `+${String(counts.added)} −${String(counts.removed)}` })), hovered
                 ? actions.map((action) => _jsx(IconAction, { ...action }, action.title))
-                : (_jsx("span", { style: { color: STATUS_TONE[change.status], flexShrink: 0, paddingLeft: '6px' }, children: STATUS_LETTER[change.status] }))] }));
+                : (_jsx("span", { className: `${cls('statusLetter')} ${TONE_CLASS[change.status]}`, children: STATUS_LETTER[change.status] }))] }));
 }
 /** Rows for one level, recursing into directories that are expanded. */
 function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor, openFor, countsFor }) {
@@ -121,81 +116,38 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
         return null;
     const isCollapsed = collapsedGroups.has(title);
     const Chevron = isCollapsed ? IconChevronRightOutlineRegular : IconChevronDownOutlineRegular;
-    return (_jsxs("div", { style: { paddingTop: '6px' }, children: [_jsxs("div", { onClick: () => { onToggleGroup(title); }, style: { ...rowStyle(0, false), gap: '4px' }, children: [_jsx(Chevron, { size: 16 }), _jsx("span", { style: { fontWeight: 600 }, children: title }), _jsx("span", { style: {
-                            background: 'var(--dsw-alias-bg-layer-3)',
-                            borderRadius: '8px',
-                            color: SECONDARY,
-                            fontSize: '0.85em',
-                            marginLeft: '4px',
-                            padding: '0 6px',
-                        }, children: changes.length }), bulk === undefined
+    return (_jsxs("div", { className: styles.groupBlock, children: [_jsxs("div", { onClick: () => { onToggleGroup(title); }, className: `${styles.row} ${styles.groupHeader}`, children: [_jsx(Chevron, { size: 16 }), _jsx("span", { className: styles.strong, children: title }), _jsx("span", { className: styles.countBadge, children: changes.length }), bulk === undefined
                         ? null
                         : (_jsx("button", { type: "button", onClick: (event) => {
                                 event.stopPropagation();
                                 bulk.run();
-                            }, style: {
-                                background: 'transparent',
-                                border: 'none',
-                                color: SECONDARY,
-                                cursor: 'pointer',
-                                font: 'inherit',
-                                marginLeft: 'auto',
-                                padding: '0 2px',
-                            }, children: bulk.label }))] }), isCollapsed
+                            }, className: styles.bulkAction, children: bulk.label }))] }), isCollapsed
                 ? null
                 : (_jsx(TreeRows, { nodes: tree, depth: 1, collapsed: collapsedDirs, onToggle: onToggleDir, hovered: hovered, onHover: onHover, actionsFor: actionsFor, openFor: openFor, countsFor: countsFor }))] }));
 }
 /** The branch line: branch name, tracking drift and the repository root. */
 function BranchLine({ status, t }) {
     const branch = status.branch ?? (status.detached ? t('panel.detached') : status.unborn ? t('panel.unborn') : t('panel.unknownBranch'));
-    return (_jsxs("div", { style: { display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }, children: [_jsxs("div", { style: { display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }, children: [_jsx("span", { style: { fontWeight: 600 }, children: branch }), status.upstream === null
+    return (_jsxs("div", { className: styles.branchColumn, children: [_jsxs("div", { className: styles.branchRow, children: [_jsx("span", { className: styles.strong, children: branch }), status.upstream === null
                         ? null
-                        : _jsx("span", { style: { color: SECONDARY }, children: `↑${String(status.ahead)} ↓${String(status.behind)}` }), status.operation === null
+                        : _jsx("span", { className: styles.secondary, children: `↑${String(status.ahead)} ↓${String(status.behind)}` }), status.operation === null
                         ? null
-                        : _jsx("span", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: t('panel.operation', { operation: status.operation }) })] }), status.root === null ? null : _jsx("div", { style: { color: TERTIARY, wordBreak: 'break-all' }, children: status.root })] }));
+                        : _jsx("span", { className: styles.warn, children: t('panel.operation', { operation: status.operation }) })] }), status.root === null ? null : _jsx("div", { className: styles.tertiaryBreak, children: status.root })] }));
 }
 /** The message box and its Commit control. */
 function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit, t }) {
     const ready = message.trim() !== '' && !busy;
-    return (_jsxs("div", { style: { display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px' }, children: [_jsx("textarea", { value: message, placeholder: t('commit.placeholder'), "aria-label": t('commit.aria'), rows: 2, onChange: (event) => { onMessage(event.target.value); }, onKeyDown: (event) => {
+    return (_jsxs("div", { className: styles.commitBox, children: [_jsx("textarea", { value: message, placeholder: t('commit.placeholder'), "aria-label": t('commit.aria'), rows: 2, onChange: (event) => { onMessage(event.target.value); }, onKeyDown: (event) => {
                     if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
                         event.preventDefault();
                         if (ready)
                             onCommit();
                     }
-                }, style: {
-                    background: 'var(--dsw-alias-bg-layer-2)',
-                    border: '1px solid var(--dsw-alias-border-l3)',
-                    borderRadius: '4px',
-                    color: 'inherit',
-                    font: 'inherit',
-                    padding: '4px 6px',
-                    resize: 'vertical',
-                    width: '100%',
-                    boxSizing: 'border-box',
-                } }), _jsxs("div", { style: { display: 'flex', alignItems: 'center', gap: '8px' }, children: [_jsx("button", { type: "button", disabled: !ready, onClick: onCommit, style: {
-                            background: ready ? 'var(--dsw-alias-state-business-primary)' : 'var(--dsw-alias-bg-layer-3)',
-                            border: 'none',
-                            borderRadius: '4px',
-                            color: ready ? 'var(--dsw-alias-label-primary-inverted)' : SECONDARY,
-                            cursor: ready ? 'pointer' : 'default',
-                            font: 'inherit',
-                            fontWeight: 600,
-                            padding: '3px 12px',
-                        }, children: busy ? t('commit.busy') : amend ? t('commit.amendButton') : t('commit.button') }), _jsxs("label", { style: { color: SECONDARY, display: 'flex', alignItems: 'center', gap: '4px' }, children: [_jsx("input", { type: "checkbox", checked: amend, onChange: (event) => { onAmend(event.target.checked); } }), t('commit.amend')] }), _jsx("span", { style: { color: TERTIARY, marginLeft: 'auto' }, children: t('commit.hint') })] })] }));
+                }, className: styles.commitInput }), _jsxs("div", { className: styles.commitRow, children: [_jsx("button", { type: "button", disabled: !ready, onClick: onCommit, className: ready ? styles.commitButton : styles.commitButtonDisabled, children: busy ? t('commit.busy') : amend ? t('commit.amendButton') : t('commit.button') }), _jsxs("label", { className: styles.amendLabel, children: [_jsx("input", { type: "checkbox", checked: amend, onChange: (event) => { onAmend(event.target.checked); } }), t('commit.amend')] }), _jsx("span", { className: styles.commitHint, children: t('commit.hint') })] })] }));
 }
 /** The panel's own small button, token-styled. */
 function Action({ label, onClick }) {
-    return (_jsx("button", { type: "button", onClick: onClick, style: {
-            background: 'transparent',
-            border: '1px solid var(--dsw-alias-border-l3)',
-            borderRadius: '4px',
-            color: 'var(--dsw-alias-label-primary)',
-            cursor: 'pointer',
-            font: 'inherit',
-            padding: '1px 8px',
-            flexShrink: 0,
-        }, children: label }));
+    return (_jsx("button", { type: "button", onClick: onClick, className: styles.outlineButton, children: label }));
 }
 /**
  * Catch a render failure and show it.
@@ -213,7 +165,7 @@ class PanelBoundary extends React.Component {
     }
     render() {
         if (this.state.failure !== null) {
-            return (_jsx("div", { style: { padding: '10px 12px', color: 'var(--dsw-alias-state-error-primary)' }, children: fill(en['panel.failed'], { message: this.state.failure }) }));
+            return (_jsx("div", { className: styles.boundaryError, children: fill(en['panel.failed'], { message: this.state.failure }) }));
         }
         return this.props.children;
     }
@@ -509,7 +461,7 @@ function GitPanel({ sessionId, translate, useSessions, useTabInfo, openTab, gitS
         label,
         run: () => { run(paths); },
     });
-    return (_jsxs("div", { style: { padding: '10px 12px', lineHeight: 1.5 }, children: [_jsxs("div", { style: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }, children: [status === null ? _jsx("span", { style: { fontWeight: 600 }, children: t('type.label') }) : _jsx(BranchLine, { status: status, t: t }), _jsx(Action, { label: t('panel.refresh'), onClick: () => { setAttempt((value) => value + 1); } })] }), status === null ? null : (_jsx(CommitBox, { t: t, message: message, amend: amend, busy: busy, onMessage: setMessage, onAmend: setAmend, onCommit: () => {
+    return (_jsxs("div", { className: styles.panel, children: [_jsxs("div", { className: styles.panelHeader, children: [status === null ? _jsx("span", { className: styles.strong, children: t('type.label') }) : _jsx(BranchLine, { status: status, t: t }), _jsx(Action, { label: t('panel.refresh'), onClick: () => { setAttempt((value) => value + 1); } })] }), status === null ? null : (_jsx(CommitBox, { t: t, message: message, amend: amend, busy: busy, onMessage: setMessage, onAmend: setAmend, onCommit: () => {
                     const commit = bridge.current.gitCommit;
                     if (commit === undefined)
                         return;
@@ -522,41 +474,15 @@ function GitPanel({ sessionId, translate, useSessions, useTabInfo, openTab, gitS
                         }
                         return result;
                     });
-                } })), notice === null ? null : (_jsx("div", { style: { color: notice.ok ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-state-error-primary)', paddingTop: '6px' }, children: notice.detail })), pendingDiscard === null ? null : (_jsxs("div", { style: {
-                    background: 'var(--dsw-alias-bg-layer-2)',
-                    border: '1px solid var(--dsw-alias-border-l3)',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginTop: '6px',
-                    padding: '4px 6px',
-                }, children: [_jsx("span", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: t('discard.confirm', { count: String(pendingDiscard.tracked.length + pendingDiscard.untracked.length) }) }), _jsx("button", { type: "button", onClick: confirmDiscard, style: {
-                            background: 'var(--dsw-alias-state-error-primary)',
-                            border: 'none',
-                            borderRadius: '4px',
-                            color: 'var(--dsw-alias-label-primary-inverted)',
-                            cursor: 'pointer',
-                            font: 'inherit',
-                            marginLeft: 'auto',
-                            padding: '1px 8px',
-                        }, children: t('action.discard') }), _jsx("button", { type: "button", onClick: () => { setPendingDiscard(null); }, style: {
-                            background: 'transparent',
-                            border: '1px solid var(--dsw-alias-border-l3)',
-                            borderRadius: '4px',
-                            color: 'var(--dsw-alias-label-primary)',
-                            cursor: 'pointer',
-                            font: 'inherit',
-                            padding: '1px 8px',
-                        }, children: t('action.cancel') })] })), _jsx("div", { role: "tree", style: { paddingTop: '4px' }, children: outcome === null
-                    ? _jsx("div", { style: { color: SECONDARY }, children: t('panel.reading') })
+                } })), notice === null ? null : (_jsx("div", { className: notice.ok ? styles.noticeOk : styles.noticeError, children: notice.detail })), pendingDiscard === null ? null : (_jsxs("div", { className: styles.confirmBar, children: [_jsx("span", { className: styles.warn, children: t('discard.confirm', { count: String(pendingDiscard.tracked.length + pendingDiscard.untracked.length) }) }), _jsx("button", { type: "button", onClick: confirmDiscard, className: styles.dangerButton, children: t('action.discard') }), _jsx("button", { type: "button", onClick: () => { setPendingDiscard(null); }, className: styles.outlineButton, children: t('action.cancel') })] })), _jsx("div", { role: "tree", className: styles.treeTop, children: outcome === null
+                    ? _jsx("div", { className: styles.secondary, children: t('panel.reading') })
                     : 'unavailable' in outcome
-                        ? _jsx("div", { style: { color: 'var(--dsw-alias-state-error-primary)' }, children: outcome.unavailable })
+                        ? _jsx("div", { className: styles.errorText, children: outcome.unavailable })
                         : !outcome.isRepo
-                            ? (_jsxs("div", { style: { color: SECONDARY }, children: [t('panel.notRepo'), outcome.note === '' ? null : _jsx("div", { style: { color: TERTIARY }, children: outcome.note })] }))
+                            ? (_jsxs("div", { className: styles.secondary, children: [t('panel.notRepo'), outcome.note === '' ? null : _jsx("div", { className: styles.tertiary, children: outcome.note })] }))
                             : (_jsxs(_Fragment, { children: [outcome.conflicted.length === 0
                                         ? null
-                                        : (_jsx("div", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${String(outcome.conflicted.length)} ${t('panel.conflicted')}` })), _jsx(Group, { title: t('group.staged'), changes: outcome.staged, openFor: (change) => { openComparison(change, true, false); }, bulk: bulkFor(outcome.staged.map((change) => change.path), t('action.unstageAll'), (paths) => {
+                                        : (_jsx("div", { className: styles.warn, children: `${String(outcome.conflicted.length)} ${t('panel.conflicted')}` })), _jsx(Group, { title: t('group.staged'), changes: outcome.staged, openFor: (change) => { openComparison(change, true, false); }, bulk: bulkFor(outcome.staged.map((change) => change.path), t('action.unstageAll'), (paths) => {
                                             const unstage = bridge.current.gitUnstage;
                                             if (unstage !== undefined)
                                                 mutate((signal) => unstage(requestRoot, paths, signal));
@@ -568,12 +494,7 @@ function GitPanel({ sessionId, translate, useSessions, useTabInfo, openTab, gitS
                                             const stage = bridge.current.gitStage;
                                             if (stage !== undefined)
                                                 mutate((signal) => stage(requestRoot, paths, signal));
-                                        }), ...groupProps }), total === 0 ? _jsx("div", { style: { color: SECONDARY }, children: t('panel.clean') }) : null] })) }), _jsxs("div", { style: {
-                    paddingTop: '10px',
-                    marginTop: '10px',
-                    borderTop: '1px solid var(--dsw-alias-border-l3)',
-                    color: TERTIARY,
-                }, children: [_jsx(Row, { label: t('diagnostics.session'), value: sessionId ?? '(none)' }), _jsx(Row, { label: t('diagnostics.workspace'), value: requestRoot === '' ? t('diagnostics.unknown') : requestRoot }), outcome !== null && !('unavailable' in outcome)
+                                        }), ...groupProps }), total === 0 ? _jsx("div", { className: styles.secondary, children: t('panel.clean') }) : null] })) }), _jsxs("div", { className: styles.diagnostics, children: [_jsx(Row, { label: t('diagnostics.session'), value: sessionId ?? '(none)' }), _jsx(Row, { label: t('diagnostics.workspace'), value: requestRoot === '' ? t('diagnostics.unknown') : requestRoot }), outcome !== null && !('unavailable' in outcome)
                         ? (_jsxs(_Fragment, { children: [_jsx(Row, { label: t('diagnostics.rootSource'), value: outcome.rootSource }), _jsx(Row, { label: t('diagnostics.git'), value: outcome.gitVersion ?? t('diagnostics.notFound') }), _jsx(Row, { label: t('diagnostics.tabHost'), value: tabRef.current === undefined
                                         ? openerRef.current === undefined ? t('diagnostics.hostNone') : t('diagnostics.hostOpener')
                                         : t('diagnostics.hostPanel') }), outcome.note === '' ? null : _jsx(Row, { label: t('diagnostics.note'), value: outcome.note })] }))
