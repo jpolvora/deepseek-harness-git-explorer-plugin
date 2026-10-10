@@ -736,6 +736,20 @@ Both are now covered: the panel reports the opener it actually got (a `tab host`
 
 ---
 
+## 16. Refinements (M4)
+
+Three small additions on top of a working panel, each verified by tests rather than by hand:
+
+| Refinement | How it works |
+|---|---|
+| **Per-file line counts** | A new `fileStats` Remote reads `git diff --numstat -z` for both comparisons (pure parser in `src/git/numstat.ts`, tested over real shapes including a path with spaces and a binary side). Rows show `+N −M`; a binary side shows nothing rather than a misleading `+0 −0`; a failed read leaves the rows without numbers instead of failing the refresh |
+| **Remembered commit draft** | The unsent message and the amend flag persist per Session under `dsh.git-explorer.draft.v1.<sessionId>`; an empty draft removes the key. A tab switch or a reload no longer loses a half-written message |
+| **Open the file from the diff** | The panel passes the workspace root with the comparison parameters; the diff tab offers **Open file**, which addresses the file through the shipped text preview (`dsh-resource://file/session/<id>/<path>`) — and only appears when the file lies inside the session workspace, because a path outside it has no address the preview accepts |
+
+Tests now total **55** (16 parser, 8 tree, 6 numstat, 6 diff, 19 panel).
+
+---
+
 ## Appendix A — research artifacts produced for this plan
 
 | Path | What it is |
