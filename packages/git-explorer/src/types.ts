@@ -85,6 +85,29 @@ export interface GitStatusSummary {
   note: string
 }
 
+/** The unified patch of one file, as a model reads it. */
+export interface GitPatch {
+  path: string
+  /** The patch text; empty when there is nothing to show. */
+  patch: string
+  /** Why the patch is empty or incomplete. */
+  note: string
+}
+
+/** One commit in the log. */
+export interface GitCommitSummary {
+  /** The full object name. */
+  hash: string
+  /** The abbreviated object name git prints. */
+  short: string
+  /** The author name recorded on the commit. */
+  author: string
+  /** The author date, ISO-8601. */
+  date: string
+  /** The first line of the commit message. */
+  subject: string
+}
+
 /** Line counts for one changed path. */
 export interface GitChangeStats {
   path: string

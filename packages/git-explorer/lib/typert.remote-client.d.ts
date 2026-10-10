@@ -3,7 +3,7 @@ import type {
   RemoteResult,
   TypertRemoteContribution,
 } from '@deepseek-ai/dsh-typert-protocol'
-import type { GitChangeStats, GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from '@jpolv/dsh-git-explorer/types'
+import type { GitChangeStats, GitCommitSummary, GitFileDiff, GitMutationResult, GitPatch, GitPingResult, GitStatusSummary } from '@jpolv/dsh-git-explorer/types'
 
 declare module '@deepseek-ai/dsh-typert-protocol' {
   interface TypertRemoteNamespace$676974 {
@@ -11,6 +11,8 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
     discard: (sessionId: string, requestRoot: string, trackedPaths: string[], untrackedPaths: string[], confirmed: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     fileDiff: (sessionId: string, requestRoot: string, path: string, staged: boolean, untracked: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitFileDiff>>
     fileStats: (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitChangeStats[]>>
+    log: (sessionId: string, requestRoot: string, limit: number, path: string, signal?: AbortSignal) => Promise<RemoteResult<GitCommitSummary[]>>
+    patch: (sessionId: string, requestRoot: string, path: string, staged: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitPatch>>
     ping: (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitPingResult>>
     stage: (sessionId: string, requestRoot: string, paths: string[], signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     status: (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitStatusSummary>>
@@ -21,6 +23,8 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
     'git/discard': (sessionId: string, requestRoot: string, trackedPaths: string[], untrackedPaths: string[], confirmed: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     'git/fileDiff': (sessionId: string, requestRoot: string, path: string, staged: boolean, untracked: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitFileDiff>>
     'git/fileStats': (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitChangeStats[]>>
+    'git/log': (sessionId: string, requestRoot: string, limit: number, path: string, signal?: AbortSignal) => Promise<RemoteResult<GitCommitSummary[]>>
+    'git/patch': (sessionId: string, requestRoot: string, path: string, staged: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitPatch>>
     'git/ping': (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitPingResult>>
     'git/stage': (sessionId: string, requestRoot: string, paths: string[], signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     'git/status': (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitStatusSummary>>

@@ -15,7 +15,7 @@ import type { Context } from '@deepseek-ai/cordis';
 import z from '@deepseek-ai/schemastery';
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol';
 import { type GitCommandLimits } from './git/commands.js';
-import type { GitChangeStats, GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from './types.js';
+import type { GitChangeStats, GitCommitSummary, GitFileDiff, GitMutationResult, GitPatch, GitPingResult, GitStatusSummary } from './types.js';
 /**
  * Declare this package as the owner of the `git` Host service. Besides giving Host
  * consumers a typed handle, this augmentation is what makes the package a Typert
@@ -79,6 +79,37 @@ export declare class GitExplorerService extends TypertRemoteService {
      * @returns the status summary the panel renders.
      */
     status(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<GitStatusSummary>;
+    /**
+     * Read the most recent commits on the current branch.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param limit - how many commits to return.
+     * @param path - restrict the history to one path; empty string means the whole branch.
+     * @param signal - the invocation's cancellation signal.
+     * @returns the commits, newest first.
+     */
+    log(sessionId: string, requestRoot: string, limit: number, path: string, signal: AbortSignal): Promise<GitCommitSummary[]>;
+    /**
+     * Read the unified patch for one changed file, as the model reads diffs.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param path - the repository-relative path.
+     * @param staged - true to compare the index against HEAD.
+     * @param signal - the invocation's cancellation signal.
+     * @returns the patch text, or the reason there is none.
+     */
+    patch(sessionId: string, requestRoot: string, path: string, staged: boolean, signal: AbortSignal): Promise<GitPatch>;
+    /**
+     * Resolve the repository root for one Session, or null when there is none.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param signal - caller cancellation.
+     * @returns the repository's top level.
+     */
+    private repositoryRoot;
     /**
      * Read the per-file line counts both comparisons report.
      *

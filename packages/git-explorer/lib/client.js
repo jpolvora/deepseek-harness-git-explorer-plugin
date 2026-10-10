@@ -5341,6 +5341,36 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			"removed": number(),
 			"binary": boolean()
 		}));
+		let _jpolv_dsh_git_explorer_git_log_parameter_0$schema$value;
+		const _jpolv_dsh_git_explorer_git_log_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_log_parameter_0$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_log_parameter_1$schema$value;
+		const _jpolv_dsh_git_explorer_git_log_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_log_parameter_1$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_log_parameter_2$schema$value;
+		const _jpolv_dsh_git_explorer_git_log_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_log_parameter_2$schema$value ??= number();
+		let _jpolv_dsh_git_explorer_git_log_parameter_3$schema$value;
+		const _jpolv_dsh_git_explorer_git_log_parameter_3$schema = () => _jpolv_dsh_git_explorer_git_log_parameter_3$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_log_result$schema$value;
+		const _jpolv_dsh_git_explorer_git_log_result$schema = () => _jpolv_dsh_git_explorer_git_log_result$schema$value ??= array(object({
+			"hash": string(),
+			"short": string(),
+			"author": string(),
+			"date": string(),
+			"subject": string()
+		}));
+		let _jpolv_dsh_git_explorer_git_patch_parameter_0$schema$value;
+		const _jpolv_dsh_git_explorer_git_patch_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_patch_parameter_0$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_patch_parameter_1$schema$value;
+		const _jpolv_dsh_git_explorer_git_patch_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_patch_parameter_1$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_patch_parameter_2$schema$value;
+		const _jpolv_dsh_git_explorer_git_patch_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_patch_parameter_2$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_patch_parameter_3$schema$value;
+		const _jpolv_dsh_git_explorer_git_patch_parameter_3$schema = () => _jpolv_dsh_git_explorer_git_patch_parameter_3$schema$value ??= boolean();
+		let _jpolv_dsh_git_explorer_git_patch_result$schema$value;
+		const _jpolv_dsh_git_explorer_git_patch_result$schema = () => _jpolv_dsh_git_explorer_git_patch_result$schema$value ??= object({
+			"path": string(),
+			"patch": string(),
+			"note": string()
+		});
 		let _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value;
 		const _jpolv_dsh_git_explorer_git_ping_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value ??= string();
 		let _jpolv_dsh_git_explorer_git_ping_parameter_1$schema$value;
@@ -5547,7 +5577,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 369,
+						"line": 465,
 						"column": 9
 					}
 				},
@@ -5617,7 +5647,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 326,
+						"line": 422,
 						"column": 9
 					}
 				},
@@ -5687,7 +5717,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 233,
+						"line": 329,
 						"column": 9
 					}
 				},
@@ -5724,7 +5754,127 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 205,
+						"line": 301,
+						"column": 9
+					}
+				},
+				{
+					id: "@jpolv/dsh-git-explorer#git/log",
+					service: "git",
+					namespace: "git",
+					method: "log",
+					invocation: { kind: "direct" },
+					parameters: [
+						{
+							name: "sessionId",
+							wire: "sessionId",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/log:sessionId",
+								create: _jpolv_dsh_git_explorer_git_log_parameter_0$schema
+							}
+						},
+						{
+							name: "requestRoot",
+							wire: "requestRoot",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/log:requestRoot",
+								create: _jpolv_dsh_git_explorer_git_log_parameter_1$schema
+							}
+						},
+						{
+							name: "limit",
+							wire: "limit",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/log:limit",
+								create: _jpolv_dsh_git_explorer_git_log_parameter_2$schema
+							}
+						},
+						{
+							name: "path",
+							wire: "path",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/log:path",
+								create: _jpolv_dsh_git_explorer_git_log_parameter_3$schema
+							}
+						}
+					],
+					cancellation: { parameter: "signal" },
+					result: {
+						mode: "strict",
+						typeSymbol: "@jpolv/dsh-git-explorer#git/log:result",
+						create: _jpolv_dsh_git_explorer_git_log_result$schema
+					},
+					sourceLocation: {
+						"file": "packages/git-explorer/src/index.ts",
+						"line": 219,
+						"column": 9
+					}
+				},
+				{
+					id: "@jpolv/dsh-git-explorer#git/patch",
+					service: "git",
+					namespace: "git",
+					method: "patch",
+					invocation: { kind: "direct" },
+					parameters: [
+						{
+							name: "sessionId",
+							wire: "sessionId",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/patch:sessionId",
+								create: _jpolv_dsh_git_explorer_git_patch_parameter_0$schema
+							}
+						},
+						{
+							name: "requestRoot",
+							wire: "requestRoot",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/patch:requestRoot",
+								create: _jpolv_dsh_git_explorer_git_patch_parameter_1$schema
+							}
+						},
+						{
+							name: "path",
+							wire: "path",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/patch:path",
+								create: _jpolv_dsh_git_explorer_git_patch_parameter_2$schema
+							}
+						},
+						{
+							name: "staged",
+							wire: "staged",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/patch:staged",
+								create: _jpolv_dsh_git_explorer_git_patch_parameter_3$schema
+							}
+						}
+					],
+					cancellation: { parameter: "signal" },
+					result: {
+						mode: "strict",
+						typeSymbol: "@jpolv/dsh-git-explorer/types#GitPatch",
+						create: _jpolv_dsh_git_explorer_git_patch_result$schema
+					},
+					sourceLocation: {
+						"file": "packages/git-explorer/src/index.ts",
+						"line": 243,
 						"column": 9
 					}
 				},
@@ -5761,7 +5911,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 435,
+						"line": 531,
 						"column": 9
 					}
 				},
@@ -5811,7 +5961,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 282,
+						"line": 378,
 						"column": 9
 					}
 				},
@@ -5848,7 +5998,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 123,
+						"line": 135,
 						"column": 9
 					}
 				},
@@ -5898,7 +6048,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 301,
+						"line": 397,
 						"column": 9
 					}
 				}

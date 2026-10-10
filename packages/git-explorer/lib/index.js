@@ -543,6 +543,243 @@ async function readStats(ctx, limits, options) {
 	return entries;
 }
 //#endregion
+//#region lib/types/git/log.js
+/** The field separator inside one record. */
+const FIELD = "";
+/** The record separator between commits. */
+const RECORD = "\0";
+/** The format string: hash, short hash, author, ISO date, subject. */
+const LOG_FORMAT = [
+	"%H",
+	"%h",
+	"%an",
+	"%aI",
+	"%s"
+].join(FIELD);
+/**
+* Parse one log stream.
+*
+* @param output - raw stdout of `git log --format=<LOG_FORMAT> -z`.
+* @returns one entry per commit, newest first.
+*/
+function parseLog(output) {
+	const commits = [];
+	for (const record of output.split(RECORD)) {
+		const trimmed = record.replace(/^\n/, "");
+		if (trimmed === "") continue;
+		const [hash, short, author, date, subject] = trimmed.split(FIELD);
+		if (hash === void 0 || short === void 0) continue;
+		commits.push({
+			hash,
+			short,
+			author: author ?? "",
+			date: date ?? "",
+			subject: subject ?? ""
+		});
+	}
+	return commits;
+}
+/**
+* Read the most recent commits on the current branch.
+*
+* @param ctx - the injected host scope.
+* @param limits - the configured runner limits.
+* @param options - the repository root, how many commits, and cancellation.
+* @returns the parsed commits, newest first; an empty list when the branch has none.
+*/
+async function readLog(ctx, limits, options) {
+	const args = [
+		"log",
+		`--format=${LOG_FORMAT}`,
+		"-z",
+		`--max-count=${String(options.limit)}`
+	];
+	if (options.path !== void 0 && options.path !== "") args.push("--", options.path);
+	const result = await runGit(ctx, limits, {
+		cwd: options.root,
+		args,
+		signal: options.signal
+	});
+	if (result.exitCode !== 0) return [];
+	return parseLog(result.stdout);
+}
+//#endregion
+//#region lib/types/tools.js
+/**
+* Wrap one tool's arguments into the JSON Schema the registry validates against.
+*
+* @param properties - the accepted properties.
+* @param required - the ones a call must supply.
+* @returns an object-rooted schema.
+*/
+function schema(properties, required) {
+	return {
+		type: "object",
+		properties,
+		required: [...required],
+		additionalProperties: false
+	};
+}
+/** The Session id a tool call belongs to, or undefined when it has none. */
+function sessionOf(exec) {
+	const id = exec.agent?.session?.id;
+	return id === void 0 ? void 0 : String(id);
+}
+/** A positive integer argument, or the fallback when it is absent or unusable. */
+function count(value, fallback, cap) {
+	return typeof value === "number" && Number.isFinite(value) && value > 0 ? Math.min(Math.floor(value), cap) : fallback;
+}
+/** One changed path, as a tool answer lists it. */
+function listChanges(summary, maxFiles) {
+	const trim = (entries) => entries.slice(0, maxFiles).map((entry) => entry.origPath === void 0 ? {
+		path: entry.path,
+		status: entry.status
+	} : {
+		path: entry.path,
+		status: entry.status,
+		from: entry.origPath
+	});
+	return {
+		staged: trim(summary.staged),
+		unstaged: trim(summary.unstaged),
+		untracked: trim(summary.untracked),
+		conflicted: trim(summary.conflicted),
+		truncated: summary.truncated
+	};
+}
+/** Every tool this plugin registers. */
+function definitions(service) {
+	return [
+		{
+			name: "git_status",
+			description: "Report the working tree of the session workspace: branch, upstream drift, in-progress operation, and the staged, unstaged, untracked and conflicted paths. Read-only.",
+			parameters: schema({ maxFiles: {
+				type: "number",
+				description: "Cap on paths listed per group; defaults to 100."
+			} }, []),
+			output: {
+				schema: { type: "string" },
+				render: (_args, value) => [{
+					type: "text",
+					text: value
+				}]
+			},
+			async execute(args, exec) {
+				const sessionId = sessionOf(exec);
+				if (sessionId === void 0) return JSON.stringify({ error: "this call has no session" });
+				const summary = await service.status(sessionId, "", exec.signal);
+				return JSON.stringify({
+					isRepo: summary.isRepo,
+					root: summary.root,
+					rootSource: summary.rootSource,
+					branch: summary.branch,
+					detached: summary.detached,
+					unborn: summary.unborn,
+					upstream: summary.upstream,
+					ahead: summary.ahead,
+					behind: summary.behind,
+					operation: summary.operation,
+					changes: listChanges(summary, count(args.maxFiles, 100, 5e3)),
+					note: summary.note
+				});
+			}
+		},
+		{
+			name: "git_diff",
+			description: "Return the unified patch of one changed file in the session workspace: the work tree against the index by default, or the index against HEAD with staged. Read-only.",
+			parameters: schema({
+				path: {
+					type: "string",
+					description: "Path relative to the repository root, as git_status reports it."
+				},
+				staged: {
+					type: "boolean",
+					description: "True for the staged comparison (index against HEAD)."
+				},
+				untracked: {
+					type: "boolean",
+					description: "True when git does not track the path yet; the whole file is then reported as added."
+				}
+			}, ["path"]),
+			output: {
+				schema: { type: "string" },
+				render: (_args, value) => [{
+					type: "text",
+					text: value
+				}]
+			},
+			async execute(args, exec) {
+				const sessionId = sessionOf(exec);
+				if (sessionId === void 0) return JSON.stringify({ error: "this call has no session" });
+				const path = typeof args.path === "string" ? args.path : "";
+				if (path === "") return JSON.stringify({ error: "path is required" });
+				const staged = args.staged === true;
+				if (args.untracked === true) {
+					const diff = await service.fileDiff(sessionId, "", path, staged, true, exec.signal);
+					return JSON.stringify({
+						path,
+						staged,
+						untracked: true,
+						binary: diff.binary,
+						oversized: diff.oversized,
+						added: diff.newText,
+						note: diff.note
+					});
+				}
+				const patch = await service.patch(sessionId, "", path, staged, exec.signal);
+				return JSON.stringify({
+					path,
+					staged,
+					patch: patch.patch,
+					note: patch.note
+				});
+			}
+		},
+		{
+			name: "git_log",
+			description: "List recent commits on the current branch of the session workspace, optionally restricted to one path. Read-only.",
+			parameters: schema({
+				limit: {
+					type: "number",
+					description: "How many commits to return; defaults to 20, capped at 200."
+				},
+				path: {
+					type: "string",
+					description: "Restrict the history to one path."
+				}
+			}, []),
+			output: {
+				schema: { type: "string" },
+				render: (_args, value) => [{
+					type: "text",
+					text: value
+				}]
+			},
+			async execute(args, exec) {
+				const sessionId = sessionOf(exec);
+				if (sessionId === void 0) return JSON.stringify({ error: "this call has no session" });
+				const commits = await service.log(sessionId, "", count(args.limit, 20, 200), typeof args.path === "string" ? args.path : "", exec.signal);
+				return JSON.stringify({ commits });
+			}
+		}
+	];
+}
+/**
+* Register the read-only git tools.
+*
+* @param ctx - the host context that carries the tools registry.
+* @param service - the git service the tools read.
+*/
+function registerGitTools(ctx, service) {
+	ctx.inject(["tools"], (scope) => {
+		const registry = scope.tools;
+		const disposers = definitions(service).map((definition) => registry.register(definition));
+		return () => {
+			for (const dispose of disposers.reverse()) dispose();
+		};
+	});
+}
+//#endregion
 //#region lib/types/index.js
 var __runInitializers = function(thisArg, initializers, value) {
 	var useValue = arguments.length > 2;
@@ -585,7 +822,7 @@ var __esDecorate = function(ctor, descriptorIn, decorators, contextIn, initializ
 	done = true;
 };
 /** The plugin's own version, reported to the panel so a build is identifiable. */
-const PACKAGE_VERSION = "0.1.0-m4";
+const PACKAGE_VERSION = "0.1.0-m5";
 /** `rev-parse` output that locates the repository. */
 const REV_PARSE_ARGS = [
 	"rev-parse",
@@ -611,6 +848,8 @@ let GitExplorerService = (() => {
 	let _classSuper = TypertRemoteService;
 	let _instanceExtraInitializers = [];
 	let _status_decorators;
+	let _log_decorators;
+	let _patch_decorators;
 	let _fileStats_decorators;
 	let _fileDiff_decorators;
 	let _stage_decorators;
@@ -622,6 +861,8 @@ let GitExplorerService = (() => {
 		static {
 			const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;
 			_status_decorators = [Remote];
+			_log_decorators = [Remote];
+			_patch_decorators = [Remote];
 			_fileStats_decorators = [Remote];
 			_fileDiff_decorators = [Remote];
 			_stage_decorators = [Remote];
@@ -637,6 +878,28 @@ let GitExplorerService = (() => {
 				access: {
 					has: (obj) => "status" in obj,
 					get: (obj) => obj.status
+				},
+				metadata: _metadata
+			}, null, _instanceExtraInitializers);
+			__esDecorate(this, null, _log_decorators, {
+				kind: "method",
+				name: "log",
+				static: false,
+				private: false,
+				access: {
+					has: (obj) => "log" in obj,
+					get: (obj) => obj.log
+				},
+				metadata: _metadata
+			}, null, _instanceExtraInitializers);
+			__esDecorate(this, null, _patch_decorators, {
+				kind: "method",
+				name: "patch",
+				static: false,
+				private: false,
+				access: {
+					has: (obj) => "patch" in obj,
+					get: (obj) => obj.patch
 				},
 				metadata: _metadata
 			}, null, _instanceExtraInitializers);
@@ -759,6 +1022,7 @@ let GitExplorerService = (() => {
 					this.scope = void 0;
 				};
 			});
+			registerGitTools(ctx, this);
 		}
 		/**
 		* Read the working-tree state for one Session.
@@ -825,6 +1089,105 @@ let GitExplorerService = (() => {
 				gitVersion: version,
 				note
 			});
+		}
+		/**
+		* Read the most recent commits on the current branch.
+		*
+		* @param sessionId - the Session identity received on the wire.
+		* @param requestRoot - the working directory the panel offers, if any.
+		* @param limit - how many commits to return.
+		* @param path - restrict the history to one path; empty string means the whole branch.
+		* @param signal - the invocation's cancellation signal.
+		* @returns the commits, newest first.
+		*/
+		async log(sessionId, requestRoot, limit, path, signal) {
+			const root = await this.repositoryRoot(sessionId, requestRoot, signal);
+			if (root === null) return [];
+			const capped = Number.isFinite(limit) && limit > 0 ? Math.min(Math.floor(limit), 200) : 20;
+			return await readLog(this.scope ?? this.ctx, this.limits, {
+				root,
+				limit: capped,
+				path,
+				signal
+			});
+		}
+		/**
+		* Read the unified patch for one changed file, as the model reads diffs.
+		*
+		* @param sessionId - the Session identity received on the wire.
+		* @param requestRoot - the working directory the panel offers, if any.
+		* @param path - the repository-relative path.
+		* @param staged - true to compare the index against HEAD.
+		* @param signal - the invocation's cancellation signal.
+		* @returns the patch text, or the reason there is none.
+		*/
+		async patch(sessionId, requestRoot, path, staged, signal) {
+			const scope = this.scope;
+			if (scope === void 0) return {
+				path,
+				patch: "",
+				note: "the host git services are not available yet"
+			};
+			const root = await this.repositoryRoot(sessionId, requestRoot, signal);
+			if (root === null) return {
+				path,
+				patch: "",
+				note: "no repository resolved for this Session"
+			};
+			const args = staged ? [
+				"diff",
+				"--cached",
+				"--no-color",
+				"--no-ext-diff",
+				"-U3",
+				"--",
+				path
+			] : [
+				"diff",
+				"--no-color",
+				"--no-ext-diff",
+				"-U3",
+				"--",
+				path
+			];
+			const result = await runGit(scope, this.limits, {
+				cwd: root,
+				args,
+				signal
+			});
+			if (result.exitCode !== 0) return {
+				path,
+				patch: "",
+				note: (result.stderr.trim().split("\n")[0] ?? "git diff failed").slice(0, 200)
+			};
+			const note = result.stdoutLossy ? "the patch exceeded the output cap and was cut" : "";
+			return {
+				path,
+				patch: result.stdout,
+				note
+			};
+		}
+		/**
+		* Resolve the repository root for one Session, or null when there is none.
+		*
+		* @param sessionId - the Session identity received on the wire.
+		* @param requestRoot - the working directory the panel offers, if any.
+		* @param signal - caller cancellation.
+		* @returns the repository's top level.
+		*/
+		async repositoryRoot(sessionId, requestRoot, signal) {
+			const scope = this.scope;
+			if (scope === void 0) return null;
+			const resolved = await resolveRoot(scope, sessionId, requestRoot);
+			if (resolved.root === null) return null;
+			const located = await runGit(scope, this.limits, {
+				cwd: resolved.root,
+				args: [...REV_PARSE_ARGS],
+				signal
+			});
+			if (located.exitCode !== 0) return null;
+			const [toplevel] = located.stdout.split("\n");
+			return toplevel === void 0 || toplevel === "" ? resolved.root : toplevel;
 		}
 		/**
 		* Read the per-file line counts both comparisons report.

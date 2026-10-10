@@ -752,6 +752,24 @@ Tests now total **55** (16 parser, 8 tree, 6 numstat, 6 diff, 19 panel).
 
 ---
 
+## 17. Agent tools (M5)
+
+The plugin now gives the model the same view the panel has, through three read-only tools registered on the Host service:
+
+| Tool | Arguments | Answer |
+|---|---|---|
+| `git_status` | `maxFiles?` | the branch line, upstream drift, in-progress operation, and the staged / unstaged / untracked / conflicted paths |
+| `git_diff` | `path` (required), `staged?`, `untracked?` | the unified patch of one file — work tree against index by default, index against HEAD with `staged`; an untracked file comes back as its whole content under `added` |
+| `git_log` | `limit?`, `path?` | recent commits with hash, short hash, author, ISO date and subject |
+
+Two host reads were added for them: `@Remote log(...)` (a pure `parseLog` over a NUL- and `\x1f`-separated `git log --format`, because subjects can contain anything) and `@Remote patch(...)` (`git diff --no-color -U3`, which is what a model reads best — the panel keeps using the two-sided read for `DiffBlock`).
+
+**A constraint worth recording:** the natural implementation imports `defineTool` from `@deepseek-ai/dsh-tools`, and that import pulls `@deepseek-ai/dsh-session` into the program the Typert generator analyzes — generation then fails with *"merged interface TypertLookupMap contains a declaration outside this face"*, the same closed-program rule recorded in §11.3. The tools are therefore declared with hand-written JSON Schemas and registered directly (the registry accepts a plain definition), which keeps the analyzed program closed. `src/tools.ts` documents this in place.
+
+Verification: `scripts/probe-tools.mjs` applies the plugin through a real Cordis context whose `tools` registry records every definition, checks that all three register with a description and an output schema, then calls each handler the way the pipeline does against a scratch repository — including the untracked-file path, an empty staged comparison, and a call with no session (which answers with an error instead of throwing). **All checks pass.**
+
+---
+
 ## Appendix A — research artifacts produced for this plan
 
 | Path | What it is |

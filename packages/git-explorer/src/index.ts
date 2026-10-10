@@ -25,9 +25,19 @@ import {
   stageArgs,
   unstageArgs,
 } from './git/mutations.js'
-import type { GitChangeStats, GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from './types.js'
+import type {
+  GitChangeStats,
+  GitCommitSummary,
+  GitFileDiff,
+  GitMutationResult,
+  GitPatch,
+  GitPingResult,
+  GitStatusSummary,
+} from './types.js'
 import { readFileDiff } from './git/diff.js'
 import { readStats } from './git/numstat.js'
+import { readLog } from './git/log.js'
+import { registerGitTools } from './tools.js'
 
 /**
  * Declare this package as the owner of the `git` Host service. Besides giving Host
@@ -43,7 +53,7 @@ declare module '@deepseek-ai/cordis' {
 }
 
 /** The plugin's own version, reported to the panel so a build is identifiable. */
-const PACKAGE_VERSION = '0.1.0-m4'
+const PACKAGE_VERSION = '0.1.0-m5'
 
 /** `rev-parse` output that locates the repository. */
 const REV_PARSE_ARGS = ['rev-parse', '--show-toplevel', '--absolute-git-dir'] as const
@@ -108,6 +118,8 @@ export class GitExplorerService extends TypertRemoteService {
         this.scope = undefined
       }
     })
+    // The read-only agent tools read the same service the panel does.
+    registerGitTools(ctx, this)
   }
 
   /**
@@ -191,6 +203,90 @@ export class GitExplorerService extends TypertRemoteService {
       gitVersion: version,
       note,
     })
+  }
+
+  /**
+   * Read the most recent commits on the current branch.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param limit - how many commits to return.
+   * @param path - restrict the history to one path; empty string means the whole branch.
+   * @param signal - the invocation's cancellation signal.
+   * @returns the commits, newest first.
+   */
+  @Remote
+  async log(
+    sessionId: string,
+    requestRoot: string,
+    limit: number,
+    path: string,
+    signal: AbortSignal,
+  ): Promise<GitCommitSummary[]> {
+    const root = await this.repositoryRoot(sessionId, requestRoot, signal)
+    if (root === null) return []
+    const capped = Number.isFinite(limit) && limit > 0 ? Math.min(Math.floor(limit), 200) : 20
+    return await readLog(this.scope ?? this.ctx, this.limits, { root, limit: capped, path, signal })
+  }
+
+  /**
+   * Read the unified patch for one changed file, as the model reads diffs.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param path - the repository-relative path.
+   * @param staged - true to compare the index against HEAD.
+   * @param signal - the invocation's cancellation signal.
+   * @returns the patch text, or the reason there is none.
+   */
+  @Remote
+  async patch(
+    sessionId: string,
+    requestRoot: string,
+    path: string,
+    staged: boolean,
+    signal: AbortSignal,
+  ): Promise<GitPatch> {
+    const scope = this.scope
+    if (scope === undefined) return { path, patch: '', note: 'the host git services are not available yet' }
+    const root = await this.repositoryRoot(sessionId, requestRoot, signal)
+    if (root === null) return { path, patch: '', note: 'no repository resolved for this Session' }
+    const args = staged
+      ? ['diff', '--cached', '--no-color', '--no-ext-diff', '-U3', '--', path]
+      : ['diff', '--no-color', '--no-ext-diff', '-U3', '--', path]
+    const result = await runGit(scope, this.limits, { cwd: root, args, signal })
+    if (result.exitCode !== 0) {
+      return { path, patch: '', note: (result.stderr.trim().split('\n')[0] ?? 'git diff failed').slice(0, 200) }
+    }
+    const note = result.stdoutLossy ? 'the patch exceeded the output cap and was cut' : ''
+    return { path, patch: result.stdout, note }
+  }
+
+  /**
+   * Resolve the repository root for one Session, or null when there is none.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param signal - caller cancellation.
+   * @returns the repository's top level.
+   */
+  private async repositoryRoot(
+    sessionId: string,
+    requestRoot: string,
+    signal: AbortSignal,
+  ): Promise<string | null> {
+    const scope = this.scope
+    if (scope === undefined) return null
+    const resolved = await resolveRoot(scope, sessionId, requestRoot)
+    if (resolved.root === null) return null
+    const located = await runGit(scope, this.limits, {
+      cwd: resolved.root,
+      args: [...REV_PARSE_ARGS],
+      signal,
+    })
+    if (located.exitCode !== 0) return null
+    const [toplevel] = located.stdout.split('\n')
+    return toplevel === undefined || toplevel === '' ? resolved.root : toplevel
   }
 
   /**
