@@ -29,6 +29,26 @@ const _jpolv_dsh_git_explorer_git_discard_result$schema = () => (_jpolv_dsh_git_
   'ok': z.boolean(),
   'detail': z.string(),
 }))
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema$value ??= z.string())
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema$value ??= z.string())
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema$value ??= z.string())
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema$value ??= z.boolean())
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema$value ??= z.boolean())
+let _jpolv_dsh_git_explorer_git_fileDiff_result$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_result$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_result$schema$value ??= z.object({
+  'path': z.string(),
+  'staged': z.boolean(),
+  'oldText': z.string(),
+  'newText': z.string(),
+  'binary': z.boolean(),
+  'oversized': z.boolean(),
+  'note': z.string(),
+}))
 let _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value
 const _jpolv_dsh_git_explorer_git_ping_parameter_0$schema = () => (_jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value ??= z.string())
 let _jpolv_dsh_git_explorer_git_ping_parameter_1$schema$value
@@ -184,7 +204,7 @@ export const TYPERT = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitMutationResult',
         create: _jpolv_dsh_git_explorer_git_commit_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":288,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":342,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/discard',
@@ -250,7 +270,73 @@ export const TYPERT = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitMutationResult',
         create: _jpolv_dsh_git_explorer_git_discard_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":245,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":299,"column":9},
+    },
+    {
+      id: '@jpolv/dsh-git-explorer#git/fileDiff',
+      service: 'git',
+      namespace: 'git',
+      method: 'fileDiff',
+      invocation: { kind: 'direct' },
+      parameters: [
+        {
+          name: 'sessionId',
+          wire: 'sessionId',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:sessionId',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema,
+          },
+        },
+        {
+          name: 'requestRoot',
+          wire: 'requestRoot',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:requestRoot',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema,
+          },
+        },
+        {
+          name: 'path',
+          wire: 'path',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:path',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema,
+          },
+        },
+        {
+          name: 'staged',
+          wire: 'staged',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:staged',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema,
+          },
+        },
+        {
+          name: 'untracked',
+          wire: 'untracked',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:untracked',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema,
+          },
+        },
+      ],
+      cancellation: { parameter: 'signal' },
+      result: {
+        mode: 'strict',
+        typeSymbol: '@jpolv/dsh-git-explorer/types#GitFileDiff',
+        create: _jpolv_dsh_git_explorer_git_fileDiff_result$schema,
+      },
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":207,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/ping',
@@ -286,7 +372,7 @@ export const TYPERT = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitPingResult',
         create: _jpolv_dsh_git_explorer_git_ping_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":354,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":408,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/stage',
@@ -332,7 +418,7 @@ export const TYPERT = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitMutationResult',
         create: _jpolv_dsh_git_explorer_git_stage_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":201,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":255,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/status',
@@ -368,7 +454,7 @@ export const TYPERT = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitStatusSummary',
         create: _jpolv_dsh_git_explorer_git_status_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":118,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":122,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/unstage',
@@ -414,7 +500,7 @@ export const TYPERT = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitMutationResult',
         create: _jpolv_dsh_git_explorer_git_unstage_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":220,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":274,"column":9},
     },
   ],
   model: {
@@ -430,6 +516,13 @@ export const TYPERT = {
             "signature": "@Remote async status(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<GitStatusSummary>",
             "summary": "Read the working-tree state for one Session.",
             "jsDoc": "/**\n * Read the working-tree state for one Session.\n *\n * @param sessionId - the Session identity received on the wire.\n * @param requestRoot - the working directory the panel offers when the host's own\n *   Session lookup cannot answer; empty string when the panel has nothing to offer.\n * @param signal - the invocation's cancellation signal, injected by the gateway.\n * @returns the status summary the panel renders.\n */"
+          },
+          {
+            "kind": "method",
+            "name": "fileDiff",
+            "signature": "@Remote async fileDiff( sessionId: string, requestRoot: string, path: string, staged: boolean, untracked: boolean, signal: AbortSignal, ): Promise<GitFileDiff>",
+            "summary": "Read both sides of one changed file for the diff view.",
+            "jsDoc": "/**\n * Read both sides of one changed file for the diff view.\n *\n * @param sessionId - the Session identity received on the wire.\n * @param requestRoot - the working directory the panel offers, if any.\n * @param path - the repository-relative path.\n * @param staged - true to compare the index against HEAD instead of the work tree.\n * @param untracked - true when git does not track the path yet (no old side).\n * @param signal - the invocation's cancellation signal.\n * @returns the two sides, or the flags explaining why they are not shown.\n */"
           },
           {
             "kind": "method",
@@ -471,6 +564,10 @@ export const TYPERT = {
           {
             "name": "GitChange",
             "declaration": "export interface GitChange {\n    path: string;\n    origPath?: string;\n    status: GitFileStatus;\n    index: string;\n    worktree: string;\n    staged: boolean;\n    renameScore?: number;\n}"
+          },
+          {
+            "name": "GitFileDiff",
+            "declaration": "export interface GitFileDiff {\n    path: string;\n    staged: boolean;\n    oldText: string;\n    newText: string;\n    binary: boolean;\n    oversized: boolean;\n    note: string;\n}"
           },
           {
             "name": "GitFileStatus",

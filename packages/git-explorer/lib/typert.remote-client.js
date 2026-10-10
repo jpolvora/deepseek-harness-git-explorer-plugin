@@ -29,6 +29,26 @@ const _jpolv_dsh_git_explorer_git_discard_result$schema = () => (_jpolv_dsh_git_
   'ok': z.boolean(),
   'detail': z.string(),
 }))
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema$value ??= z.string())
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema$value ??= z.string())
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema$value ??= z.string())
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema$value ??= z.boolean())
+let _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema$value ??= z.boolean())
+let _jpolv_dsh_git_explorer_git_fileDiff_result$schema$value
+const _jpolv_dsh_git_explorer_git_fileDiff_result$schema = () => (_jpolv_dsh_git_explorer_git_fileDiff_result$schema$value ??= z.object({
+  'path': z.string(),
+  'staged': z.boolean(),
+  'oldText': z.string(),
+  'newText': z.string(),
+  'binary': z.boolean(),
+  'oversized': z.boolean(),
+  'note': z.string(),
+}))
 let _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value
 const _jpolv_dsh_git_explorer_git_ping_parameter_0$schema = () => (_jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value ??= z.string())
 let _jpolv_dsh_git_explorer_git_ping_parameter_1$schema$value
@@ -181,7 +201,7 @@ export const TYPERT_REMOTE = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitMutationResult',
         create: _jpolv_dsh_git_explorer_git_commit_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":288,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":342,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/discard',
@@ -247,7 +267,73 @@ export const TYPERT_REMOTE = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitMutationResult',
         create: _jpolv_dsh_git_explorer_git_discard_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":245,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":299,"column":9},
+    },
+    {
+      id: '@jpolv/dsh-git-explorer#git/fileDiff',
+      service: 'git',
+      namespace: 'git',
+      method: 'fileDiff',
+      invocation: { kind: 'direct' },
+      parameters: [
+        {
+          name: 'sessionId',
+          wire: 'sessionId',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:sessionId',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_0$schema,
+          },
+        },
+        {
+          name: 'requestRoot',
+          wire: 'requestRoot',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:requestRoot',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_1$schema,
+          },
+        },
+        {
+          name: 'path',
+          wire: 'path',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:path',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_2$schema,
+          },
+        },
+        {
+          name: 'staged',
+          wire: 'staged',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:staged',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_3$schema,
+          },
+        },
+        {
+          name: 'untracked',
+          wire: 'untracked',
+          source: 'json',
+          codec: {
+            mode: 'strict',
+            typeSymbol: '@jpolv/dsh-git-explorer#git/fileDiff:untracked',
+            create: _jpolv_dsh_git_explorer_git_fileDiff_parameter_4$schema,
+          },
+        },
+      ],
+      cancellation: { parameter: 'signal' },
+      result: {
+        mode: 'strict',
+        typeSymbol: '@jpolv/dsh-git-explorer/types#GitFileDiff',
+        create: _jpolv_dsh_git_explorer_git_fileDiff_result$schema,
+      },
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":207,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/ping',
@@ -283,7 +369,7 @@ export const TYPERT_REMOTE = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitPingResult',
         create: _jpolv_dsh_git_explorer_git_ping_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":354,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":408,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/stage',
@@ -329,7 +415,7 @@ export const TYPERT_REMOTE = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitMutationResult',
         create: _jpolv_dsh_git_explorer_git_stage_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":201,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":255,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/status',
@@ -365,7 +451,7 @@ export const TYPERT_REMOTE = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitStatusSummary',
         create: _jpolv_dsh_git_explorer_git_status_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":118,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":122,"column":9},
     },
     {
       id: '@jpolv/dsh-git-explorer#git/unstage',
@@ -411,7 +497,7 @@ export const TYPERT_REMOTE = {
         typeSymbol: '@jpolv/dsh-git-explorer/types#GitMutationResult',
         create: _jpolv_dsh_git_explorer_git_unstage_result$schema,
       },
-      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":220,"column":9},
+      sourceLocation: {"file":"packages/git-explorer/src/index.ts","line":274,"column":9},
     },
   ],
 }

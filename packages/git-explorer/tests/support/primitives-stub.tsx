@@ -38,3 +38,35 @@ export function classifyFileType(name: string): string {
 export function fileExtension(name: string): string {
   return name.includes('.') ? name.slice(name.lastIndexOf('.') + 1) : ''
 }
+
+/** Stand-in for the unified diff renderer: it reports the sides it was handed. */
+export function DiffBlock({ diffs }: {
+  diffs: { path: string; oldText: string | null; newText: string }[]
+}): React.ReactElement {
+  return (
+    <div data-testid="diff-block">
+      {diffs.map((diff) => (
+        <div key={diff.path}>
+          <span data-testid="diff-path">{diff.path}</span>
+          <pre data-testid="diff-old">{diff.oldText ?? ''}</pre>
+          <pre data-testid="diff-new">{diff.newText}</pre>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** Count lines the way the shipped helper does, coarsely, for assertions. */
+export function diffTotals(diffs: { oldText: string | null; newText: string }[]): { added: number; removed: number } {
+  let added = 0
+  let removed = 0
+  for (const diff of diffs) {
+    const before = diff.oldText === null || diff.oldText === '' ? [] : diff.oldText.replace(/\n$/, '').split('\n')
+    const after = diff.newText === '' ? [] : diff.newText.replace(/\n$/, '').split('\n')
+    const shared = new Set(before)
+    added += after.filter((line) => !shared.has(line)).length
+    const afterSet = new Set(after)
+    removed += before.filter((line) => !afterSet.has(line)).length
+  }
+  return { added, removed }
+}

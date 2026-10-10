@@ -3,12 +3,13 @@ import type {
   RemoteResult,
   TypertRemoteContribution,
 } from '@deepseek-ai/dsh-typert-protocol'
-import type { GitMutationResult, GitPingResult, GitStatusSummary } from '@jpolv/dsh-git-explorer/types'
+import type { GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from '@jpolv/dsh-git-explorer/types'
 
 declare module '@deepseek-ai/dsh-typert-protocol' {
   interface TypertRemoteNamespace$676974 {
     commit: (sessionId: string, requestRoot: string, message: string, amend: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     discard: (sessionId: string, requestRoot: string, trackedPaths: string[], untrackedPaths: string[], confirmed: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
+    fileDiff: (sessionId: string, requestRoot: string, path: string, staged: boolean, untracked: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitFileDiff>>
     ping: (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitPingResult>>
     stage: (sessionId: string, requestRoot: string, paths: string[], signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     status: (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitStatusSummary>>
@@ -17,6 +18,7 @@ declare module '@deepseek-ai/dsh-typert-protocol' {
   interface TypertRemoteMap {
     'git/commit': (sessionId: string, requestRoot: string, message: string, amend: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     'git/discard': (sessionId: string, requestRoot: string, trackedPaths: string[], untrackedPaths: string[], confirmed: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
+    'git/fileDiff': (sessionId: string, requestRoot: string, path: string, staged: boolean, untracked: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitFileDiff>>
     'git/ping': (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitPingResult>>
     'git/stage': (sessionId: string, requestRoot: string, paths: string[], signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     'git/status': (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitStatusSummary>>

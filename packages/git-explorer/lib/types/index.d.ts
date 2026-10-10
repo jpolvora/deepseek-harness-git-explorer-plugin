@@ -15,7 +15,7 @@ import type { Context } from '@deepseek-ai/cordis';
 import z from '@deepseek-ai/schemastery';
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol';
 import { type GitCommandLimits } from './git/commands.js';
-import type { GitMutationResult, GitPingResult, GitStatusSummary } from './types.js';
+import type { GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from './types.js';
 /**
  * Declare this package as the owner of the `git` Host service. Besides giving Host
  * consumers a typed handle, this augmentation is what makes the package a Typert
@@ -32,6 +32,8 @@ declare module '@deepseek-ai/cordis' {
 export interface GitExplorerConfig extends GitCommandLimits {
     /** Cap on entries carried by one status read. */
     maxFiles: number;
+    /** Cap on one side of a file comparison; a larger side is reported, not truncated. */
+    maxFileBytes: number;
 }
 export declare class GitExplorerService extends TypertRemoteService {
     /**
@@ -49,11 +51,13 @@ export declare class GitExplorerService extends TypertRemoteService {
         timeoutMs: z<number, number, "defined">;
         outputMaxBytes: z<number, number, "defined">;
         maxFiles: z<number, number, "defined">;
+        maxFileBytes: z<number, number, "defined">;
     }>>, Schemastery.ObjectT<NoInfer<{
         gitPath: z<string, string, "defined">;
         timeoutMs: z<number, number, "defined">;
         outputMaxBytes: z<number, number, "defined">;
         maxFiles: z<number, number, "defined">;
+        maxFileBytes: z<number, number, "defined">;
     }>>, "plain">;
     private readonly limits;
     /** The injected scope every git read runs on; undefined until the services exist. */
@@ -75,6 +79,18 @@ export declare class GitExplorerService extends TypertRemoteService {
      * @returns the status summary the panel renders.
      */
     status(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<GitStatusSummary>;
+    /**
+     * Read both sides of one changed file for the diff view.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param path - the repository-relative path.
+     * @param staged - true to compare the index against HEAD instead of the work tree.
+     * @param untracked - true when git does not track the path yet (no old side).
+     * @param signal - the invocation's cancellation signal.
+     * @returns the two sides, or the flags explaining why they are not shown.
+     */
+    fileDiff(sessionId: string, requestRoot: string, path: string, staged: boolean, untracked: boolean, signal: AbortSignal): Promise<GitFileDiff>;
     /**
      * Stage the given paths.
      *

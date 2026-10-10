@@ -275,4 +275,40 @@ describe('Git panel actions', () => {
       expect(recorder.calls).toContain('unstage:src/app.ts')
     })
   })
+
+  it('opens the comparison tab for the clicked file', async () => {
+    const opened: { kind: string; params?: Record<string, unknown> }[] = []
+    const useTabInfo = () => ({
+      tab: {
+        id: 'tab-1',
+        navigation: { params: {} },
+        actions: {
+          openTab: (kind: string, options?: { params?: Record<string, unknown> }) => {
+            opened.push({ kind, ...(options?.params === undefined ? {} : { params: options.params }) })
+          },
+        },
+      },
+    })
+    render(<GitBody sessionId="session-1" useTabInfo={useTabInfo} {...bridge(summary())} />)
+    fireEvent.click(await screen.findByTitle('src/other.ts'))
+    expect(opened).toEqual([{ kind: 'git-diff', params: { path: 'src/other.ts', staged: false, untracked: false } }])
+  })
+
+  it('marks an untracked file as having no old side when opening its comparison', async () => {
+    const opened: Record<string, unknown>[] = []
+    const useTabInfo = () => ({
+      tab: {
+        id: 'tab-1',
+        navigation: { params: {} },
+        actions: {
+          openTab: (_kind: string, options?: { params?: Record<string, unknown> }) => {
+            opened.push(options?.params ?? {})
+          },
+        },
+      },
+    })
+    render(<GitBody sessionId="session-1" useTabInfo={useTabInfo} {...bridge(summary())} />)
+    fireEvent.click(await screen.findByTitle('notes.md'))
+    expect(opened).toEqual([{ path: 'notes.md', staged: false, untracked: true }])
+  })
 })

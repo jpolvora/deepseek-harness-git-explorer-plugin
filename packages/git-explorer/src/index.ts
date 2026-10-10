@@ -25,7 +25,8 @@ import {
   stageArgs,
   unstageArgs,
 } from './git/mutations.js'
-import type { GitMutationResult, GitPingResult, GitStatusSummary } from './types.js'
+import type { GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from './types.js'
+import { readFileDiff } from './git/diff.js'
 
 /**
  * Declare this package as the owner of the `git` Host service. Besides giving Host
@@ -41,7 +42,7 @@ declare module '@deepseek-ai/cordis' {
 }
 
 /** The plugin's own version, reported to the panel so a build is identifiable. */
-const PACKAGE_VERSION = '0.1.0-m2'
+const PACKAGE_VERSION = '0.1.0-m3'
 
 /** `rev-parse` output that locates the repository. */
 const REV_PARSE_ARGS = ['rev-parse', '--show-toplevel', '--absolute-git-dir'] as const
@@ -61,6 +62,8 @@ const OPERATION_REFS: ReadonlyArray<readonly [string, string]> = [
 export interface GitExplorerConfig extends GitCommandLimits {
   /** Cap on entries carried by one status read. */
   maxFiles: number
+  /** Cap on one side of a file comparison; a larger side is reported, not truncated. */
+  maxFileBytes: number
 }
 
 export class GitExplorerService extends TypertRemoteService {
@@ -80,6 +83,7 @@ export class GitExplorerService extends TypertRemoteService {
     timeoutMs: z.number().step(1).min(1).default(30_000),
     outputMaxBytes: z.number().step(1).min(1).default(8 * 1024 * 1024),
     maxFiles: z.number().step(1).min(1).default(2_000),
+    maxFileBytes: z.number().step(1).min(1).default(2 * 1024 * 1024),
   })
 
   private readonly limits: GitExplorerConfig
@@ -185,6 +189,56 @@ export class GitExplorerService extends TypertRemoteService {
       operation: await this.detectOperation(scope, root, signal),
       gitVersion: version,
       note,
+    })
+  }
+
+  /**
+   * Read both sides of one changed file for the diff view.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param path - the repository-relative path.
+   * @param staged - true to compare the index against HEAD instead of the work tree.
+   * @param untracked - true when git does not track the path yet (no old side).
+   * @param signal - the invocation's cancellation signal.
+   * @returns the two sides, or the flags explaining why they are not shown.
+   */
+  @Remote
+  async fileDiff(
+    sessionId: string,
+    requestRoot: string,
+    path: string,
+    staged: boolean,
+    untracked: boolean,
+    signal: AbortSignal,
+  ): Promise<GitFileDiff> {
+    const empty = (note: string): GitFileDiff => ({
+      path, staged, oldText: '', newText: '', binary: false, oversized: false, note,
+    })
+    const scope = this.scope
+    if (scope === undefined) return empty('the host git services are not available yet')
+
+    const resolved = await resolveRoot(scope, sessionId, requestRoot)
+    if (resolved.root === null) return empty(resolved.note)
+
+    const located = await runGit(scope, this.limits, {
+      cwd: resolved.root,
+      args: [...REV_PARSE_ARGS],
+      signal,
+    })
+    if (located.exitCode !== 0) {
+      return empty((located.stderr.trim().split('\n')[0] ?? 'not a git repository').slice(0, 200))
+    }
+    const [toplevel] = located.stdout.split('\n')
+    const root = toplevel === undefined || toplevel === '' ? resolved.root : toplevel
+
+    return await readFileDiff(scope, this.limits, {
+      root,
+      path,
+      staged,
+      untracked,
+      maxFileBytes: this.limits.maxFileBytes,
+      signal,
     })
   }
 

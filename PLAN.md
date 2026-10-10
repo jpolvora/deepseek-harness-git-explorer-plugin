@@ -705,6 +705,26 @@ One fixture lesson worth keeping: Git for Windows defaults to `core.autocrlf=tru
 
 Sandbox confinement and approval for mutating verbs (M2.5): the panel gates destructive actions and the host requires `confirmed`, but the commands themselves are not yet run through `ctx.sandbox.confine` / `ctx.approval.request` when a session's policy is narrower than this one. Tracked in §7 as M6 alongside push/pull.
 
+**Verified in the running GUI**: after the m2 install and a restart, the message box renders under the branch line, hovering a file row shows the `+` and trash actions, and `Stage all` moves a file from Changes to Staged changes against the real repository. Committed as `213caec`.
+
+## 15. Diff view (M3)
+
+Clicking a changed file opens a comparison tab showing the shipped unified `DiffBlock` — the same renderer the transcript's edit cards use, so a diff reads the same everywhere in the product.
+
+| Piece | Where | Notes |
+|---|---|---|
+| Side reader | `src/git/diff.ts` | staged = `HEAD:<path>` against `:<path>`; unstaged = `:<path>` against the work-tree file read through `ctx.fs`; an untracked file has no old side, a deleted file no new side |
+| Remote | `@Remote fileDiff(sessionId, root, path, staged, untracked, signal)` | returns `{ oldText, newText, binary, oversized, note }` |
+| Tab type | `client/index.ts` | a second registered type, `git-diff`, with `multiple: true` so each file gets its own tab; opened by the panel as `openTab('git-diff', { params: { path, staged, untracked } })` |
+| Body | `src/client/GitDiffBody.tsx` | reads the params from `useTabInfo`, renders the toolbar/diff with `+N −M` totals from `diffTotals`, and prints a plain notice instead of a diff for binary or oversized sides |
+| Chip | `DiffTitle` | shows the file's own name (the open-time title is a generic "Diff") |
+
+Config gained `maxFileBytes` (default 2 MiB): a side larger than that is reported, never truncated into a diff that looks complete.
+
+Verification: `scripts/probe-diff.mjs` drives the real service through a real Cordis context against a scratch repository and asserts both sides for seven shapes — unstaged, staged, partially staged, untracked, deleted, binary, oversized — **all checks pass**. Client tests cover both sides rendering, the staged label, the binary and oversized notices, a tab with no file, and the panel's row click passing the right params (47 tests total).
+
+Known gap: the diff tab does not yet offer "open the file itself at a line"; that needs the resource-address helper the Files panel uses and is deferred to the next UI pass.
+
 ---
 
 ## Appendix A — research artifacts produced for this plan

@@ -16,6 +16,12 @@ export const GIT_EXPLORER_ID = '@jpolv/dsh-git-explorer'
 /** The right-sidebar tab kind this plugin registers. */
 export const GIT_TAB_KIND = 'git'
 
+/** The tab kind that shows one file's comparison. */
+export const GIT_DIFF_TAB_KIND = 'git-diff'
+
+/** The definition id of the diff tab type (distinct from the panel's). */
+export const GIT_DIFF_ID = '@jpolv/dsh-git-explorer/diff'
+
 /** The Remote wire namespace the host service binds to (`remote.git.*`). */
 export const GIT_REMOTE_NAMESPACE = 'git'
 
@@ -79,6 +85,23 @@ export interface GitStatusSummary {
   note: string
 }
 
+/** Both sides of one changed file, as the diff view renders them. */
+export interface GitFileDiff {
+  path: string
+  /** True when the comparison is the index against HEAD rather than the work tree against the index. */
+  staged: boolean
+  /** The prior side; empty when there is none (an added or untracked file). */
+  oldText: string
+  /** The current side; empty when the file was deleted. */
+  newText: string
+  /** One side is not UTF-8 text, so no diff is shown. */
+  binary: boolean
+  /** One side exceeded the read cap, so the diff would be incomplete. */
+  oversized: boolean
+  /** Human-readable context when something could not be read. */
+  note: string
+}
+
 /** What one mutating call did. */
 export interface GitMutationResult {
   ok: boolean
@@ -113,3 +136,6 @@ export type GitPingOutcome = GitOutcome<GitPingResult>
 
 /** The panel's view of a status read. */
 export type GitStatusOutcome = GitOutcome<GitStatusSummary>
+
+/** The diff view's reading of one file comparison. */
+export type GitFileDiffOutcome = GitOutcome<GitFileDiff>

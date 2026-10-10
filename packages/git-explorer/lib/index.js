@@ -336,6 +336,140 @@ async function runMutation(ctx, limits, options) {
 	}
 }
 //#endregion
+//#region lib/types/git/diff.js
+/** Decode UTF-8 and refuse anything that reads as binary. */
+function decodeText(bytes) {
+	if (bytes.includes(0)) return null;
+	try {
+		return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+	} catch {
+		return null;
+	}
+}
+/** Read one git object as text. */
+async function readObject(ctx, limits, options) {
+	const result = await runGit(ctx, limits, {
+		cwd: options.root,
+		args: ["show", options.revision],
+		signal: options.signal
+	});
+	if (result.exitCode !== 0) return {
+		text: null,
+		missing: true,
+		lossy: false
+	};
+	return {
+		text: result.stdout,
+		missing: false,
+		lossy: result.stdoutLossy
+	};
+}
+/**
+* Read both sides of one changed file.
+*
+* @param ctx - the injected host scope.
+* @param limits - the configured runner limits.
+* @param options - which file, which comparison, and the caps.
+* @returns the two sides plus the flags the panel renders.
+*/
+async function readFileDiff(ctx, limits, options) {
+	const { root, path, staged, untracked, maxFileBytes, signal } = options;
+	const base = {
+		path,
+		staged,
+		oldText: "",
+		newText: "",
+		binary: false,
+		oversized: false,
+		note: ""
+	};
+	let oldText = "";
+	if (!untracked) {
+		const oldSide = await readObject(ctx, limits, {
+			root,
+			revision: staged ? `HEAD:${path}` : `:${path}`,
+			signal
+		});
+		if (oldSide.text !== null && decodeText(new TextEncoder().encode(oldSide.text)) === null) return {
+			...base,
+			binary: true,
+			note: "the previous version is not text"
+		};
+		if (oldSide.lossy) return {
+			...base,
+			oversized: true,
+			note: "the previous version exceeded the output cap"
+		};
+		oldText = oldSide.text ?? "";
+	}
+	let newText = "";
+	if (staged) {
+		const newSide = await readObject(ctx, limits, {
+			root,
+			revision: `:${path}`,
+			signal
+		});
+		if (newSide.lossy) return {
+			...base,
+			oversized: true,
+			note: "the staged version exceeded the output cap"
+		};
+		newText = newSide.text ?? "";
+	} else {
+		const fs = ctx.get?.("fs");
+		if (fs === void 0) return {
+			...base,
+			oldText,
+			note: "the filesystem service is unavailable, so the working copy could not be read"
+		};
+		try {
+			const target = await fs.resolve(path, {
+				cwd: root,
+				signal
+			});
+			const decoded = decodeText(await fs.readBytes(target, signal, maxFileBytes));
+			if (decoded === null) return {
+				...base,
+				oldText,
+				binary: true,
+				note: "the working copy is not text"
+			};
+			newText = decoded;
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			if (/too-large|maxFileBytes|larger than/i.test(message)) return {
+				...base,
+				oldText,
+				oversized: true,
+				note: "the working copy exceeds the read cap"
+			};
+			if (/not-found|ENOENT|no such file/i.test(message)) return {
+				path,
+				staged,
+				oldText,
+				newText: "",
+				binary: false,
+				oversized: false,
+				note: "the file is deleted in the working tree"
+			};
+			return {
+				...base,
+				oldText,
+				note: message.slice(0, 200)
+			};
+		}
+	}
+	return {
+		path,
+		staged,
+		oldText,
+		newText,
+		binary: false,
+		oversized: false,
+		note: ""
+	};
+}
+//#endregion
 //#region lib/types/index.js
 var __runInitializers = function(thisArg, initializers, value) {
 	var useValue = arguments.length > 2;
@@ -378,7 +512,7 @@ var __esDecorate = function(ctor, descriptorIn, decorators, contextIn, initializ
 	done = true;
 };
 /** The plugin's own version, reported to the panel so a build is identifiable. */
-const PACKAGE_VERSION = "0.1.0-m2";
+const PACKAGE_VERSION = "0.1.0-m3";
 /** `rev-parse` output that locates the repository. */
 const REV_PARSE_ARGS = [
 	"rev-parse",
@@ -404,6 +538,7 @@ let GitExplorerService = (() => {
 	let _classSuper = TypertRemoteService;
 	let _instanceExtraInitializers = [];
 	let _status_decorators;
+	let _fileDiff_decorators;
 	let _stage_decorators;
 	let _unstage_decorators;
 	let _discard_decorators;
@@ -413,6 +548,7 @@ let GitExplorerService = (() => {
 		static {
 			const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;
 			_status_decorators = [Remote];
+			_fileDiff_decorators = [Remote];
 			_stage_decorators = [Remote];
 			_unstage_decorators = [Remote];
 			_discard_decorators = [Remote];
@@ -426,6 +562,17 @@ let GitExplorerService = (() => {
 				access: {
 					has: (obj) => "status" in obj,
 					get: (obj) => obj.status
+				},
+				metadata: _metadata
+			}, null, _instanceExtraInitializers);
+			__esDecorate(this, null, _fileDiff_decorators, {
+				kind: "method",
+				name: "fileDiff",
+				static: false,
+				private: false,
+				access: {
+					has: (obj) => "fileDiff" in obj,
+					get: (obj) => obj.fileDiff
 				},
 				metadata: _metadata
 			}, null, _instanceExtraInitializers);
@@ -505,7 +652,8 @@ let GitExplorerService = (() => {
 			gitPath: z.string().default("git"),
 			timeoutMs: z.number().step(1).min(1).default(3e4),
 			outputMaxBytes: z.number().step(1).min(1).default(8388608),
-			maxFiles: z.number().step(1).min(1).default(2e3)
+			maxFiles: z.number().step(1).min(1).default(2e3),
+			maxFileBytes: z.number().step(1).min(1).default(2097152)
 		});
 		limits = __runInitializers(this, _instanceExtraInitializers);
 		/** The injected scope every git read runs on; undefined until the services exist. */
@@ -590,6 +738,48 @@ let GitExplorerService = (() => {
 				operation: await this.detectOperation(scope, root, signal),
 				gitVersion: version,
 				note
+			});
+		}
+		/**
+		* Read both sides of one changed file for the diff view.
+		*
+		* @param sessionId - the Session identity received on the wire.
+		* @param requestRoot - the working directory the panel offers, if any.
+		* @param path - the repository-relative path.
+		* @param staged - true to compare the index against HEAD instead of the work tree.
+		* @param untracked - true when git does not track the path yet (no old side).
+		* @param signal - the invocation's cancellation signal.
+		* @returns the two sides, or the flags explaining why they are not shown.
+		*/
+		async fileDiff(sessionId, requestRoot, path, staged, untracked, signal) {
+			const empty = (note) => ({
+				path,
+				staged,
+				oldText: "",
+				newText: "",
+				binary: false,
+				oversized: false,
+				note
+			});
+			const scope = this.scope;
+			if (scope === void 0) return empty("the host git services are not available yet");
+			const resolved = await resolveRoot(scope, sessionId, requestRoot);
+			if (resolved.root === null) return empty(resolved.note);
+			const located = await runGit(scope, this.limits, {
+				cwd: resolved.root,
+				args: [...REV_PARSE_ARGS],
+				signal
+			});
+			if (located.exitCode !== 0) return empty((located.stderr.trim().split("\n")[0] ?? "not a git repository").slice(0, 200));
+			const [toplevel] = located.stdout.split("\n");
+			const root = toplevel === void 0 || toplevel === "" ? resolved.root : toplevel;
+			return await readFileDiff(scope, this.limits, {
+				root,
+				path,
+				staged,
+				untracked,
+				maxFileBytes: this.limits.maxFileBytes,
+				signal
 			});
 		}
 		/**

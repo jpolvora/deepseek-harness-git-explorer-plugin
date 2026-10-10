@@ -24,6 +24,7 @@ import {
   classifyFileType,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import { buildChangeTree, type ChangeTreeNode } from './change-tree.js'
+import { GIT_DIFF_TAB_KIND } from '../types.js'
 import type {
   GitChange,
   GitFileStatus,
@@ -41,10 +42,21 @@ interface SessionListState {
   byId: Record<string, { cwd?: string } | undefined>
 }
 
+/** The tab-information hook the sidebar injects into every tab body. */
+type TabInfoHook = () => {
+  tab: {
+    id: string
+    navigation: { params?: Record<string, unknown> }
+    actions: { openTab(kind: string, options?: { params?: Record<string, unknown> }): void }
+  }
+}
+
 /** Props the framework and this plugin's business face deliver to the body. */
 export interface GitBodyProps {
   /** The Session the tab belongs to, delivered by the sidebar's render call. */
   sessionId?: string
+  /** Framework hook: how to open another tab from this one. */
+  useTabInfo?: TabInfoHook
   /** The client session store, part of the session standard kit. */
   useSessions?: SessionsHook
   /** The status read, contributed through the slot's `inject` face factory. */
@@ -187,13 +199,15 @@ function DirectoryRow({ node, depth, collapsed, onToggle }: {
   )
 }
 
-/** A file row: glyph, name, right-aligned status letter, hover actions. */
-function FileRow({ node, depth, hovered, onHover, actions }: {
+/** A file row: glyph, name, right-aligned status letter, hover actions, and a click that
+ * opens the comparison for this file. */
+function FileRow({ node, depth, hovered, onHover, actions, onOpen }: {
   node: ChangeTreeNode
   depth: number
   hovered: boolean
   onHover: (path: string | undefined) => void
   actions: RowAction[]
+  onOpen: () => void
 }): React.ReactElement {
   const change = node.change
   if (change === undefined) {
@@ -203,6 +217,7 @@ function FileRow({ node, depth, hovered, onHover, actions }: {
     <div
       role="treeitem"
       title={change.origPath === undefined ? change.path : `${change.origPath} → ${change.path}`}
+      onClick={onOpen}
       onMouseEnter={() => { onHover(change.path) }}
       onMouseLeave={() => { onHover(undefined) }}
       style={rowStyle(depth, hovered)}
@@ -227,7 +242,7 @@ function FileRow({ node, depth, hovered, onHover, actions }: {
 }
 
 /** Rows for one level, recursing into directories that are expanded. */
-function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor }: {
+function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor, openFor }: {
   nodes: readonly ChangeTreeNode[]
   depth: number
   collapsed: ReadonlySet<string>
@@ -235,6 +250,7 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actions
   hovered: string | undefined
   onHover: (path: string | undefined) => void
   actionsFor: (change: GitChange) => RowAction[]
+  openFor: (change: GitChange) => void
 }): React.ReactElement {
   return (
     <>
@@ -253,6 +269,7 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actions
                   hovered={hovered}
                   onHover={onHover}
                   actionsFor={actionsFor}
+                  openFor={openFor}
                 />
               )}
           </React.Fragment>
@@ -265,6 +282,7 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actions
             hovered={hovered === node.path}
             onHover={onHover}
             actions={node.change === undefined ? [] : actionsFor(node.change)}
+            onOpen={() => { if (node.change !== undefined) openFor(node.change) }}
           />
         ))}
     </>
@@ -272,7 +290,7 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actions
 }
 
 /** One collapsible group with its count badge, its bulk action and its tree. */
-function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor }: {
+function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor, openFor }: {
   title: string
   changes: readonly GitChange[]
   bulk?: { label: string; run: () => void }
@@ -283,6 +301,7 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
   hovered: string | undefined
   onHover: (path: string | undefined) => void
   actionsFor: (change: GitChange) => RowAction[]
+  openFor: (change: GitChange) => void
 }): React.ReactElement | null {
   const tree = React.useMemo(() => buildChangeTree(changes), [changes])
   if (changes.length === 0) return null
@@ -337,6 +356,7 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
             hovered={hovered}
             onHover={onHover}
             actionsFor={actionsFor}
+            openFor={openFor}
           />
         )}
     </div>
@@ -518,6 +538,7 @@ export function GitBody(props: GitBodyProps): React.ReactElement {
 function GitPanel({
   sessionId,
   useSessions,
+  useTabInfo,
   gitStatus,
   gitPing,
   gitStage,
@@ -693,6 +714,13 @@ function GitPanel({
     actionsFor,
   }
 
+  /** Open (or focus) the comparison tab for one file. */
+  const openFor = (change: GitChange, staged: boolean, untracked: boolean): (() => void) => () => {
+    useTabInfo?.().tab.actions.openTab(GIT_DIFF_TAB_KIND, {
+      params: { path: change.path, staged, untracked },
+    })
+  }
+
   const bulkFor = (paths: string[], label: string, run: (paths: string[]) => void): { label: string; run: () => void } => ({
     label,
     run: () => { run(paths) },
@@ -806,6 +834,7 @@ function GitPanel({
                   <Group
                     title="Staged changes"
                     changes={outcome.staged}
+                    openFor={(change) => { openFor(change, true, false)() }}
                     bulk={bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
                       const unstage = bridge.current.gitUnstage
                       if (unstage !== undefined) mutate((signal) => unstage(requestRoot, paths, signal))
@@ -815,16 +844,23 @@ function GitPanel({
                   <Group
                     title="Changes"
                     changes={outcome.unstaged}
+                    openFor={(change) => { openFor(change, false, false)() }}
                     bulk={bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
                       const stage = bridge.current.gitStage
                       if (stage !== undefined) mutate((signal) => stage(requestRoot, paths, signal))
                     })}
                     {...groupProps}
                   />
-                  <Group title="Conflicted" changes={outcome.conflicted} {...groupProps} />
+                  <Group
+                    title="Conflicted"
+                    changes={outcome.conflicted}
+                    openFor={(change) => { openFor(change, false, false)() }}
+                    {...groupProps}
+                  />
                   <Group
                     title="Untracked"
                     changes={outcome.untracked}
+                    openFor={(change) => { openFor(change, false, true)() }}
                     bulk={bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
                       const stage = bridge.current.gitStage
                       if (stage !== undefined) mutate((signal) => stage(requestRoot, paths, signal))

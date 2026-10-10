@@ -1,9 +1,11 @@
+import * as React from 'react';
 // Our own generated Host-for-Client Remote projection. Importing it through the
 // package's `./remote` export is a package self-reference: the bundler inlines it (and
 // its zod schemas) exactly as the shipped remote assembly inlines the ones it mounts.
 import { TYPERT_REMOTE } from '@jpolv/dsh-git-explorer/remote';
-import { GIT_EXPLORER_ID, GIT_TAB_KIND, } from '../types.js';
+import { GIT_DIFF_ID, GIT_DIFF_TAB_KIND, GIT_EXPLORER_ID, GIT_TAB_KIND, } from '../types.js';
 import { GitBody } from './GitBody.js';
+import { GitDiffBody } from './GitDiffBody.js';
 import { GitTitle } from './GitTitle.js';
 export const name = 'git-explorer-client';
 /** Services this half needs to exist before it applies. */
@@ -46,6 +48,7 @@ function hostCalls(ctx) {
     return (sessionId) => ({
         status: (requestRoot, signal) => call((namespace) => namespace.status(sessionId, requestRoot, signal)),
         ping: (requestRoot, signal) => call((namespace) => namespace.ping(sessionId, requestRoot, signal)),
+        fileDiff: (requestRoot, path, staged, untracked, signal) => call((namespace) => namespace.fileDiff(sessionId, requestRoot, path, staged, untracked, signal)),
         mutate: async (run, requestRoot, signal) => {
             const result = await call((namespace) => run(namespace, requestRoot, signal));
             // A mutation always answers with a payload (`ok` plus a line to show); only a
@@ -102,5 +105,39 @@ export async function apply(ctx) {
         name: 'sidebar.right.pane.tab.title',
         key: GIT_EXPLORER_ID,
     }, GitTitle)), 'git-explorer: tab title');
+    // The comparison tab: one instance per file, opened by the panel with the path and
+    // which comparison to show. `multiple: true` is what gives each file its own tab.
+    ctx.effect(() => faces.sidebarRightTabs.register({
+        id: GIT_DIFF_ID,
+        kind: GIT_DIFF_TAB_KIND,
+        priority: 'extension',
+        multiple: true,
+        title: () => 'Diff',
+    }), 'git-explorer: diff tab type');
+    ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab', () => faces.slots.register({
+        name: 'sidebar.right.pane.tab',
+        key: GIT_DIFF_ID,
+        inject: (sessionId) => {
+            const host = hostFor(sessionId);
+            return {
+                gitDiff: (path, staged, untracked, signal) => host.fileDiff('', path, staged, untracked, signal),
+            };
+        },
+    }, GitDiffBody)), 'git-explorer: diff body');
+    ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab.title', () => faces.slots.register({
+        name: 'sidebar.right.pane.tab.title',
+        key: GIT_DIFF_ID,
+    }, DiffTitle)), 'git-explorer: diff title');
+}
+/**
+ * The diff tab's chip: the file's own name, taken from the tab's navigation parameters.
+ *
+ * @returns the chip content.
+ */
+function DiffTitle({ useTabInfo }) {
+    const params = useTabInfo?.().tab.navigation.params;
+    const path = typeof params?.path === 'string' ? params.path : 'Diff';
+    // This module is plain TypeScript, so the element is built without JSX.
+    return React.createElement('span', null, path.split('/').pop() ?? path);
 }
 //# sourceMappingURL=index.js.map

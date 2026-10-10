@@ -38,8 +38,9 @@ import { runGit } from './git/commands.js';
 import { resolveRoot } from './git/repo.js';
 import { parsePorcelainV2, toStatusSummary } from './git/status.js';
 import { commitArgs, discardTrackedArgs, discardUntrackedArgs, runMutation, stageArgs, unstageArgs, } from './git/mutations.js';
+import { readFileDiff } from './git/diff.js';
 /** The plugin's own version, reported to the panel so a build is identifiable. */
-const PACKAGE_VERSION = '0.1.0-m2';
+const PACKAGE_VERSION = '0.1.0-m3';
 /** `rev-parse` output that locates the repository. */
 const REV_PARSE_ARGS = ['rev-parse', '--show-toplevel', '--absolute-git-dir'];
 /** The status read: porcelain v2 is NUL-separated and never quotes paths. */
@@ -55,6 +56,7 @@ let GitExplorerService = (() => {
     let _classSuper = TypertRemoteService;
     let _instanceExtraInitializers = [];
     let _status_decorators;
+    let _fileDiff_decorators;
     let _stage_decorators;
     let _unstage_decorators;
     let _discard_decorators;
@@ -64,12 +66,14 @@ let GitExplorerService = (() => {
         static {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;
             _status_decorators = [Remote];
+            _fileDiff_decorators = [Remote];
             _stage_decorators = [Remote];
             _unstage_decorators = [Remote];
             _discard_decorators = [Remote];
             _commit_decorators = [Remote];
             _ping_decorators = [Remote];
             __esDecorate(this, null, _status_decorators, { kind: "method", name: "status", static: false, private: false, access: { has: obj => "status" in obj, get: obj => obj.status }, metadata: _metadata }, null, _instanceExtraInitializers);
+            __esDecorate(this, null, _fileDiff_decorators, { kind: "method", name: "fileDiff", static: false, private: false, access: { has: obj => "fileDiff" in obj, get: obj => obj.fileDiff }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _stage_decorators, { kind: "method", name: "stage", static: false, private: false, access: { has: obj => "stage" in obj, get: obj => obj.stage }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _unstage_decorators, { kind: "method", name: "unstage", static: false, private: false, access: { has: obj => "unstage" in obj, get: obj => obj.unstage }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _discard_decorators, { kind: "method", name: "discard", static: false, private: false, access: { has: obj => "discard" in obj, get: obj => obj.discard }, metadata: _metadata }, null, _instanceExtraInitializers);
@@ -92,6 +96,7 @@ let GitExplorerService = (() => {
             timeoutMs: z.number().step(1).min(1).default(30_000),
             outputMaxBytes: z.number().step(1).min(1).default(8 * 1024 * 1024),
             maxFiles: z.number().step(1).min(1).default(2_000),
+            maxFileBytes: z.number().step(1).min(1).default(2 * 1024 * 1024),
         });
         limits = __runInitializers(this, _instanceExtraInitializers);
         /** The injected scope every git read runs on; undefined until the services exist. */
@@ -186,6 +191,46 @@ let GitExplorerService = (() => {
                 operation: await this.detectOperation(scope, root, signal),
                 gitVersion: version,
                 note,
+            });
+        }
+        /**
+         * Read both sides of one changed file for the diff view.
+         *
+         * @param sessionId - the Session identity received on the wire.
+         * @param requestRoot - the working directory the panel offers, if any.
+         * @param path - the repository-relative path.
+         * @param staged - true to compare the index against HEAD instead of the work tree.
+         * @param untracked - true when git does not track the path yet (no old side).
+         * @param signal - the invocation's cancellation signal.
+         * @returns the two sides, or the flags explaining why they are not shown.
+         */
+        async fileDiff(sessionId, requestRoot, path, staged, untracked, signal) {
+            const empty = (note) => ({
+                path, staged, oldText: '', newText: '', binary: false, oversized: false, note,
+            });
+            const scope = this.scope;
+            if (scope === undefined)
+                return empty('the host git services are not available yet');
+            const resolved = await resolveRoot(scope, sessionId, requestRoot);
+            if (resolved.root === null)
+                return empty(resolved.note);
+            const located = await runGit(scope, this.limits, {
+                cwd: resolved.root,
+                args: [...REV_PARSE_ARGS],
+                signal,
+            });
+            if (located.exitCode !== 0) {
+                return empty((located.stderr.trim().split('\n')[0] ?? 'not a git repository').slice(0, 200));
+            }
+            const [toplevel] = located.stdout.split('\n');
+            const root = toplevel === undefined || toplevel === '' ? resolved.root : toplevel;
+            return await readFileDiff(scope, this.limits, {
+                root,
+                path,
+                staged,
+                untracked,
+                maxFileBytes: this.limits.maxFileBytes,
+                signal,
             });
         }
         /**

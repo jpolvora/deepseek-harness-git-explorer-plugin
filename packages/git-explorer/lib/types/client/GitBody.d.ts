@@ -21,10 +21,26 @@ interface SessionListState {
         cwd?: string;
     } | undefined>;
 }
+/** The tab-information hook the sidebar injects into every tab body. */
+type TabInfoHook = () => {
+    tab: {
+        id: string;
+        navigation: {
+            params?: Record<string, unknown>;
+        };
+        actions: {
+            openTab(kind: string, options?: {
+                params?: Record<string, unknown>;
+            }): void;
+        };
+    };
+};
 /** Props the framework and this plugin's business face deliver to the body. */
 export interface GitBodyProps {
     /** The Session the tab belongs to, delivered by the sidebar's render call. */
     sessionId?: string;
+    /** Framework hook: how to open another tab from this one. */
+    useTabInfo?: TabInfoHook;
     /** The client session store, part of the session standard kit. */
     useSessions?: SessionsHook;
     /** The status read, contributed through the slot's `inject` face factory. */

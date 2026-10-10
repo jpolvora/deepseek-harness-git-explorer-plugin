@@ -15,6 +15,7 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import * as React from 'react';
 import { FileTypeIcon, IconChevronDownOutlineRegular, IconChevronRightOutlineRegular, IconCloseOutlineRegular, IconFolderCloseRegular, IconFolderOpenRegular, IconPlusOutlineRegular, IconTrashOutlineRegular, classifyFileType, } from '@deepseek-ai/dsh-client-ui-primitives';
 import { buildChangeTree } from './change-tree.js';
+import { GIT_DIFF_TAB_KIND } from '../types.js';
 /** How one status letter reads in the row badge. */
 const STATUS_LETTER = {
     modified: 'M',
@@ -88,28 +89,30 @@ function DirectoryRow({ node, depth, collapsed, onToggle }) {
     const Folder = isCollapsed ? IconFolderCloseRegular : IconFolderOpenRegular;
     return (_jsxs("div", { role: "treeitem", "aria-expanded": !isCollapsed, onClick: () => { onToggle(node.path); }, style: rowStyle(depth, false), children: [_jsx(Chevron, { size: 16 }), _jsx(Folder, { size: 16 }), _jsx("span", { style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, children: node.name })] }));
 }
-/** A file row: glyph, name, right-aligned status letter, hover actions. */
-function FileRow({ node, depth, hovered, onHover, actions }) {
+/** A file row: glyph, name, right-aligned status letter, hover actions, and a click that
+ * opens the comparison for this file. */
+function FileRow({ node, depth, hovered, onHover, actions, onOpen }) {
     const change = node.change;
     if (change === undefined) {
         return _jsx("div", { style: rowStyle(depth, false), children: _jsx("span", { children: node.name }) });
     }
-    return (_jsxs("div", { role: "treeitem", title: change.origPath === undefined ? change.path : `${change.origPath} → ${change.path}`, onMouseEnter: () => { onHover(change.path); }, onMouseLeave: () => { onHover(undefined); }, style: rowStyle(depth, hovered), children: [_jsx("span", { style: { width: 16, flexShrink: 0 } }), _jsx(FileTypeIcon, { kind: classifyFileType(node.name), size: 16 }), _jsx("span", { style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, children: node.name }), change.origPath === undefined
+    return (_jsxs("div", { role: "treeitem", title: change.origPath === undefined ? change.path : `${change.origPath} → ${change.path}`, onClick: onOpen, onMouseEnter: () => { onHover(change.path); }, onMouseLeave: () => { onHover(undefined); }, style: rowStyle(depth, hovered), children: [_jsx("span", { style: { width: 16, flexShrink: 0 } }), _jsx(FileTypeIcon, { kind: classifyFileType(node.name), size: 16 }), _jsx("span", { style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, children: node.name }), change.origPath === undefined
                 ? null
                 : _jsx("span", { style: { color: TERTIARY, flexShrink: 0 }, children: change.origPath.split('/').pop() }), hovered
                 ? actions.map((action) => _jsx(IconAction, { ...action }, action.title))
                 : (_jsx("span", { style: { color: STATUS_TONE[change.status], flexShrink: 0, paddingLeft: '6px' }, children: STATUS_LETTER[change.status] }))] }));
 }
 /** Rows for one level, recursing into directories that are expanded. */
-function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor }) {
+function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor, openFor }) {
     return (_jsx(_Fragment, { children: nodes.map((node) => node.kind === 'directory'
             ? (_jsxs(React.Fragment, { children: [_jsx(DirectoryRow, { node: node, depth: depth, collapsed: collapsed, onToggle: onToggle }), collapsed.has(node.path)
                         ? null
-                        : (_jsx(TreeRows, { nodes: node.children, depth: depth + 1, collapsed: collapsed, onToggle: onToggle, hovered: hovered, onHover: onHover, actionsFor: actionsFor }))] }, `d:${node.path}`))
-            : (_jsx(FileRow, { node: node, depth: depth, hovered: hovered === node.path, onHover: onHover, actions: node.change === undefined ? [] : actionsFor(node.change) }, `f:${node.path}`))) }));
+                        : (_jsx(TreeRows, { nodes: node.children, depth: depth + 1, collapsed: collapsed, onToggle: onToggle, hovered: hovered, onHover: onHover, actionsFor: actionsFor, openFor: openFor }))] }, `d:${node.path}`))
+            : (_jsx(FileRow, { node: node, depth: depth, hovered: hovered === node.path, onHover: onHover, actions: node.change === undefined ? [] : actionsFor(node.change), onOpen: () => { if (node.change !== undefined)
+                    openFor(node.change); } }, `f:${node.path}`))) }));
 }
 /** One collapsible group with its count badge, its bulk action and its tree. */
-function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor }) {
+function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor, openFor }) {
     const tree = React.useMemo(() => buildChangeTree(changes), [changes]);
     if (changes.length === 0)
         return null;
@@ -137,7 +140,7 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
                                 padding: '0 2px',
                             }, children: bulk.label }))] }), isCollapsed
                 ? null
-                : (_jsx(TreeRows, { nodes: tree, depth: 1, collapsed: collapsedDirs, onToggle: onToggleDir, hovered: hovered, onHover: onHover, actionsFor: actionsFor }))] }));
+                : (_jsx(TreeRows, { nodes: tree, depth: 1, collapsed: collapsedDirs, onToggle: onToggleDir, hovered: hovered, onHover: onHover, actionsFor: actionsFor, openFor: openFor }))] }));
 }
 /** The branch line: branch name, tracking drift and the repository root. */
 function BranchLine({ status }) {
@@ -249,7 +252,7 @@ export function GitBody(props) {
  * @param props - the session, the session store and the host bridge.
  * @returns the panel body.
  */
-function GitPanel({ sessionId, useSessions, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit, }) {
+function GitPanel({ sessionId, useSessions, useTabInfo, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit, }) {
     const [outcome, setOutcome] = React.useState(null);
     const [probe, setProbe] = React.useState(null);
     const [attempt, setAttempt] = React.useState(0);
@@ -403,6 +406,12 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing, gitStage, gitUns
         onHover: setHovered,
         actionsFor,
     };
+    /** Open (or focus) the comparison tab for one file. */
+    const openFor = (change, staged, untracked) => () => {
+        useTabInfo?.().tab.actions.openTab(GIT_DIFF_TAB_KIND, {
+            params: { path: change.path, staged, untracked },
+        });
+    };
     const bulkFor = (paths, label, run) => ({
         label,
         run: () => { run(paths); },
@@ -454,15 +463,15 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing, gitStage, gitUns
                             ? (_jsxs("div", { style: { color: SECONDARY }, children: ["Not a git repository.", outcome.note === '' ? null : _jsx("div", { style: { color: TERTIARY }, children: outcome.note })] }))
                             : (_jsxs(_Fragment, { children: [outcome.conflicted.length === 0
                                         ? null
-                                        : (_jsx("div", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${String(outcome.conflicted.length)} conflicted file(s) need resolution` })), _jsx(Group, { title: "Staged changes", changes: outcome.staged, bulk: bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
+                                        : (_jsx("div", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${String(outcome.conflicted.length)} conflicted file(s) need resolution` })), _jsx(Group, { title: "Staged changes", changes: outcome.staged, openFor: (change) => { openFor(change, true, false)(); }, bulk: bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
                                             const unstage = bridge.current.gitUnstage;
                                             if (unstage !== undefined)
                                                 mutate((signal) => unstage(requestRoot, paths, signal));
-                                        }), ...groupProps }), _jsx(Group, { title: "Changes", changes: outcome.unstaged, bulk: bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
+                                        }), ...groupProps }), _jsx(Group, { title: "Changes", changes: outcome.unstaged, openFor: (change) => { openFor(change, false, false)(); }, bulk: bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
                                             const stage = bridge.current.gitStage;
                                             if (stage !== undefined)
                                                 mutate((signal) => stage(requestRoot, paths, signal));
-                                        }), ...groupProps }), _jsx(Group, { title: "Conflicted", changes: outcome.conflicted, ...groupProps }), _jsx(Group, { title: "Untracked", changes: outcome.untracked, bulk: bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
+                                        }), ...groupProps }), _jsx(Group, { title: "Conflicted", changes: outcome.conflicted, openFor: (change) => { openFor(change, false, false)(); }, ...groupProps }), _jsx(Group, { title: "Untracked", changes: outcome.untracked, openFor: (change) => { openFor(change, false, true)(); }, bulk: bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
                                             const stage = bridge.current.gitStage;
                                             if (stage !== undefined)
                                                 mutate((signal) => stage(requestRoot, paths, signal));

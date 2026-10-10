@@ -20,13 +20,18 @@
  *     scoped `ctx.inject(['remote.git'], …)` callback and passed to the body as props.
  */
 import type { Context } from '@deepseek-ai/cordis'
+import * as React from 'react'
 // Our own generated Host-for-Client Remote projection. Importing it through the
 // package's `./remote` export is a package self-reference: the bundler inlines it (and
 // its zod schemas) exactly as the shipped remote assembly inlines the ones it mounts.
 import { TYPERT_REMOTE } from '@jpolv/dsh-git-explorer/remote'
 import {
+  GIT_DIFF_ID,
+  GIT_DIFF_TAB_KIND,
   GIT_EXPLORER_ID,
   GIT_TAB_KIND,
+  type GitFileDiff,
+  type GitFileDiffOutcome,
   type GitMutationResult,
   type GitPingOutcome,
   type GitPingResult,
@@ -34,6 +39,7 @@ import {
   type GitStatusSummary,
 } from '../types.js'
 import { GitBody } from './GitBody.js'
+import { GitDiffBody } from './GitDiffBody.js'
 import { GitTitle } from './GitTitle.js'
 
 export const name = 'git-explorer-client'
@@ -55,6 +61,8 @@ interface TabTypeSpec {
   kind: string
   priority: 'builtin' | 'extension' | 'fallback'
   keepMounted?: boolean
+  /** True when each open gets its own instance, as terminals and diffs do. */
+  multiple?: boolean
   title: () => string
   guide?: GuideEntrySpec[]
 }
@@ -115,6 +123,14 @@ interface GitNamespace {
     amend: boolean,
     signal: AbortSignal,
   ): Promise<RemoteEnvelope<GitMutationResult>>
+  fileDiff(
+    sessionId: string,
+    requestRoot: string,
+    path: string,
+    staged: boolean,
+    untracked: boolean,
+    signal: AbortSignal,
+  ): Promise<RemoteEnvelope<GitFileDiff>>
 }
 
 const GUIDE_DESCRIPTION = 'Stage, commit and review working-tree changes.'
@@ -126,6 +142,14 @@ const BRIDGE_READY_TIMEOUT_MS = 3_000
 interface HostCalls {
   status(requestRoot: string, signal: AbortSignal): Promise<GitStatusOutcome>
   ping(requestRoot: string, signal: AbortSignal): Promise<GitPingOutcome>
+  /** The comparison read for the diff tab. */
+  fileDiff(
+    requestRoot: string,
+    path: string,
+    staged: boolean,
+    untracked: boolean,
+    signal: AbortSignal,
+  ): Promise<GitFileDiffOutcome>
   /** Every mutation resolves the same way; the panel reports `detail` either way. */
   mutate(
     run: (namespace: GitNamespace, requestRoot: string, signal: AbortSignal) => Promise<RemoteEnvelope<GitMutationResult>>,
@@ -170,6 +194,8 @@ function hostCalls(ctx: Context): (sessionId: string) => HostCalls {
   return (sessionId) => ({
     status: (requestRoot, signal) => call((namespace) => namespace.status(sessionId, requestRoot, signal)),
     ping: (requestRoot, signal) => call((namespace) => namespace.ping(sessionId, requestRoot, signal)),
+    fileDiff: (requestRoot, path, staged, untracked, signal) =>
+      call((namespace) => namespace.fileDiff(sessionId, requestRoot, path, staged, untracked, signal)),
     mutate: async (run, requestRoot, signal) => {
       const result = await call((namespace) => run(namespace, requestRoot, signal))
       // A mutation always answers with a payload (`ok` plus a line to show); only a
@@ -244,4 +270,43 @@ export async function apply(ctx: Context): Promise<void> {
     name: 'sidebar.right.pane.tab.title',
     key: GIT_EXPLORER_ID,
   }, GitTitle)), 'git-explorer: tab title')
+
+  // The comparison tab: one instance per file, opened by the panel with the path and
+  // which comparison to show. `multiple: true` is what gives each file its own tab.
+  ctx.effect(() => faces.sidebarRightTabs.register({
+    id: GIT_DIFF_ID,
+    kind: GIT_DIFF_TAB_KIND,
+    priority: 'extension',
+    multiple: true,
+    title: () => 'Diff',
+  }), 'git-explorer: diff tab type')
+
+  ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab', () => faces.slots.register({
+    name: 'sidebar.right.pane.tab',
+    key: GIT_DIFF_ID,
+    inject: (sessionId: string) => {
+      const host = hostFor(sessionId)
+      return {
+        gitDiff: (path: string, staged: boolean, untracked: boolean, signal: AbortSignal) =>
+          host.fileDiff('', path, staged, untracked, signal),
+      }
+    },
+  }, GitDiffBody)), 'git-explorer: diff body')
+
+  ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab.title', () => faces.slots.register({
+    name: 'sidebar.right.pane.tab.title',
+    key: GIT_DIFF_ID,
+  }, DiffTitle)), 'git-explorer: diff title')
+}
+
+/**
+ * The diff tab's chip: the file's own name, taken from the tab's navigation parameters.
+ *
+ * @returns the chip content.
+ */
+function DiffTitle({ useTabInfo }: { useTabInfo?: () => { tab: { navigation: { params?: Record<string, unknown> } } } }): React.ReactElement {
+  const params = useTabInfo?.().tab.navigation.params
+  const path = typeof params?.path === 'string' ? params.path : 'Diff'
+  // This module is plain TypeScript, so the element is built without JSX.
+  return React.createElement('span', null, path.split('/').pop() ?? path)
 }
