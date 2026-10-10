@@ -20,12 +20,15 @@
  *    this file because tsdown's config loader does not resolve a relative `.ts` import.
  */
 import { existsSync, readFileSync } from 'node:fs'
-import { sep } from 'node:path'
+import { relative, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { transform } from 'lightningcss'
 import { defineConfig } from 'tsdown'
 
 const PACKAGE_NAME = '@jpolv/dsh-git-explorer'
+
+/** The directory the client sources are compiled from, for per-stylesheet tag ids. */
+const packageRoot = fileURLToPath(new URL('.', import.meta.url))
 
 /** The page's frozen module table in the running 0.2.0-rc.2 client. */
 const FROZEN_MODULE_TABLE = new Set([
@@ -66,15 +69,20 @@ function emitCssModule(filename: string, source: string): string {
   })
   const classes: Record<string, string> = {}
   for (const [original, entry] of Object.entries(compiled.exports)) classes[original] = entry.name
+  // Every stylesheet gets its OWN tag, keyed by its path: one shared tag meant the last
+  // sheet to materialize overwrote the others, which showed up as a completely unstyled
+  // panel. `data-plugin` stays the package name so the loader can evict plugin CSS.
+  const tagId = `${PACKAGE_NAME}/${relative(packageRoot, filename).split(sep).join('/')}`
   return [
     `const css = ${JSON.stringify(compiled.code.toString())};`,
     `const classes = ${JSON.stringify(classes)};`,
-    `const tagId = ${JSON.stringify(PACKAGE_NAME)};`,
+    `const tagId = ${JSON.stringify(tagId)};`,
     'if (typeof document !== "undefined") {',
-    '  let tag = document.querySelector(`style[data-plugin="${tagId}"]`);',
+    '  let tag = document.querySelector("style[data-plugin-css=" + JSON.stringify(tagId) + "]");',
     '  if (tag === null) {',
     '    tag = document.createElement("style");',
-    '    tag.setAttribute("data-plugin", tagId);',
+    `    tag.dataset.plugin = ${JSON.stringify(PACKAGE_NAME)};`,
+    '    tag.dataset.pluginCss = tagId;',
     '    document.head.appendChild(tag);',
     '  }',
     '  if (tag.textContent !== css) tag.textContent = css;',

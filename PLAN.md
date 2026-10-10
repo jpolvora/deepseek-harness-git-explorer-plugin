@@ -780,7 +780,7 @@ Translated: the tab label and Start-page card copy, group titles, every action l
 
 Tests (5) cover dictionary parity, placeholder substitution (`{count}`, `{operation}`, `{message}`), the English fallback, and a panel rendered with a Chinese translator — which proves the wiring without changing the application's language.
 
-### 18.2 CSS Modules (remaining)
+### 18.2 CSS Modules (done)
 
 The panel and diff body still draw with inline styles over `--dsw-alias-*` tokens; AGENTS.md convention 6 asks for CSS Modules. The work is bounded but touches the build: the client bundle must compile `*.module.css` into a class map plus an injected `<style data-plugin="…">` tag (the shipped preset does this with lightningcss). Plan: add `lightningcss` as a dev dependency, write a small tsdown plugin that emits the virtual module, create `GitBody.module.css` and `GitDiffBody.module.css` with token-based rules, and convert the components' style objects to class names, using the shipped `Button`/`PathLabel` primitives where they fit without changing behaviour.
 
