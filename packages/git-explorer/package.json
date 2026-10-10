@@ -65,13 +65,15 @@
     "watch:client": "tsdown --config tsdown.client.config.ts --watch",
     "typecheck": "tsc -p tsconfig.build.host.json --noEmit && tsc -p tsconfig.build.client.json --noEmit",
     "test": "vitest run",
-    "pack:plugin": "pnpm pack --pack-destination ../../dist"
+    "pack:plugin": "pnpm pack --pack-destination ../../dist",
+    "probe:compat": "node scripts/probe-compat.mjs",
+    "prepack": "pnpm run build"
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "~4.0.4"
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-typert-protocol": ">=0.2.0-rc.2 <0.3"
   },
   "dependencies": {
-    "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2",
     "@deepseek-ai/schemastery": "~3.18.4",
     "zod": "^4.4.3"
   },
@@ -102,5 +104,24 @@
     "tsdown": "^0.22.14",
     "typescript": "6.0.3",
     "vitest": "^4.1.11"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jpolvora/deepseek-harness-git-explorer-plugin.git",
+    "directory": "packages/git-explorer"
+  },
+  "homepage": "https://github.com/jpolvora/deepseek-harness-git-explorer-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/jpolvora/deepseek-harness-git-explorer-plugin/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "git",
+    "source-control"
+  ],
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
   }
 }
