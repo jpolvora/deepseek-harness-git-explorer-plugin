@@ -12,10 +12,13 @@ release line drops the suffix (`0.1.0`).
   `main`/`exports` point into the build project, and `files` packs the built halves, so a
   git install needs no build step.
 - **Renamed to `dsh-plugin-git-explorer`** — the community convention for a DSH plugin
-  package, and now the single *installed* identity: root package, bundle row, client
-  loader id and both tab ids. `packages/git-explorer/` stays the private Cordis/Typert
-  build project (the analyzer only registers projects under `packages/`, PLAN.md §19), and
-  its name survives only inside the generated Remote ids.
+  package, and now the single installed identity: root package, build project, bundle
+  row, client loader id and both tab ids all carry it. The Typert loader binds generated
+  artifacts to the mounting package (`typert-loader: … the manifest must be owned by the
+  package that exports it`), so the build project `packages/git-explorer/` could not keep
+  an internal name — the rename was measured to fix exactly that cold-start rejection.
+  Root scripts address the build project by directory (`pnpm -C …`); pnpm accepts a
+  member named like the root workspace package (PLAN.md §19).
 - `scripts/probe-compat.mjs` resolves the installed artifacts through the manifest's
   export map, so it checks whatever shape the bundle publishes.
 - `LICENSE` (MIT) added, and `README.md` / `docs/INSTALL.md` rewritten around the four

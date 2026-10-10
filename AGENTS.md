@@ -4,12 +4,16 @@
 
 `dsh-plugin-git-explorer`: an out-of-tree DSH plugin (right-sidebar Git tab + Start
 page card) with a Cordis host service, a Typert Remote, a React client panel, and
-agent tools (`git_status`, `git_diff`, `git_log`). Two packages in one repository: the
-**root** is the published bundle (bundle patch, `dsh.client`, entry points into the
-build output), and `packages/git-explorer/` is the private Cordis/Typert build project
-where `src/`, `lib/`, `tests/` and `scripts/` live — the analyzer only registers
-projects under `packages/`, so the two cannot be merged (PLAN.md §19). Spec and
-platform contract: `PLAN.md`. Targets DSH desktop `0.2.0-rc.2` only.
+agent tools (`git_status`, `git_diff`, `git_log`). Two packages in one repository, BOTH
+carrying the package name `dsh-plugin-git-explorer`: the **root** is the published bundle
+(bundle patch, `dsh.client`, entry points into the build output), and
+`packages/git-explorer/` is the private Cordis/Typert build project where `src/`, `lib/`,
+`tests/` and `scripts/` live. Both identities must share the name for runtime reasons
+(PLAN.md §19): the analyzer only registers projects under `packages/`, and the Typert
+loader binds generated artifacts to the mounting package, so the build project must be
+stamped with the installed name. pnpm tolerates a member named like the root workspace
+package; the root scripts address the build project by directory (`pnpm -C …`), never by
+`--filter`. Spec and platform contract: `PLAN.md`. Targets DSH desktop `0.2.0-rc.2` only.
 
 ## Commands (run from root)
 
@@ -65,11 +69,11 @@ platform contract: `PLAN.md`. Targets DSH desktop `0.2.0-rc.2` only.
    `M2: stage, unstage, discard and commit`. A published version is a release
    version (`0.1.0`) — npm's `latest` tag never points at a prerelease.
 10. **One installed name.** The root package name, the `cordis.patch.yml` row name, the
-    client bundle's loader id (`tsdown.client.config.ts`), the tab ids in `src/types.ts`
-    and the name the profile records must stay identical — the loader and module
-    resolution both key on it. The build project's own name (`@jpolv/dsh-git-explorer`)
-    is internal: it appears only in generated Remote ids, never in a row, a loader id or
-    an install spec.
+    client bundle's loader id (`tsdown.client.config.ts`), the tab ids in `src/types.ts`,
+    the name the profile records AND the build project's `name` in
+    `packages/git-explorer/package.json` must stay identical — the loader binds rows and
+    the Typert loader binds generated artifacts to it. The build project is private,
+    never installed on its own, never addressed by `--filter`.
 
 ## Verify before ship
 

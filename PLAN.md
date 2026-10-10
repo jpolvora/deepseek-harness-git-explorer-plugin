@@ -106,8 +106,8 @@ staged/unstaged grouping UI, a side-by-side diff, context menus, and virtualized
 > **Since M6 the published bundle is the repository root** (see §19): the root
 > `package.json` is `dsh-plugin-git-explorer` — bundle patch, `dsh.client` and entry points
 > into the build project — while the Cordis/Typert project this tree describes stays under
-> `packages/git-explorer/`. The tree below is the M1–M5 layout; only the manifest and
-> `cordis.patch.yml` moved.
+> `packages/git-explorer/`, named `dsh-plugin-git-explorer` as well (§19.6). The tree below
+> is the M1–M5 layout; only the manifest and `cordis.patch.yml` moved.
 
 ```
 L:\source\deepseek-harness-git-explorer-plugin\
@@ -831,7 +831,7 @@ Neither rule can be satisfied by an additive change to a shipped package, so the
 ### 19.3 What changed here
 
 - **The root package is the published bundle**: `dsh-plugin-git-explorer` with `cordis.patch.yml` (row name = package name), `dsh.bundle.patch`, `dsh.client`, peers and runtime dependencies, and `main`/`exports` pointing into the build project (`packages/git-explorer/lib/**`). `files` packs exactly those artifacts plus the patch and the locale files, so a git install needs no build step. `prepack` rebuilds before packing.
-- **`packages/git-explorer/` stays the Cordis/Typert build project** — `src/`, `lib/`, `tests/`, `scripts/`, `locale/`, the tsconfigs and the bundler configs — and is `private: true`, never installed on its own. It keeps the `./typert`, `./remote` and `./client` exports the generator validates, and its name (`@jpolv/dsh-git-explorer`) survives only inside the generated Remote ids, which both halves share.
+- **`packages/git-explorer/` stays the Cordis/Typert build project** — `src/`, `lib/`, `tests/`, `scripts/`, `locale/`, the tsconfigs and the bundler configs — and is `private: true`, never installed on its own. It keeps the `./typert`, `./remote` and `./client` exports the generator validates, and it carries the **installed** name (§19.6).
 - **One installed name** (AGENTS.md convention 10): root package name = `cordis.patch.yml` row name = client loader id (`tsdown.client.config.ts`) = tab ids (`src/types.ts`) = the name the profile records. The build project's own name is deliberately *not* that name, and its bundle stamps the installed one.
 - `scripts/probe-compat.mjs` now resolves the installed artifacts through the manifest's export map instead of hard-coding `lib/…`, so it tests whatever shape the bundle publishes; `scripts/vendor-typert-protocol.mjs` finds the protocol mirror whether pnpm hoisted it to the workspace root or kept it beside the build package.
 - Added `LICENSE` (MIT) and rewrote `README.md` / `docs/INSTALL.md` around the four install routes.
@@ -848,6 +848,25 @@ Neither rule can be satisfied by an additive change to a shipped package, so the
 ### 19.5 Verification
 
 `pnpm install && pnpm typecheck && pnpm test` (60/60) `&& pnpm build`, then every probe: `probe-status`, `probe-mutations`, `probe-diff`, `probe-tools`, `probe-typert` (both artifacts discovered, ours with `hasRemote: true`), `probe-bundle` (loader row `dsh-plugin-git-explorer`, three stylesheets with per-sheet ids) and `probe:compat` — whose runtime half (0.2.0-rc.2, protocol v4, the frozen module table, the three sidebar slots) passes against the installed app, and whose plugin half turns green once the profile installs the renamed bundle.
+
+### 19.6 The cold-start crash, read from the runtime
+
+The first restart with the installed bundle killed the desktop shell: the app reached its webserver (authentication succeeded) but the welcome's `settings/describe` RPC returned a failed envelope, and the recovery path exited with `crash-…-main.log` writing only `desktop welcome: Web RPC failed`. Disabling third-party plugins restored startup — twice.
+
+The desktop log names nothing deeper, but the error reproduces exactly outside the GUI: the installed `dsh.cmd` CLI bootstraps any profile from a terminal (`…\resources\runtime\cli\bin\dsh.cmd` → `Electron Harness.exe --expose-internals …\app.asar\dsh\node_modules\@deepseek-ai\dsh-desktop-host\lib\cli.js`). A profile created with `dsh --profile gitexplorer-probe --from-default-profile web` (plus the storeDir pin for this machine and a `--patch` port overlay) printed the true rejection:
+
+```
+dsh: warning: 1 entry did not activate
+typert-loader (@deepseek-ai/dsh-typert-loader): AggregateError: typert-loader: 1 typert contributor(s) failed to register:
+  - typert-loader: dsh-plugin-git-explorer TYPERT manifest names package "@jpolv/dsh-git-explorer" —
+    the manifest must be owned by the package that exports it
+```
+
+`validateTypertManifest` (`@deepseek-ai/dsh-typert-loader`) requires an equality: the `TYPERT.package` field of a mounted bundle's generated artifacts must equal the **package that exports them** — the installed bundle, `dsh-plugin-git-explorer` — while the generator stamps its contributor's own manifest name. The old tarball install satisfied this only because the build package WAS the installed package.
+
+Resolution: the build project takes the installed name too. pnpm 11 tolerates a workspace member named like the root package (measured: "Scope: all 2 workspace projects" installs cleanly), and because the two projects now share one name, `pnpm --filter <name>` would match both — the root scripts address the build project by directory instead (`pnpm -C packages/git-explorer run build`). After the rename the generator stamps `package: 'dsh-plugin-git-explorer'` into `lib/typert.host.js` and `lib/typert.remote-client.js`, the probe profile boots with zero entries-that-did-not-activate, and the client bundle carries no `@jpolv` string at all.
+
+Convention 10 grew accordingly: the installed name is now the identity of BOTH package manifests, and the build project is addressed by directory.
 
 ---
 
