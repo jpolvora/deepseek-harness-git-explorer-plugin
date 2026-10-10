@@ -1,7 +1,63 @@
 {
-  "name": "dsh-git-explorer-plugin",
-  "private": true,
+  "name": "dsh-plugin-git-explorer",
+  "version": "0.1.0-m6",
+  "description": "Git (Source Control) panel for the DeepSeek Harness Web GUI: a right-sidebar Git tab with staging, commits and diffs.",
   "type": "module",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "packages/git-explorer/lib/index.js",
+  "types": "packages/git-explorer/lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./packages/git-explorer/lib/types/index.d.ts",
+      "default": "./packages/git-explorer/lib/index.js"
+    },
+    "./client": {
+      "types": "./packages/git-explorer/lib/types/client/index.d.ts",
+      "default": "./packages/git-explorer/lib/client.js"
+    },
+    "./types": {
+      "types": "./packages/git-explorer/lib/types/types.d.ts",
+      "default": "./packages/git-explorer/lib/types/types.js"
+    },
+    "./typert": {
+      "types": "./packages/git-explorer/lib/typert.host.d.ts",
+      "default": "./packages/git-explorer/lib/typert.host.js"
+    },
+    "./remote": {
+      "types": "./packages/git-explorer/lib/typert.remote-client.d.ts",
+      "default": "./packages/git-explorer/lib/typert.remote-client.js"
+    },
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "packages/git-explorer/lib/index.js",
+    "packages/git-explorer/lib/client.js",
+    "packages/git-explorer/lib/typert.host.js",
+    "packages/git-explorer/lib/typert.host.d.ts",
+    "packages/git-explorer/lib/typert.remote-client.js",
+    "packages/git-explorer/lib/typert.remote-client.d.ts",
+    "packages/git-explorer/lib/types/**/*.d.ts",
+    "packages/git-explorer/locale",
+    "cordis.patch.yml"
+  ],
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar-right",
+        "@deepseek-ai/dsh-client-ui-primitives",
+        "@deepseek-ai/dsh-client-store",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
   "packageManager": "pnpm@11.7.0",
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
@@ -13,9 +69,36 @@
     "watch:client": "pnpm --filter @jpolv/dsh-git-explorer run watch:client",
     "typecheck": "pnpm --filter @jpolv/dsh-git-explorer run typecheck",
     "test": "pnpm --filter @jpolv/dsh-git-explorer run test",
-    "pack:plugin": "pnpm --filter @jpolv/dsh-git-explorer run pack:plugin"
+    "pack:plugin": "pnpm pack --pack-destination dist",
+    "probe:compat": "pnpm --filter @jpolv/dsh-git-explorer run probe:compat",
+    "probe:bundle": "pnpm --filter @jpolv/dsh-git-explorer run probe:bundle",
+    "prepack": "pnpm run build"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-typert-protocol": ">=0.2.0-rc.2 <0.3"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "~3.18.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.20.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jpolvora/deepseek-harness-git-explorer-plugin.git"
+  },
+  "homepage": "https://github.com/jpolvora/deepseek-harness-git-explorer-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/jpolvora/deepseek-harness-git-explorer-plugin/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "dsh-plugins",
+    "git",
+    "source-control"
+  ]
 }

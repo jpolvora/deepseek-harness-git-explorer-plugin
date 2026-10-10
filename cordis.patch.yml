@@ -6,4 +6,4 @@
 
 - insert:
     - id: git-explorer
-      name: '@jpolv/dsh-git-explorer'
+      name: 'dsh-plugin-git-explorer'

@@ -10,13 +10,13 @@
  * stay free of services and of any package with runtime identity to share.
  */
 /** The plugin's stable identity: the tab-type id, the slot key, and the package name. */
-export declare const GIT_EXPLORER_ID = "@jpolv/dsh-git-explorer";
+export declare const GIT_EXPLORER_ID = "dsh-plugin-git-explorer";
 /** The right-sidebar tab kind this plugin registers. */
 export declare const GIT_TAB_KIND = "git";
 /** The tab kind that shows one file's comparison. */
 export declare const GIT_DIFF_TAB_KIND = "git-diff";
 /** The definition id of the diff tab type (distinct from the panel's). */
-export declare const GIT_DIFF_ID = "@jpolv/dsh-git-explorer/diff";
+export declare const GIT_DIFF_ID = "dsh-plugin-git-explorer/diff";
 /** The Remote wire namespace the host service binds to (`remote.git.*`). */
 export declare const GIT_REMOTE_NAMESPACE = "git";
 /** How a file differs from `HEAD` (staged) or from the index (unstaged). */

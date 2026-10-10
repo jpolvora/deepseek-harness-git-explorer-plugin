@@ -1,12 +1,10 @@
 {
   "name": "@jpolv/dsh-git-explorer",
-  "version": "0.1.0-m5",
-  "description": "Git (Source Control) panel for the DeepSeek Harness Web GUI: a right-sidebar Git tab with staging, commits and diffs.",
+  "version": "0.1.0-m6",
+  "private": true,
+  "description": "Build project for the Git Explorer DSH plugin: the Cordis/Typert project the published root package points at. Never installed on its own.",
   "type": "module",
   "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
   "exports": {
@@ -30,7 +28,6 @@
       "types": "./lib/typert.remote-client.d.ts",
       "default": "./lib/typert.remote-client.js"
     },
-    "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
   "files": [
@@ -41,7 +38,6 @@
     "lib/typert.host.d.ts",
     "lib/typert.remote-client.js",
     "lib/typert.remote-client.d.ts",
-    "cordis.patch.yml",
     "locale"
   ],
   "dsh": {
@@ -53,9 +49,6 @@
         "@deepseek-ai/dsh-client-store",
         "@deepseek-ai/dsh-client-locale"
       ]
-    },
-    "bundle": {
-      "patch": "./cordis.patch.yml"
     }
   },
   "scripts": {
@@ -65,17 +58,8 @@
     "watch:client": "tsdown --config tsdown.client.config.ts --watch",
     "typecheck": "tsc -p tsconfig.build.host.json --noEmit && tsc -p tsconfig.build.client.json --noEmit",
     "test": "vitest run",
-    "pack:plugin": "pnpm pack --pack-destination ../../dist",
     "probe:compat": "node scripts/probe-compat.mjs",
-    "prepack": "pnpm run build"
-  },
-  "peerDependencies": {
-    "@deepseek-ai/cordis": "~4.0.4",
-    "@deepseek-ai/dsh-typert-protocol": ">=0.2.0-rc.2 <0.3"
-  },
-  "dependencies": {
-    "@deepseek-ai/schemastery": "~3.18.4",
-    "zod": "^4.4.3"
+    "probe:bundle": "node scripts/probe-bundle.mjs"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "~4.0.4",
@@ -104,24 +88,5 @@
     "tsdown": "^0.22.14",
     "typescript": "6.0.3",
     "vitest": "^4.1.11"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jpolvora/deepseek-harness-git-explorer-plugin.git",
-    "directory": "packages/git-explorer"
-  },
-  "homepage": "https://github.com/jpolvora/deepseek-harness-git-explorer-plugin#readme",
-  "bugs": {
-    "url": "https://github.com/jpolvora/deepseek-harness-git-explorer-plugin/issues"
-  },
-  "keywords": [
-    "deepseek-harness",
-    "dsh",
-    "dsh-plugin",
-    "git",
-    "source-control"
-  ],
-  "engines": {
-    "node": "^22.19.0 || >=24.0.0"
   }
 }

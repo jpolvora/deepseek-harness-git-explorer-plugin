@@ -42,7 +42,7 @@ runInContext(code, dom.getInternalVMContext())
 
 console.log(`rows registered with the loader: ${[...loaded.keys()].join(', ') || '(none)'}`)
 
-const client = loaded.get('@jpolv/dsh-git-explorer')
+const client = loaded.get('dsh-plugin-git-explorer')
 console.log(`client entry: ${client === undefined ? 'MISSING' : Object.keys(client).join(', ')}`)
 
 // Apply the plugin with stub services, capturing what it registers.
@@ -78,7 +78,7 @@ globalThis.window = window
 globalThis.document = window.document
 const React = require('react')
 const { createRoot } = require('react-dom/client')
-const registration = slotRegistrations.find((entry) => entry.slot === 'sidebar.right.pane.tab' && entry.key === '@jpolv/dsh-git-explorer')
+const registration = slotRegistrations.find((entry) => entry.slot === 'sidebar.right.pane.tab' && entry.key === 'dsh-plugin-git-explorer')
 const Body = registration?.component
 if (Body === undefined) {
   console.log('panel body was not registered')

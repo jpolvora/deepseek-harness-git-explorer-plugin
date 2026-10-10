@@ -21,17 +21,34 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const packageRoot = resolve(here, '..')
 const repoRoot = resolve(packageRoot, '../..')
-const source = join(packageRoot, 'node_modules', '@deepseek-ai', 'dsh-typert-protocol')
 const target = join(repoRoot, 'packages', 'typert-protocol')
 
-if (!existsSync(join(source, 'package.json'))) {
-  console.error(`vendor-typert-protocol: ${source} is not installed; run pnpm install first`)
-  process.exit(1)
+/**
+ * Locate one installed dependency, preferring this package's own `node_modules` and
+ * falling back to the workspace root's — pnpm hoists a dependency declared only by the
+ * root package (the published one) up there.
+ *
+ * @param name - the package name to find.
+ * @returns its directory.
+ */
+function installedDir(name) {
+  const candidates = [
+    join(packageRoot, 'node_modules', ...name.split('/')),
+    join(repoRoot, 'node_modules', ...name.split('/')),
+  ]
+  const found = candidates.find((candidate) => existsSync(join(candidate, 'package.json')))
+  if (found === undefined) {
+    console.error(`vendor-typert-protocol: ${name} is not installed; run pnpm install first`)
+    process.exit(1)
+  }
+  return found
 }
+
+const source = installedDir('@deepseek-ai/dsh-typert-protocol')
 
 const installed = JSON.parse(readFileSync(join(source, 'package.json'), 'utf8'))
 const cordisVersion = JSON.parse(
-  readFileSync(join(packageRoot, 'node_modules', '@deepseek-ai', 'cordis', 'package.json'), 'utf8'),
+  readFileSync(join(installedDir('@deepseek-ai/cordis'), 'package.json'), 'utf8'),
 ).version
 
 rmSync(join(target, 'lib'), { recursive: true, force: true })

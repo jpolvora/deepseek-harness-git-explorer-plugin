@@ -5,6 +5,24 @@ release line drops the suffix (`0.1.0`).
 
 ## Unreleased
 
+### Distribution (M6)
+- **The published bundle is now the repository root.** A bare GitHub repository address
+  installs directly: pnpm records the fetched manifest's name, the root declares
+  `dsh.bundle.patch`, and the patch row resolves by that same name. The root manifest's
+  `main`/`exports` point into the build project, and `files` packs the built halves, so a
+  git install needs no build step.
+- **Renamed to `dsh-plugin-git-explorer`** — the community convention for a DSH plugin
+  package, and now the single *installed* identity: root package, bundle row, client
+  loader id and both tab ids. `packages/git-explorer/` stays the private Cordis/Typert
+  build project (the analyzer only registers projects under `packages/`, PLAN.md §19), and
+  its name survives only inside the generated Remote ids.
+- `scripts/probe-compat.mjs` resolves the installed artifacts through the manifest's
+  export map, so it checks whatever shape the bundle publishes.
+- `LICENSE` (MIT) added, and `README.md` / `docs/INSTALL.md` rewritten around the four
+  install routes (npm name, GitHub URL, clone root, tarball).
+- Documented that a published version must be a release version: npm's `latest` tag never
+  points at a `0.1.0-m<N>` prerelease.
+
 ### Distribution
 - Publish-ready manifest: repository/homepage/bugs, keywords, `engines`, `publishConfig`,
   a `prepack` build hook and a `probe:compat` script.

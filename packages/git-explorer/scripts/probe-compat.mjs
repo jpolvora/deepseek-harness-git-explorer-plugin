@@ -14,10 +14,10 @@
  *   node scripts/probe-compat.mjs --json
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
 
 /** The plugin's own package name, as a profile records it. */
-const PLUGIN = '@jpolv/dsh-git-explorer'
+const PLUGIN = 'dsh-plugin-git-explorer'
 
 /** The modules the browser half requires from the page's frozen module table. */
 const REQUIRED_MODULES = [
@@ -186,14 +186,51 @@ if (asarPath === undefined || !existsSync(asarPath)) {
   }
 }
 
-// 3. This plugin's own installation in the profile.
+// 3. This plugin's own installation in the profile. Every artifact is resolved through
+// the installed manifest's export map: the published package is a bundle whose halves live
+// under `packages/`, so a hardcoded `lib/...` path would test the wrong shape.
 const installed = profileRoot === undefined ? undefined : join(profileRoot, 'node_modules', PLUGIN)
 check('plugin', `profile found${profileRoot === undefined ? '' : ` (${profileRoot})`}`, profileRoot !== undefined)
 check('plugin', `${PLUGIN} installed in the profile`, installed !== undefined && existsSync(installed))
-for (const artifact of ['lib/index.js', 'lib/client.js', 'lib/typert.host.js', 'lib/typert.remote-client.js', 'cordis.patch.yml']) {
-  check('plugin', `artifact ${artifact} present`, installed !== undefined && existsSync(join(installed, artifact)))
+
+const manifestPath = installed === undefined ? undefined : join(installed, 'package.json')
+const manifestText = manifestPath === undefined ? undefined : readText(manifestPath)
+const manifest = manifestText === undefined ? undefined : JSON.parse(manifestText)
+const bundlePatch = manifest?.dsh?.bundle?.patch
+check('plugin', 'installed manifest declares dsh.bundle.patch', typeof bundlePatch === 'string')
+check('plugin', 'installed manifest declares dsh.client for the web platform', manifest?.dsh?.client?.platform === 'web')
+
+/** Resolve one export subpath of the installed package to a path inside it. */
+function artifactOf(subpath) {
+  const target = manifest?.exports?.[subpath]
+  const relativePath = typeof target === 'string' ? target : target?.default
+  if (installed === undefined || typeof relativePath !== 'string') return undefined
+  return join(installed, relativePath)
 }
-const remoteClient = installed === undefined ? undefined : readText(join(installed, 'lib', 'typert.remote-client.js'))
+
+const ARTIFACTS = [
+  ['host half', '.'],
+  ['client half', './client'],
+  ['host typert artifact', './typert'],
+  ['remote projection', './remote'],
+]
+for (const [label, subpath] of ARTIFACTS) {
+  const file = artifactOf(subpath)
+  check(
+    'plugin',
+    `${label} present (exports["${subpath}"])`,
+    file !== undefined && existsSync(file),
+    file === undefined ? 'no export target' : relative(installed, file),
+  )
+}
+check(
+  'plugin',
+  `bundle patch present (${typeof bundlePatch === 'string' ? bundlePatch : 'undeclared'})`,
+  installed !== undefined && typeof bundlePatch === 'string' && existsSync(join(installed, bundlePatch)),
+)
+
+const remoteClientPath = artifactOf('./remote')
+const remoteClient = remoteClientPath === undefined ? undefined : readText(remoteClientPath)
 if (remoteClient !== undefined) {
   for (const endpoint of REQUIRED_ENDPOINTS) {
     check('endpoints', `${endpoint} exposed`, remoteClient.includes(endpoint))

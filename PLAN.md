@@ -103,6 +103,12 @@ staged/unstaged grouping UI, a side-by-side diff, context menus, and virtualized
 
 ### 3.1 Repository layout
 
+> **Since M6 the published bundle is the repository root** (see §19): the root
+> `package.json` is `dsh-plugin-git-explorer` — bundle patch, `dsh.client` and entry points
+> into the build project — while the Cordis/Typert project this tree describes stays under
+> `packages/git-explorer/`. The tree below is the M1–M5 layout; only the manifest and
+> `cordis.patch.yml` moved.
+
 ```
 L:\source\deepseek-harness-git-explorer-plugin\
 ├─ PLAN.md                        ← this file
@@ -792,6 +798,59 @@ The first CSS Modules build gave every stylesheet the *same* tag id (the package
 `scripts/probe-bundle.mjs` made it visible: it evaluates the built bundle in jsdom with stub services and reports the loader rows, the registered tab types and slots, every injected stylesheet with its id and size, and how many rendered class attributes are defined in the panel's own sheet (37 of 39 today; the other two belong to the shipped icon primitives). Run it after any styling build.
 
 ---
+## 19. Distribution (M6): a published root bundle over a `packages/` build project
+
+### 19.1 The failure that started it
+
+Installing `https://github.com/jpolvora/deepseek-harness-git-explorer-plugin` through **Plugins → Add plugin** answered *"This package declares no bundle, so it cannot be managed as a plugin."* The dialog's spec goes straight to `pnpm add <spec>` inside the profile, so pnpm fetched the repository and recorded it under the name in the **fetched manifest** — the monorepo root, `dsh-git-explorer-plugin`, `private: true`, no `dsh.bundle`. The plugin manager refuses that with reason `not-a-bundle` (`@deepseek-ai/dsh-plugin-manager`: `if (!inspection.bundle) return refused("not-a-bundle", …)`) and rolls `package.json`/`pnpm-lock.yaml` back while the downloaded files stay — the stale `node_modules/dsh-git-explorer-plugin` left in the profile was that residue.
+
+Three facts were measured rather than assumed:
+
+| Question | Experiment | Answer |
+|---|---|---|
+| Which name does a git install use? | `pnpm add github:jpolvora/deepseek-harness-git-explorer-plugin` in a scratch dir | the **manifest name** (`dsh-git-explorer-plugin`), not the repository name (`deepseek-harness-git-explorer-plugin`) — so the `cordis.patch.yml` row name must equal the package name, while the repository name is free |
+| Can a monorepo subdirectory be installed? | `pnpm add 'github:…/deepseek-harness-git-explorer-plugin#path:/packages/git-explorer'` | yes: pnpm installs the nested package under its own name with its full `files` set (`lib/`, `cordis.patch.yml`, `locale/`). Kept as a documented fallback, not the primary route |
+| Can the package be the repository root? | moved `src/`, `lib/`, `tests/`, `scripts/` to the root and rebuilt | **no** — see 19.2. The move was reverted |
+
+### 19.2 Why the build project cannot be the repository root
+
+The Typert analyzer enumerates the face aggregates' project references but **discards any project whose directory is not inside `<workspaceRoot>/packages/`** (`@deepseek-ai/dsh-typert-generator`, `analyzer.js`):
+
+```js
+if (!isWithin(realPath(packageRoot), join(this.options.root, 'packages'))
+    && !(includeVendor && isWithin(realPath(packageRoot), join(this.options.root, 'vendor'))))
+  continue;
+```
+
+With the package at the root, `packageRoot === root`, the registration was dropped, and the build **silently emitted nothing**: `lib/index.js` was rebuilt while `lib/typert.host.js` and `lib/typert.remote-client.js` kept the previous revision (stale timestamps and the old package name). `scripts/probe-typert.mjs` named it — its artifact list contained only the protocol mirror.
+
+A second rule bit on the way back: a build package must declare `dsh.client` (`isDualFacePackage`) so the host pass filters `./client` out of its export surface (`hostExportSubpaths`). Without it, the host pass demands that `exports["./client"]` resolve to a source file *inside the host program*, and `src/client/index.ts` is not one — `typert(host): … export ./client resolves to missing source …`. The build manifest therefore keeps a `dsh.client` block as its **face declaration**; the *installed* bundle's `dsh.client` lives in the root manifest.
+
+Neither rule can be satisfied by an additive change to a shipped package, so the repository keeps both packages instead of flattening.
+
+### 19.3 What changed here
+
+- **The root package is the published bundle**: `dsh-plugin-git-explorer` with `cordis.patch.yml` (row name = package name), `dsh.bundle.patch`, `dsh.client`, peers and runtime dependencies, and `main`/`exports` pointing into the build project (`packages/git-explorer/lib/**`). `files` packs exactly those artifacts plus the patch and the locale files, so a git install needs no build step. `prepack` rebuilds before packing.
+- **`packages/git-explorer/` stays the Cordis/Typert build project** — `src/`, `lib/`, `tests/`, `scripts/`, `locale/`, the tsconfigs and the bundler configs — and is `private: true`, never installed on its own. It keeps the `./typert`, `./remote` and `./client` exports the generator validates, and its name (`@jpolv/dsh-git-explorer`) survives only inside the generated Remote ids, which both halves share.
+- **One installed name** (AGENTS.md convention 10): root package name = `cordis.patch.yml` row name = client loader id (`tsdown.client.config.ts`) = tab ids (`src/types.ts`) = the name the profile records. The build project's own name is deliberately *not* that name, and its bundle stamps the installed one.
+- `scripts/probe-compat.mjs` now resolves the installed artifacts through the manifest's export map instead of hard-coding `lib/…`, so it tests whatever shape the bundle publishes; `scripts/vendor-typert-protocol.mjs` finds the protocol mirror whether pnpm hoisted it to the workspace root or kept it beside the build package.
+- Added `LICENSE` (MIT) and rewrote `README.md` / `docs/INSTALL.md` around the four install routes.
+
+### 19.4 Install routes after M6
+
+| Route | Spec | Notes |
+|---|---|---|
+| npm | `dsh-plugin-git-explorer` | needs a published **release** version: npm's `latest` tag never points at `0.1.0-m<N>` |
+| GitHub | the bare repository URL | pnpm installs the repository root, whose manifest name is the dependency key, and the row name matches it |
+| Clone | the clone root | the root manifest is the bundle; the built halves ship inside it |
+| Tarball | `dist/dsh-plugin-git-explorer-<version>.tgz` | `pnpm pack:plugin` runs `prepack` first |
+
+### 19.5 Verification
+
+`pnpm install && pnpm typecheck && pnpm test` (60/60) `&& pnpm build`, then every probe: `probe-status`, `probe-mutations`, `probe-diff`, `probe-tools`, `probe-typert` (both artifacts discovered, ours with `hasRemote: true`), `probe-bundle` (loader row `dsh-plugin-git-explorer`, three stylesheets with per-sheet ids) and `probe:compat` — whose runtime half (0.2.0-rc.2, protocol v4, the frozen module table, the three sidebar slots) passes against the installed app, and whose plugin half turns green once the profile installs the renamed bundle.
+
+---
+
 ## Appendix A — research artifacts produced for this plan
 
 | Path | What it is |

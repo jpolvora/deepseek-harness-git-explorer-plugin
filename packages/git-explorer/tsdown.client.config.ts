@@ -25,7 +25,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { transform } from 'lightningcss'
 import { defineConfig } from 'tsdown'
 
-const PACKAGE_NAME = '@jpolv/dsh-git-explorer'
+/**
+ * The **installed** package name — the published root package, which is what the profile
+ * records, what the bundle patch names as a row and therefore what the loader keys the
+ * browser row by. It is deliberately not this build package's own name: the build package
+ * is private, and only its generated Remote ids carry that name.
+ */
+const PACKAGE_NAME = 'dsh-plugin-git-explorer'
 
 /** The directory the client sources are compiled from, for per-stylesheet tag ids. */
 const packageRoot = fileURLToPath(new URL('.', import.meta.url))

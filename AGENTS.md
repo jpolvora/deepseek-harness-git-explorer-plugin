@@ -2,11 +2,14 @@
 
 ## What this is
 
-`@jpolv/dsh-git-explorer`: an out-of-tree DSH plugin (right-sidebar Git tab + Start
+`dsh-plugin-git-explorer`: an out-of-tree DSH plugin (right-sidebar Git tab + Start
 page card) with a Cordis host service, a Typert Remote, a React client panel, and
-agent tools (`git_status`, `git_diff`, `git_log`). pnpm monorepo, root scripts
-delegate with `--filter @jpolv/dsh-git-explorer`. Spec and platform contract:
-`PLAN.md`. Targets DSH desktop `0.2.0-rc.2` only.
+agent tools (`git_status`, `git_diff`, `git_log`). Two packages in one repository: the
+**root** is the published bundle (bundle patch, `dsh.client`, entry points into the
+build output), and `packages/git-explorer/` is the private Cordis/Typert build project
+where `src/`, `lib/`, `tests/` and `scripts/` live — the analyzer only registers
+projects under `packages/`, so the two cannot be merged (PLAN.md §19). Spec and
+platform contract: `PLAN.md`. Targets DSH desktop `0.2.0-rc.2` only.
 
 ## Commands (run from root)
 
@@ -14,18 +17,24 @@ delegate with `--filter @jpolv/dsh-git-explorer`. Spec and platform contract:
 - `pnpm test` (`vitest run`) / `pnpm watch:client` (HMR loop) / `pnpm pack:plugin`
 - `node packages/git-explorer/scripts/probe-<area>.mjs` — verify against a scratch
   repo through a real Cordis context; assert repo state after each verb.
+  `pnpm probe:compat` checks the installed runtime still offers every contract.
 - Never run `pnpm build` / `pack:plugin` while another agent is mid-edit of `src/`:
   outputs land in committed `lib/` and `dist/` and will collide.
 
 ## Layout
 
+- `package.json` — the published bundle; `cordis.patch.yml` — its patch (row name must
+  equal the root package name).
 - `packages/git-explorer/src/index.ts` — plugin entry, service + tool registration.
-- `src/git/` — pure argv builders + runners (`commands.ts`, `mutations.ts`,
-  `status.ts`, `repo.ts`, `diff.ts`); `src/client/` — panel (`GitBody.tsx`,
-  `GitTitle.tsx`, `change-tree.ts`); `src/types.ts`, `src/contract` — shared shapes.
-- `tests/` + `fixtures/status/` (recorded git outputs, `regenerate.ps1` refreshes
-  them); `scripts/` (probes); `lib/` (**committed** build output); `locale/` (en, zh).
-- `packages/typert-protocol/` — Remote protocol companion package.
+- `packages/git-explorer/src/git/` — pure argv builders + runners (`commands.ts`,
+  `mutations.ts`, `status.ts`, `repo.ts`, `diff.ts`); `src/client/` — panel
+  (`GitBody.tsx`, `GitTitle.tsx`, `change-tree.ts`); `src/types.ts`, `src/contract` —
+  shared shapes.
+- `packages/git-explorer/tests/` + `tests/fixtures/status/` (recorded git outputs,
+  `regenerate.ps1` refreshes them); `scripts/` (probes + the protocol mirror
+  generator); `lib/` (**committed** build output); `locale/` (en, zh).
+- `packages/typert-protocol/` — generated, declarations-only mirror of the Typert
+  protocol, registered so the analyzer recognizes the Remote contract.
 - `.tools/notes/` — durable research notes (kept); `.tools/scratch/` and
   `.tools/notes/scratch/` — throwaway (ignored).
 
@@ -52,8 +61,15 @@ delegate with `--filter @jpolv/dsh-git-explorer`. Spec and platform contract:
    for a later milestone via a terminal handoff).
 8. **pnpm `storeDir` override** in `pnpm-workspace.yaml` stays (this machine has no
    `G:` drive).
-9. **Versioning:** package version `0.1.0-m<N>` per milestone; commit subjects like
-   `M2: stage, unstage, discard and commit`.
+9. **Versioning:** in-repo milestone versions are `0.1.0-m<N>`; commit subjects like
+   `M2: stage, unstage, discard and commit`. A published version is a release
+   version (`0.1.0`) — npm's `latest` tag never points at a prerelease.
+10. **One installed name.** The root package name, the `cordis.patch.yml` row name, the
+    client bundle's loader id (`tsdown.client.config.ts`), the tab ids in `src/types.ts`
+    and the name the profile records must stay identical — the loader and module
+    resolution both key on it. The build project's own name (`@jpolv/dsh-git-explorer`)
+    is internal: it appears only in generated Remote ids, never in a row, a loader id or
+    an install spec.
 
 ## Verify before ship
 

@@ -1,5 +1,5 @@
 window.__ModuleLoader__.load({
-	id: "@jpolv/dsh-git-explorer",
+	id: "dsh-plugin-git-explorer",
 	factory: (require) => {
 		var module = { exports: {} };
 		var exports = module.exports;
@@ -6068,11 +6068,11 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		* stay free of services and of any package with runtime identity to share.
 		*/
 		/** The plugin's stable identity: the tab-type id, the slot key, and the package name. */
-		const GIT_EXPLORER_ID = "@jpolv/dsh-git-explorer";
+		const GIT_EXPLORER_ID = "dsh-plugin-git-explorer";
 		/** The tab kind that shows one file's comparison. */
 		const GIT_DIFF_TAB_KIND = "git-diff";
 		/** The definition id of the diff tab type (distinct from the panel's). */
-		const GIT_DIFF_ID = "@jpolv/dsh-git-explorer/diff";
+		const GIT_DIFF_ID = "dsh-plugin-git-explorer/diff";
 		//#endregion
 		//#region lib/types/client/change-tree.js
 		/** Compare two labels naturally, ignoring case. */
@@ -6155,60 +6155,60 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		//#region \0dsh-css:L:\source\deepseek-harness-git-explorer-plugin\packages\git-explorer\src\client\GitBody.module.css.mjs
 		const css$2 = "._7vE8PW_panel {\n  padding: 10px 12px;\n  font-size: .88em;\n  line-height: 1.4;\n}\n\n._7vE8PW_panelHeader {\n  justify-content: space-between;\n  align-items: flex-start;\n  gap: 8px;\n  display: flex;\n}\n\n._7vE8PW_boundaryError {\n  color: var(--dsw-alias-state-error-primary);\n  padding: 10px 12px;\n}\n\n._7vE8PW_branchColumn {\n  flex-direction: column;\n  gap: 2px;\n  min-width: 0;\n  display: flex;\n}\n\n._7vE8PW_branchRow {\n  flex-wrap: wrap;\n  align-items: baseline;\n  gap: 6px;\n  display: flex;\n}\n\n._7vE8PW_strong {\n  font-weight: 600;\n}\n\n._7vE8PW_secondary {\n  color: var(--dsw-alias-label-secondary);\n}\n\n._7vE8PW_tertiary {\n  color: var(--dsw-alias-label-tertiary);\n}\n\n._7vE8PW_tertiaryBreak {\n  color: var(--dsw-alias-label-tertiary);\n  word-break: break-all;\n}\n\n._7vE8PW_tertiaryPadded {\n  color: var(--dsw-alias-label-tertiary);\n  flex-shrink: 0;\n  padding-left: 6px;\n}\n\n._7vE8PW_warn {\n  color: var(--dsw-alias-state-warn-label);\n}\n\n._7vE8PW_errorText {\n  color: var(--dsw-alias-state-error-primary);\n}\n\n._7vE8PW_breakAll {\n  word-break: break-all;\n}\n\n._7vE8PW_ellipsis {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  overflow: hidden;\n}\n\n._7vE8PW_growEllipsis {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  flex: 1;\n  overflow: hidden;\n}\n\n._7vE8PW_glyphSlot {\n  flex-shrink: 0;\n  width: 16px;\n}\n\n._7vE8PW_treeTop {\n  padding-top: 4px;\n}\n\n._7vE8PW_groupBlock {\n  padding-top: 6px;\n}\n\n._7vE8PW_row {\n  box-sizing: border-box;\n  color: inherit;\n  cursor: pointer;\n  font: inherit;\n  padding: 1px 4px;\n  padding-left: calc(4px + var(--indent, 0) * 14px);\n  text-align: left;\n  background: none;\n  border: none;\n  border-radius: 4px;\n  align-items: center;\n  gap: 4px;\n  width: 100%;\n  display: flex;\n}\n\n._7vE8PW_row:hover {\n  background: var(--dsw-alias-interactive-bg-hover);\n}\n\n._7vE8PW_groupHeader {\n  gap: 4px;\n}\n\n._7vE8PW_countBadge {\n  background: var(--dsw-alias-bg-layer-3);\n  color: var(--dsw-alias-label-secondary);\n  border-radius: 8px;\n  margin-left: 4px;\n  padding: 0 6px;\n  font-size: .85em;\n}\n\n._7vE8PW_bulkAction {\n  color: var(--dsw-alias-label-secondary);\n  cursor: pointer;\n  font: inherit;\n  background: none;\n  border: none;\n  margin-left: auto;\n  padding: 0 2px;\n}\n\n._7vE8PW_iconAction {\n  color: var(--dsw-alias-label-secondary);\n  cursor: pointer;\n  background: none;\n  border: none;\n  padding: 0 2px;\n  display: flex;\n}\n\n._7vE8PW_statusLetter {\n  flex-shrink: 0;\n  padding-left: 6px;\n}\n\n._7vE8PW_toneModified, ._7vE8PW_toneTypechange {\n  color: var(--dsw-alias-state-warn-label);\n}\n\n._7vE8PW_toneAdded, ._7vE8PW_toneUntracked {\n  color: var(--dsw-alias-state-success-primary);\n}\n\n._7vE8PW_toneDeleted, ._7vE8PW_toneConflicted {\n  color: var(--dsw-alias-state-error-primary);\n}\n\n._7vE8PW_toneRenamed, ._7vE8PW_toneCopied {\n  color: var(--dsw-alias-state-business-primary);\n}\n\n._7vE8PW_outlineButton {\n  border: 1px solid var(--dsw-alias-border-l3);\n  color: var(--dsw-alias-label-primary);\n  cursor: pointer;\n  font: inherit;\n  background: none;\n  border-radius: 4px;\n  flex-shrink: 0;\n  padding: 1px 8px;\n}\n\n._7vE8PW_dangerButton {\n  background: var(--dsw-alias-state-error-primary);\n  color: var(--dsw-alias-label-primary-inverted);\n  cursor: pointer;\n  font: inherit;\n  border: none;\n  border-radius: 4px;\n  margin-left: auto;\n  padding: 1px 8px;\n}\n\n._7vE8PW_commitBox {\n  flex-direction: column;\n  gap: 4px;\n  padding-top: 8px;\n  display: flex;\n}\n\n._7vE8PW_commitInput {\n  background: var(--dsw-alias-bg-layer-2);\n  border: 1px solid var(--dsw-alias-border-l3);\n  box-sizing: border-box;\n  color: inherit;\n  font: inherit;\n  resize: vertical;\n  border-radius: 4px;\n  width: 100%;\n  padding: 4px 6px;\n}\n\n._7vE8PW_commitRow {\n  align-items: center;\n  gap: 8px;\n  display: flex;\n}\n\n._7vE8PW_commitButton {\n  background: var(--dsw-alias-state-business-primary);\n  color: var(--dsw-alias-label-primary-inverted);\n  cursor: pointer;\n  font: inherit;\n  border: none;\n  border-radius: 4px;\n  padding: 3px 12px;\n  font-weight: 600;\n}\n\n._7vE8PW_commitButtonDisabled {\n  background: var(--dsw-alias-bg-layer-3);\n  color: var(--dsw-alias-label-secondary);\n  cursor: default;\n  font: inherit;\n  border: none;\n  border-radius: 4px;\n  padding: 3px 12px;\n  font-weight: 600;\n}\n\n._7vE8PW_amendLabel {\n  color: var(--dsw-alias-label-secondary);\n  align-items: center;\n  gap: 4px;\n  display: flex;\n}\n\n._7vE8PW_commitHint {\n  color: var(--dsw-alias-label-tertiary);\n  margin-left: auto;\n}\n\n._7vE8PW_noticeOk {\n  color: var(--dsw-alias-state-success-primary);\n  padding-top: 6px;\n}\n\n._7vE8PW_noticeError {\n  color: var(--dsw-alias-state-error-primary);\n  padding-top: 6px;\n}\n\n._7vE8PW_confirmBar {\n  background: var(--dsw-alias-bg-layer-2);\n  border: 1px solid var(--dsw-alias-border-l3);\n  border-radius: 4px;\n  align-items: center;\n  gap: 8px;\n  margin-top: 6px;\n  padding: 4px 6px;\n  display: flex;\n}\n\n._7vE8PW_diagnostics {\n  border-top: 1px solid var(--dsw-alias-border-l3);\n  color: var(--dsw-alias-label-tertiary);\n  margin-top: 10px;\n  padding-top: 10px;\n}\n\n._7vE8PW_diagRow {\n  gap: 8px;\n  padding: 1px 0;\n  display: flex;\n}\n\n._7vE8PW_diagLabel {\n  color: var(--dsw-alias-label-tertiary);\n  min-width: 104px;\n}\n";
 		const classes$2 = {
-			"toneConflicted": "_7vE8PW_toneConflicted",
-			"toneCopied": "_7vE8PW_toneCopied",
-			"warn": "_7vE8PW_warn",
-			"confirmBar": "_7vE8PW_confirmBar",
-			"commitButtonDisabled": "_7vE8PW_commitButtonDisabled",
-			"tertiary": "_7vE8PW_tertiary",
-			"commitButton": "_7vE8PW_commitButton",
-			"panelHeader": "_7vE8PW_panelHeader",
-			"groupHeader": "_7vE8PW_groupHeader",
-			"noticeError": "_7vE8PW_noticeError",
-			"diagnostics": "_7vE8PW_diagnostics",
-			"statusLetter": "_7vE8PW_statusLetter",
-			"toneUntracked": "_7vE8PW_toneUntracked",
-			"toneTypechange": "_7vE8PW_toneTypechange",
-			"panel": "_7vE8PW_panel",
-			"breakAll": "_7vE8PW_breakAll",
-			"ellipsis": "_7vE8PW_ellipsis",
-			"strong": "_7vE8PW_strong",
-			"bulkAction": "_7vE8PW_bulkAction",
-			"toneDeleted": "_7vE8PW_toneDeleted",
-			"dangerButton": "_7vE8PW_dangerButton",
-			"commitBox": "_7vE8PW_commitBox",
-			"diagLabel": "_7vE8PW_diagLabel",
-			"iconAction": "_7vE8PW_iconAction",
-			"tertiaryBreak": "_7vE8PW_tertiaryBreak",
-			"boundaryError": "_7vE8PW_boundaryError",
-			"commitHint": "_7vE8PW_commitHint",
-			"amendLabel": "_7vE8PW_amendLabel",
-			"branchColumn": "_7vE8PW_branchColumn",
-			"secondary": "_7vE8PW_secondary",
-			"errorText": "_7vE8PW_errorText",
 			"commitInput": "_7vE8PW_commitInput",
-			"tertiaryPadded": "_7vE8PW_tertiaryPadded",
 			"toneAdded": "_7vE8PW_toneAdded",
-			"glyphSlot": "_7vE8PW_glyphSlot",
-			"groupBlock": "_7vE8PW_groupBlock",
-			"row": "_7vE8PW_row",
-			"outlineButton": "_7vE8PW_outlineButton",
-			"treeTop": "_7vE8PW_treeTop",
-			"growEllipsis": "_7vE8PW_growEllipsis",
+			"breakAll": "_7vE8PW_breakAll",
+			"errorText": "_7vE8PW_errorText",
+			"panel": "_7vE8PW_panel",
+			"secondary": "_7vE8PW_secondary",
 			"toneRenamed": "_7vE8PW_toneRenamed",
-			"commitRow": "_7vE8PW_commitRow",
-			"noticeOk": "_7vE8PW_noticeOk",
-			"diagRow": "_7vE8PW_diagRow",
-			"branchRow": "_7vE8PW_branchRow",
+			"toneTypechange": "_7vE8PW_toneTypechange",
 			"toneModified": "_7vE8PW_toneModified",
-			"countBadge": "_7vE8PW_countBadge"
+			"toneDeleted": "_7vE8PW_toneDeleted",
+			"toneCopied": "_7vE8PW_toneCopied",
+			"commitRow": "_7vE8PW_commitRow",
+			"countBadge": "_7vE8PW_countBadge",
+			"bulkAction": "_7vE8PW_bulkAction",
+			"commitBox": "_7vE8PW_commitBox",
+			"commitButton": "_7vE8PW_commitButton",
+			"branchColumn": "_7vE8PW_branchColumn",
+			"tertiaryPadded": "_7vE8PW_tertiaryPadded",
+			"branchRow": "_7vE8PW_branchRow",
+			"dangerButton": "_7vE8PW_dangerButton",
+			"groupHeader": "_7vE8PW_groupHeader",
+			"groupBlock": "_7vE8PW_groupBlock",
+			"statusLetter": "_7vE8PW_statusLetter",
+			"commitHint": "_7vE8PW_commitHint",
+			"growEllipsis": "_7vE8PW_growEllipsis",
+			"tertiary": "_7vE8PW_tertiary",
+			"diagnostics": "_7vE8PW_diagnostics",
+			"tertiaryBreak": "_7vE8PW_tertiaryBreak",
+			"strong": "_7vE8PW_strong",
+			"treeTop": "_7vE8PW_treeTop",
+			"glyphSlot": "_7vE8PW_glyphSlot",
+			"row": "_7vE8PW_row",
+			"panelHeader": "_7vE8PW_panelHeader",
+			"warn": "_7vE8PW_warn",
+			"iconAction": "_7vE8PW_iconAction",
+			"boundaryError": "_7vE8PW_boundaryError",
+			"toneUntracked": "_7vE8PW_toneUntracked",
+			"outlineButton": "_7vE8PW_outlineButton",
+			"amendLabel": "_7vE8PW_amendLabel",
+			"noticeOk": "_7vE8PW_noticeOk",
+			"noticeError": "_7vE8PW_noticeError",
+			"ellipsis": "_7vE8PW_ellipsis",
+			"toneConflicted": "_7vE8PW_toneConflicted",
+			"commitButtonDisabled": "_7vE8PW_commitButtonDisabled",
+			"confirmBar": "_7vE8PW_confirmBar",
+			"diagRow": "_7vE8PW_diagRow",
+			"diagLabel": "_7vE8PW_diagLabel"
 		};
-		const tagId$2 = "@jpolv/dsh-git-explorer/src/client/GitBody.module.css";
+		const tagId$2 = "dsh-plugin-git-explorer/src/client/GitBody.module.css";
 		if (typeof document !== "undefined") {
 			let tag = document.querySelector("style[data-plugin-css=" + JSON.stringify(tagId$2) + "]");
 			if (tag === null) {
 				tag = document.createElement("style");
-				tag.dataset.plugin = "@jpolv/dsh-git-explorer";
+				tag.dataset.plugin = "dsh-plugin-git-explorer";
 				tag.dataset.pluginCss = tagId$2;
 				document.head.appendChild(tag);
 			}
@@ -7184,23 +7184,23 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		//#region \0dsh-css:L:\source\deepseek-harness-git-explorer-plugin\packages\git-explorer\src\client\GitDiffBody.module.css.mjs
 		const css$1 = "._7TTuGW_diffBody {\n  min-width: 0;\n  padding: 10px 12px;\n}\n\n._7TTuGW_diffLoading {\n  padding: 10px 12px;\n}\n\n._7TTuGW_diffError {\n  color: var(--dsw-alias-state-error-primary);\n  padding: 10px 12px;\n}\n\n._7TTuGW_diffHeader {\n  color: var(--dsw-alias-label-secondary);\n  padding-bottom: 6px;\n}\n\n._7TTuGW_diffHeaderWarn {\n  color: var(--dsw-alias-state-warn-label);\n  padding-bottom: 6px;\n}\n\n._7TTuGW_diffTitleRow {\n  align-items: baseline;\n  gap: 8px;\n  padding-bottom: 6px;\n  display: flex;\n}\n\n._7TTuGW_diffPath {\n  word-break: break-all;\n  font-weight: 600;\n}\n\n._7TTuGW_diffTotals {\n  color: var(--dsw-alias-label-secondary);\n  margin-left: auto;\n}\n\n._7TTuGW_secondary {\n  color: var(--dsw-alias-label-secondary);\n}\n\n._7TTuGW_outlineButton {\n  border: 1px solid var(--dsw-alias-border-l3);\n  color: var(--dsw-alias-label-primary);\n  cursor: pointer;\n  font: inherit;\n  background: none;\n  border-radius: 4px;\n  flex-shrink: 0;\n  padding: 1px 8px;\n}\n";
 		const classes$1 = {
-			"diffPath": "_7TTuGW_diffPath",
 			"diffTotals": "_7TTuGW_diffTotals",
-			"diffHeader": "_7TTuGW_diffHeader",
-			"secondary": "_7TTuGW_secondary",
-			"diffLoading": "_7TTuGW_diffLoading",
+			"diffPath": "_7TTuGW_diffPath",
 			"outlineButton": "_7TTuGW_outlineButton",
-			"diffBody": "_7TTuGW_diffBody",
+			"diffHeader": "_7TTuGW_diffHeader",
+			"diffLoading": "_7TTuGW_diffLoading",
 			"diffError": "_7TTuGW_diffError",
+			"diffBody": "_7TTuGW_diffBody",
+			"diffTitleRow": "_7TTuGW_diffTitleRow",
 			"diffHeaderWarn": "_7TTuGW_diffHeaderWarn",
-			"diffTitleRow": "_7TTuGW_diffTitleRow"
+			"secondary": "_7TTuGW_secondary"
 		};
-		const tagId$1 = "@jpolv/dsh-git-explorer/src/client/GitDiffBody.module.css";
+		const tagId$1 = "dsh-plugin-git-explorer/src/client/GitDiffBody.module.css";
 		if (typeof document !== "undefined") {
 			let tag = document.querySelector("style[data-plugin-css=" + JSON.stringify(tagId$1) + "]");
 			if (tag === null) {
 				tag = document.createElement("style");
-				tag.dataset.plugin = "@jpolv/dsh-git-explorer";
+				tag.dataset.plugin = "dsh-plugin-git-explorer";
 				tag.dataset.pluginCss = tagId$1;
 				document.head.appendChild(tag);
 			}
@@ -7366,12 +7366,12 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		//#region \0dsh-css:L:\source\deepseek-harness-git-explorer-plugin\packages\git-explorer\src\client\GitTitle.module.css.mjs
 		const css = ".cUEaga_title {\n  color: var(--dsw-alias-label-primary);\n  font-weight: 600;\n}\n";
 		const classes = { "title": "cUEaga_title" };
-		const tagId = "@jpolv/dsh-git-explorer/src/client/GitTitle.module.css";
+		const tagId = "dsh-plugin-git-explorer/src/client/GitTitle.module.css";
 		if (typeof document !== "undefined") {
 			let tag = document.querySelector("style[data-plugin-css=" + JSON.stringify(tagId) + "]");
 			if (tag === null) {
 				tag = document.createElement("style");
-				tag.dataset.plugin = "@jpolv/dsh-git-explorer";
+				tag.dataset.plugin = "dsh-plugin-git-explorer";
 				tag.dataset.pluginCss = tagId;
 				document.head.appendChild(tag);
 			}
