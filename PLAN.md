@@ -770,6 +770,21 @@ Verification: `scripts/probe-tools.mjs` applies the plugin through a real Cordis
 
 ---
 
+## 18. Polish
+
+### 18.1 Localization (done)
+
+The panel's words live in a `gitExplorer` namespace registered with the client locale service, carrying `en` and `zh` dictionaries (`src/client/locales.ts`). Every slot registration names the namespace, which is how a body receives `t`; a body rendered without one falls back to the English dictionary, so tests and any composition that names no namespace still read correctly.
+
+Translated: the tab label and Start-page card copy, group titles, every action label, the panel and diff states, the commit box, the discard confirmation, the diff header labels and the diagnostics rows. **Not** translated, deliberately: git's own output — branch names, paths, `git`'s error lines — which is data rather than copy.
+
+Tests (5) cover dictionary parity, placeholder substitution (`{count}`, `{operation}`, `{message}`), the English fallback, and a panel rendered with a Chinese translator — which proves the wiring without changing the application's language.
+
+### 18.2 CSS Modules (remaining)
+
+The panel and diff body still draw with inline styles over `--dsw-alias-*` tokens; AGENTS.md convention 6 asks for CSS Modules. The work is bounded but touches the build: the client bundle must compile `*.module.css` into a class map plus an injected `<style data-plugin="…">` tag (the shipped preset does this with lightningcss). Plan: add `lightningcss` as a dev dependency, write a small tsdown plugin that emits the virtual module, create `GitBody.module.css` and `GitDiffBody.module.css` with token-based rules, and convert the components' style objects to class names, using the shipped `Button`/`PathLabel` primitives where they fit without changing behaviour.
+
+---
 ## Appendix A — research artifacts produced for this plan
 
 | Path | What it is |
