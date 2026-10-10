@@ -11,3 +11,28 @@ dist/
 .tools/scratch/
 .tools/notes/scratch/
 .tools/notes/_*
+
+# Local environment & secrets (never commit; use *.example templates instead)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+*.asc
+*.gpg
+secrets.yaml
+secrets.yml
+secrets.json
+credentials.yaml
+credentials.yml
+credentials.json
+
+# Logs, coverage & OS/editor noise
+*.log
+coverage/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
