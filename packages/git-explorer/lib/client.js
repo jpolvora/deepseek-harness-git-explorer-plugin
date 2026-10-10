@@ -6152,6 +6152,150 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			return toNodes(root);
 		}
 		//#endregion
+		//#region lib/types/client/locales.js
+		/**
+		* The panel's words, in English and Chinese.
+		*
+		* The namespace is registered with the client locale service and named on every slot
+		* registration, which is how a body receives its `t`. Git's own output — branch names,
+		* paths, `git`'s error lines — is never translated: it is data, not copy.
+		*/
+		/** The locale namespace this plugin registers. */
+		const NS = "gitExplorer";
+		/** The English dictionary; its keys define the namespace's shape. */
+		const en = {
+			"type.label": "Git",
+			"guide.title": "Git",
+			"guide.description": "Stage, commit and review working-tree changes.",
+			"panel.refresh": "Refresh",
+			"panel.reading": "Reading the working tree…",
+			"panel.notRepo": "Not a git repository.",
+			"panel.clean": "No changes — the working tree is clean.",
+			"panel.conflicted": "conflicted file(s) need resolution",
+			"panel.detached": "(detached HEAD)",
+			"panel.unborn": "(no commits yet)",
+			"panel.unknownBranch": "(unknown)",
+			"group.staged": "Staged changes",
+			"group.unstaged": "Changes",
+			"group.untracked": "Untracked",
+			"group.conflicted": "Conflicted",
+			"action.stage": "Stage",
+			"action.unstage": "Unstage",
+			"action.discardTracked": "Discard changes",
+			"action.discardUntracked": "Delete file",
+			"action.discard": "Discard",
+			"action.cancel": "Cancel",
+			"action.stageAll": "Stage all",
+			"action.unstageAll": "Unstage all",
+			"action.openFile": "Open file",
+			"commit.placeholder": "Message (Ctrl+Enter to commit)",
+			"commit.aria": "Commit message",
+			"commit.button": "Commit",
+			"commit.amendButton": "Amend",
+			"commit.busy": "Committing…",
+			"commit.amend": "amend",
+			"commit.hint": "Ctrl+Enter",
+			"discard.confirm": "Discard {count} change(s)? This cannot be undone.",
+			"diff.reading": "Reading the diff…",
+			"diff.noFile": "this diff tab has no file to compare",
+			"diff.stagedLabel": "index vs HEAD",
+			"diff.unstagedLabel": "working tree vs index",
+			"diff.binary": "A binary file has no text diff.",
+			"diff.oversized": "One side is larger than the read cap, so no diff is shown.",
+			"diagnostics.session": "session",
+			"diagnostics.workspace": "workspace",
+			"diagnostics.unknown": "(unknown to the panel)",
+			"diagnostics.rootSource": "root source",
+			"diagnostics.git": "git",
+			"diagnostics.notFound": "(not found)",
+			"diagnostics.note": "note",
+			"diagnostics.probe": "probe",
+			"diagnostics.build": "plugin build",
+			"diagnostics.tabHost": "tab host",
+			"diagnostics.hostPanel": "panel host",
+			"diagnostics.hostOpener": "sidebar opener only",
+			"diagnostics.hostNone": "unavailable",
+			"panel.operation": "{operation} in progress",
+			"panel.failed": "The Git panel failed to render: {message}",
+			"opener.missing": "this panel was given neither a tab host nor the sidebar opener",
+			"opener.failed": "opening the comparison failed: {message}"
+		};
+		/** The Chinese dictionary. */
+		const zh = {
+			"type.label": "Git",
+			"guide.title": "Git",
+			"guide.description": "在右侧边栏暂存、提交并审阅工作区改动。",
+			"panel.refresh": "刷新",
+			"panel.reading": "正在读取工作区…",
+			"panel.notRepo": "不是 Git 仓库。",
+			"panel.clean": "没有改动 — 工作区是干净的。",
+			"panel.conflicted": "个冲突文件需要处理",
+			"panel.detached": "（游离 HEAD）",
+			"panel.unborn": "（尚无提交）",
+			"panel.unknownBranch": "（未知）",
+			"group.staged": "已暂存的更改",
+			"group.unstaged": "更改",
+			"group.untracked": "未跟踪",
+			"group.conflicted": "冲突",
+			"action.stage": "暂存",
+			"action.unstage": "取消暂存",
+			"action.discardTracked": "放弃更改",
+			"action.discardUntracked": "删除文件",
+			"action.discard": "放弃",
+			"action.cancel": "取消",
+			"action.stageAll": "全部暂存",
+			"action.unstageAll": "全部取消暂存",
+			"action.openFile": "打开文件",
+			"commit.placeholder": "提交信息（Ctrl+Enter 提交）",
+			"commit.aria": "提交信息",
+			"commit.button": "提交",
+			"commit.amendButton": "修补",
+			"commit.busy": "正在提交…",
+			"commit.amend": "修补上次提交",
+			"commit.hint": "Ctrl+Enter",
+			"discard.confirm": "放弃 {count} 处更改？此操作无法撤销。",
+			"diff.reading": "正在读取差异…",
+			"diff.noFile": "此差异标签页没有要比较的文件",
+			"diff.stagedLabel": "索引 对比 HEAD",
+			"diff.unstagedLabel": "工作区 对比 索引",
+			"diff.binary": "二进制文件没有文本差异。",
+			"diff.oversized": "其中一侧超过读取上限，因此不显示差异。",
+			"diagnostics.session": "会话",
+			"diagnostics.workspace": "工作目录",
+			"diagnostics.unknown": "（面板未知）",
+			"diagnostics.rootSource": "目录来源",
+			"diagnostics.git": "git",
+			"diagnostics.notFound": "（未找到）",
+			"diagnostics.note": "说明",
+			"diagnostics.probe": "探测",
+			"diagnostics.build": "插件构建",
+			"diagnostics.tabHost": "标签宿主",
+			"diagnostics.hostPanel": "面板宿主",
+			"diagnostics.hostOpener": "仅侧边栏打开器",
+			"diagnostics.hostNone": "不可用",
+			"panel.operation": "{operation} 进行中",
+			"panel.failed": "Git 面板渲染失败：{message}",
+			"opener.missing": "此面板既没有标签宿主，也没有侧边栏打开器",
+			"opener.failed": "打开比较视图失败：{message}"
+		};
+		/**
+		* The panel's translator: the framework's `t`, or the English dictionary when a body was
+		* rendered without one (a test, or a slot that named no namespace).
+		*
+		* @param t - the framework's translate function, if any.
+		* @returns a translator that never returns an empty string.
+		*/
+		function translator(t) {
+			return (key, values) => {
+				const text = t?.(key) ?? en[key];
+				return values === void 0 ? text : fill(text, values);
+			};
+		}
+		/** Substitute `{name}` placeholders in one message. */
+		function fill(template, values) {
+			return template.replace(/\{(\w+)\}/g, (_match, key) => values[key] ?? `{${key}}`);
+		}
+		//#endregion
 		//#region lib/types/client/GitBody.js
 		/**
 		* The Git panel body — the Source Control view.
@@ -6438,8 +6582,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			});
 		}
 		/** The branch line: branch name, tracking drift and the repository root. */
-		function BranchLine({ status }) {
-			const branch = status.branch ?? (status.detached ? "(detached HEAD)" : status.unborn ? "(no commits yet)" : "(unknown)");
+		function BranchLine({ status, t }) {
+			const branch = status.branch ?? (status.detached ? t("panel.detached") : status.unborn ? t("panel.unborn") : t("panel.unknownBranch"));
 			return (0, react_jsx_runtime.jsxs)("div", {
 				style: {
 					display: "flex",
@@ -6465,7 +6609,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						}),
 						status.operation === null ? null : (0, react_jsx_runtime.jsx)("span", {
 							style: { color: "var(--dsw-alias-state-warn-label)" },
-							children: `${status.operation} in progress`
+							children: t("panel.operation", { operation: status.operation })
 						})
 					]
 				}), status.root === null ? null : (0, react_jsx_runtime.jsx)("div", {
@@ -6478,7 +6622,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			});
 		}
 		/** The message box and its Commit control. */
-		function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit }) {
+		function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit, t }) {
 			const ready = message.trim() !== "" && !busy;
 			return (0, react_jsx_runtime.jsxs)("div", {
 				style: {
@@ -6489,8 +6633,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				},
 				children: [(0, react_jsx_runtime.jsx)("textarea", {
 					value: message,
-					placeholder: "Message (Ctrl+Enter to commit)",
-					"aria-label": "Commit message",
+					placeholder: t("commit.placeholder"),
+					"aria-label": t("commit.aria"),
 					rows: 2,
 					onChange: (event) => {
 						onMessage(event.target.value);
@@ -6533,7 +6677,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								fontWeight: 600,
 								padding: "3px 12px"
 							},
-							children: busy ? "Committing…" : amend ? "Amend" : "Commit"
+							children: busy ? t("commit.busy") : amend ? t("commit.amendButton") : t("commit.button")
 						}),
 						(0, react_jsx_runtime.jsxs)("label", {
 							style: {
@@ -6548,14 +6692,14 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								onChange: (event) => {
 									onAmend(event.target.checked);
 								}
-							}), "amend"]
+							}), t("commit.amend")]
 						}),
 						(0, react_jsx_runtime.jsx)("span", {
 							style: {
 								color: TERTIARY,
 								marginLeft: "auto"
 							},
-							children: "Ctrl+Enter"
+							children: t("commit.hint")
 						})
 					]
 				})]
@@ -6599,7 +6743,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						padding: "10px 12px",
 						color: "var(--dsw-alias-state-error-primary)"
 					},
-					children: `The Git panel failed to render: ${this.state.failure}`
+					children: fill(en["panel.failed"], { message: this.state.failure })
 				});
 				return this.props.children;
 			}
@@ -6687,7 +6831,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		* @param props - the session, the session store and the host bridge.
 		* @returns the panel body.
 		*/
-		function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitStats, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }) {
+		function GitPanel({ sessionId, translate, useSessions, useTabInfo, openTab, gitStatus, gitStats, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }) {
+			const t = translator(translate);
 			const [outcome, setOutcome] = react.useState(null);
 			const [stats, setStats] = react.useState([]);
 			const [probe, setProbe] = react.useState(null);
@@ -6829,7 +6974,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				const unstage = bridge.current.gitUnstage;
 				if (stage === void 0 || unstage === void 0) return [];
 				if (status !== null && status.staged.includes(change)) return [{
-					title: "Unstage",
+					title: t("action.unstage"),
 					icon: _deepseek_ai_dsh_client_ui_primitives.IconCloseOutlineRegular,
 					run: () => {
 						mutate((signal) => unstage(requestRoot, [change.path], signal));
@@ -6837,13 +6982,13 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				}];
 				const untracked = status !== null && status.untracked.includes(change);
 				return [{
-					title: "Stage",
+					title: t("action.stage"),
 					icon: _deepseek_ai_dsh_client_ui_primitives.IconPlusOutlineRegular,
 					run: () => {
 						mutate((signal) => stage(requestRoot, [change.path], signal));
 					}
 				}, {
-					title: untracked ? "Delete file" : "Discard changes",
+					title: untracked ? t("action.discardUntracked") : t("action.discardTracked"),
 					icon: _deepseek_ai_dsh_client_ui_primitives.IconTrashOutlineRegular,
 					run: () => {
 						setPendingDiscard(untracked ? {
@@ -6894,12 +7039,12 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					}
 					setNotice({
 						ok: false,
-						detail: "this panel was given neither a tab host nor the sidebar opener"
+						detail: t("opener.missing")
 					});
 				} catch (error) {
 					setNotice({
 						ok: false,
-						detail: `opening the comparison failed: ${error instanceof Error ? error.message : String(error)}`
+						detail: `opener.failed', { message: error instanceof Error ? error.message : String(error) })}`
 					});
 				}
 			};
@@ -6924,15 +7069,19 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						},
 						children: [status === null ? (0, react_jsx_runtime.jsx)("span", {
 							style: { fontWeight: 600 },
-							children: "Git"
-						}) : (0, react_jsx_runtime.jsx)(BranchLine, { status }), (0, react_jsx_runtime.jsx)(Action, {
-							label: "Refresh",
+							children: t("type.label")
+						}) : (0, react_jsx_runtime.jsx)(BranchLine, {
+							status,
+							t
+						}), (0, react_jsx_runtime.jsx)(Action, {
+							label: t("panel.refresh"),
 							onClick: () => {
 								setAttempt((value) => value + 1);
 							}
 						})]
 					}),
 					status === null ? null : (0, react_jsx_runtime.jsx)(CommitBox, {
+						t,
 						message,
 						amend,
 						busy,
@@ -6973,7 +7122,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						children: [
 							(0, react_jsx_runtime.jsx)("span", {
 								style: { color: "var(--dsw-alias-state-warn-label)" },
-								children: `Discard ${String(pendingDiscard.tracked.length + pendingDiscard.untracked.length)} change(s)? This cannot be undone.`
+								children: t("discard.confirm", { count: String(pendingDiscard.tracked.length + pendingDiscard.untracked.length) })
 							}),
 							(0, react_jsx_runtime.jsx)("button", {
 								type: "button",
@@ -6988,7 +7137,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 									marginLeft: "auto",
 									padding: "1px 8px"
 								},
-								children: "Discard"
+								children: t("action.discard")
 							}),
 							(0, react_jsx_runtime.jsx)("button", {
 								type: "button",
@@ -7004,7 +7153,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 									font: "inherit",
 									padding: "1px 8px"
 								},
-								children: "Cancel"
+								children: t("action.cancel")
 							})
 						]
 					}),
@@ -7013,47 +7162,47 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						style: { paddingTop: "4px" },
 						children: outcome === null ? (0, react_jsx_runtime.jsx)("div", {
 							style: { color: SECONDARY },
-							children: "Reading the working tree…"
+							children: t("panel.reading")
 						}) : "unavailable" in outcome ? (0, react_jsx_runtime.jsx)("div", {
 							style: { color: "var(--dsw-alias-state-error-primary)" },
 							children: outcome.unavailable
 						}) : !outcome.isRepo ? (0, react_jsx_runtime.jsxs)("div", {
 							style: { color: SECONDARY },
-							children: ["Not a git repository.", outcome.note === "" ? null : (0, react_jsx_runtime.jsx)("div", {
+							children: [t("panel.notRepo"), outcome.note === "" ? null : (0, react_jsx_runtime.jsx)("div", {
 								style: { color: TERTIARY },
 								children: outcome.note
 							})]
 						}) : (0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, { children: [
 							outcome.conflicted.length === 0 ? null : (0, react_jsx_runtime.jsx)("div", {
 								style: { color: "var(--dsw-alias-state-warn-label)" },
-								children: `${String(outcome.conflicted.length)} conflicted file(s) need resolution`
+								children: `${String(outcome.conflicted.length)} ${t("panel.conflicted")}`
 							}),
 							(0, react_jsx_runtime.jsx)(Group, {
-								title: "Staged changes",
+								title: t("group.staged"),
 								changes: outcome.staged,
 								openFor: (change) => {
 									openComparison(change, true, false);
 								},
-								bulk: bulkFor(outcome.staged.map((change) => change.path), "Unstage all", (paths) => {
+								bulk: bulkFor(outcome.staged.map((change) => change.path), t("action.unstageAll"), (paths) => {
 									const unstage = bridge.current.gitUnstage;
 									if (unstage !== void 0) mutate((signal) => unstage(requestRoot, paths, signal));
 								}),
 								...groupProps
 							}),
 							(0, react_jsx_runtime.jsx)(Group, {
-								title: "Changes",
+								title: t("group.unstaged"),
 								changes: outcome.unstaged,
 								openFor: (change) => {
 									openComparison(change, false, false);
 								},
-								bulk: bulkFor(outcome.unstaged.map((change) => change.path), "Stage all", (paths) => {
+								bulk: bulkFor(outcome.unstaged.map((change) => change.path), t("action.stageAll"), (paths) => {
 									const stage = bridge.current.gitStage;
 									if (stage !== void 0) mutate((signal) => stage(requestRoot, paths, signal));
 								}),
 								...groupProps
 							}),
 							(0, react_jsx_runtime.jsx)(Group, {
-								title: "Conflicted",
+								title: t("group.conflicted"),
 								changes: outcome.conflicted,
 								openFor: (change) => {
 									openComparison(change, false, false);
@@ -7061,12 +7210,12 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								...groupProps
 							}),
 							(0, react_jsx_runtime.jsx)(Group, {
-								title: "Untracked",
+								title: t("group.untracked"),
 								changes: outcome.untracked,
 								openFor: (change) => {
 									openComparison(change, false, true);
 								},
-								bulk: bulkFor(outcome.untracked.map((change) => change.path), "Stage all", (paths) => {
+								bulk: bulkFor(outcome.untracked.map((change) => change.path), t("action.stageAll"), (paths) => {
 									const stage = bridge.current.gitStage;
 									if (stage !== void 0) mutate((signal) => stage(requestRoot, paths, signal));
 								}),
@@ -7074,7 +7223,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							}),
 							total === 0 ? (0, react_jsx_runtime.jsx)("div", {
 								style: { color: SECONDARY },
-								children: "No changes — the working tree is clean."
+								children: t("panel.clean")
 							}) : null
 						] })
 					}),
@@ -7087,36 +7236,36 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						},
 						children: [
 							(0, react_jsx_runtime.jsx)(Row, {
-								label: "session",
+								label: t("diagnostics.session"),
 								value: sessionId ?? "(none)"
 							}),
 							(0, react_jsx_runtime.jsx)(Row, {
-								label: "workspace",
-								value: requestRoot === "" ? "(unknown to the panel)" : requestRoot
+								label: t("diagnostics.workspace"),
+								value: requestRoot === "" ? t("diagnostics.unknown") : requestRoot
 							}),
 							outcome !== null && !("unavailable" in outcome) ? (0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, { children: [
 								(0, react_jsx_runtime.jsx)(Row, {
-									label: "root source",
+									label: t("diagnostics.rootSource"),
 									value: outcome.rootSource
 								}),
 								(0, react_jsx_runtime.jsx)(Row, {
-									label: "git",
-									value: outcome.gitVersion ?? "(not found)"
+									label: t("diagnostics.git"),
+									value: outcome.gitVersion ?? t("diagnostics.notFound")
 								}),
 								(0, react_jsx_runtime.jsx)(Row, {
-									label: "tab host",
-									value: tabRef.current === void 0 ? openerRef.current === void 0 ? "unavailable" : "sidebar opener only" : "panel host"
+									label: t("diagnostics.tabHost"),
+									value: tabRef.current === void 0 ? openerRef.current === void 0 ? t("diagnostics.hostNone") : t("diagnostics.hostOpener") : t("diagnostics.hostPanel")
 								}),
 								outcome.note === "" ? null : (0, react_jsx_runtime.jsx)(Row, {
-									label: "note",
+									label: t("diagnostics.note"),
 									value: outcome.note
 								})
 							] }) : null,
 							probe === null ? null : "unavailable" in probe ? (0, react_jsx_runtime.jsx)(Row, {
-								label: "probe",
+								label: t("diagnostics.probe"),
 								value: probe.unavailable
 							}) : (0, react_jsx_runtime.jsx)(Row, {
-								label: "plugin build",
+								label: t("diagnostics.build"),
 								value: probe.packageVersion
 							})
 						]
@@ -7178,7 +7327,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		* @param props - the session, the tab hook and the host bridge.
 		* @returns the diff body.
 		*/
-		function GitDiffBody({ sessionId, useTabInfo, gitDiff }) {
+		function GitDiffBody({ sessionId, useTabInfo, translate, gitDiff }) {
+			const t = translator(translate);
 			const tab = useTabInfo?.();
 			const params = tab?.tab.navigation.params;
 			const path = typeof params?.path === "string" ? params.path : "";
@@ -7197,7 +7347,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					return;
 				}
 				if (path === "") {
-					setOutcome({ unavailable: "this diff tab has no file to compare" });
+					setOutcome({ unavailable: t("diff.noFile") });
 					return;
 				}
 				const abort = new AbortController();
@@ -7218,7 +7368,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			]);
 			if (outcome === null) return (0, react_jsx_runtime.jsx)("div", {
 				style: { padding: "10px 12px" },
-				children: (0, react_jsx_runtime.jsx)(Header, { text: "Reading the diff…" })
+				children: (0, react_jsx_runtime.jsx)(Header, { text: t("diff.reading") })
 			});
 			if ("unavailable" in outcome) return (0, react_jsx_runtime.jsx)("div", {
 				style: {
@@ -7258,7 +7408,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							}),
 							(0, react_jsx_runtime.jsx)("span", {
 								style: { color: "var(--dsw-alias-label-secondary)" },
-								children: staged ? "index vs HEAD" : "working tree vs index"
+								children: staged ? t("diff.stagedLabel") : t("diff.unstagedLabel")
 							}),
 							totals === null ? null : (0, react_jsx_runtime.jsx)("span", {
 								style: {
@@ -7284,16 +7434,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 									font: "inherit",
 									padding: "1px 8px"
 								},
-								children: "Open file"
+								children: t("action.openFile")
 							}) : null
 						]
 					}),
 					diff.binary ? (0, react_jsx_runtime.jsx)(Header, {
-						text: "A binary file has no text diff.",
+						text: t("diff.binary"),
 						tone: "var(--dsw-alias-state-warn-label)"
 					}) : null,
 					diff.oversized ? (0, react_jsx_runtime.jsx)(Header, {
-						text: "One side is larger than the read cap, so no diff is shown.",
+						text: t("diff.oversized"),
 						tone: "var(--dsw-alias-state-warn-label)"
 					}) : null,
 					diff.note === "" ? null : (0, react_jsx_runtime.jsx)(Header, { text: diff.note }),
@@ -7385,6 +7535,12 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			const faces = ctx;
 			const unmount = await faces.remote.$mount(TYPERT_REMOTE);
 			ctx.effect(() => () => unmount(), "git-explorer: remote contract");
+			ctx.inject(["locale"], (scope) => {
+				return scope.locale.register(NS, {
+					en,
+					zh
+				});
+			});
 			const hostFor = hostCalls(ctx);
 			ctx.effect(() => faces.sidebarRightTabs.register({
 				id: GIT_EXPLORER_ID,
@@ -7402,6 +7558,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			ctx.effect(() => faces.slots.inject("sidebar.right.pane.tab", () => faces.slots.register({
 				name: "sidebar.right.pane.tab",
 				key: GIT_EXPLORER_ID,
+				locale: NS,
 				inject: (sessionId) => {
 					const host = hostFor(sessionId);
 					return {
@@ -7420,7 +7577,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			}, GitBody)), "git-explorer: tab body");
 			ctx.effect(() => faces.slots.inject("sidebar.right.pane.tab.title", () => faces.slots.register({
 				name: "sidebar.right.pane.tab.title",
-				key: GIT_EXPLORER_ID
+				key: GIT_EXPLORER_ID,
+				locale: NS
 			}, GitTitle)), "git-explorer: tab title");
 			ctx.effect(() => faces.sidebarRightTabs.register({
 				id: GIT_DIFF_ID,
@@ -7432,6 +7590,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			ctx.effect(() => faces.slots.inject("sidebar.right.pane.tab", () => faces.slots.register({
 				name: "sidebar.right.pane.tab",
 				key: GIT_DIFF_ID,
+				locale: NS,
 				inject: (sessionId) => {
 					const host = hostFor(sessionId);
 					return { gitDiff: (path, staged, untracked, signal) => host.fileDiff("", path, staged, untracked, signal) };
@@ -7439,7 +7598,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			}, GitDiffBody)), "git-explorer: diff body");
 			ctx.effect(() => faces.slots.inject("sidebar.right.pane.tab.title", () => faces.slots.register({
 				name: "sidebar.right.pane.tab.title",
-				key: GIT_DIFF_ID
+				key: GIT_DIFF_ID,
+				locale: NS
 			}, DiffTitle)), "git-explorer: diff title");
 		}
 		/**

@@ -42,6 +42,7 @@ import {
 import { GitBody } from './GitBody.js'
 import { GitDiffBody } from './GitDiffBody.js'
 import { GitTitle } from './GitTitle.js'
+import { NS, en, zh } from './locales.js'
 
 export const name = 'git-explorer-client'
 
@@ -229,6 +230,15 @@ export async function apply(ctx: Context): Promise<void> {
   const unmount = await faces.remote.$mount(TYPERT_REMOTE)
   ctx.effect(() => () => unmount(), 'git-explorer: remote contract')
 
+  // The panel's words, in the locales this build ships. A body receives `t` because its
+  // slot registration names this namespace.
+  ctx.inject(['locale'], (scope) => {
+    const locale = (scope as unknown as {
+      locale: { register(namespace: string, dicts: Record<string, unknown>): () => void }
+    }).locale
+    return locale.register(NS, { en, zh })
+  })
+
   const hostFor = hostCalls(ctx)
 
   ctx.effect(() => faces.sidebarRightTabs.register({
@@ -248,6 +258,7 @@ export async function apply(ctx: Context): Promise<void> {
   ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab', () => faces.slots.register({
     name: 'sidebar.right.pane.tab',
     key: GIT_EXPLORER_ID,
+    locale: NS,
     // The slot's `inject` is a factory called per (session, actions); its return value
     // becomes the body's business props. Returning a plain object renders an empty pane.
     inject: (sessionId: string) => {
@@ -285,6 +296,7 @@ export async function apply(ctx: Context): Promise<void> {
   ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab.title', () => faces.slots.register({
     name: 'sidebar.right.pane.tab.title',
     key: GIT_EXPLORER_ID,
+    locale: NS,
   }, GitTitle)), 'git-explorer: tab title')
 
   // The comparison tab: one instance per file, opened by the panel with the path and
@@ -300,6 +312,7 @@ export async function apply(ctx: Context): Promise<void> {
   ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab', () => faces.slots.register({
     name: 'sidebar.right.pane.tab',
     key: GIT_DIFF_ID,
+    locale: NS,
     inject: (sessionId: string) => {
       const host = hostFor(sessionId)
       return {
@@ -312,6 +325,7 @@ export async function apply(ctx: Context): Promise<void> {
   ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab.title', () => faces.slots.register({
     name: 'sidebar.right.pane.tab.title',
     key: GIT_DIFF_ID,
+    locale: NS,
   }, DiffTitle)), 'git-explorer: diff title')
 }
 

@@ -11,6 +11,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  */
 import * as React from 'react';
 import { DiffBlock, diffTotals } from '@deepseek-ai/dsh-client-ui-primitives';
+import { translator } from './locales.js';
 /** The workspace-relative path of an absolute path, or null when it lies outside. */
 function relativeToWorkspace(workspaceRoot, absolute) {
     const root = workspaceRoot.replace(/\\/g, '/').split('/').filter((segment) => segment !== '');
@@ -50,7 +51,8 @@ function Header({ text, tone }) {
  * @param props - the session, the tab hook and the host bridge.
  * @returns the diff body.
  */
-export function GitDiffBody({ sessionId, useTabInfo, gitDiff }) {
+export function GitDiffBody({ sessionId, useTabInfo, translate, gitDiff }) {
+    const t = translator(translate);
     const tab = useTabInfo?.();
     const params = tab?.tab.navigation.params;
     const path = typeof params?.path === 'string' ? params.path : '';
@@ -69,7 +71,7 @@ export function GitDiffBody({ sessionId, useTabInfo, gitDiff }) {
             return;
         }
         if (path === '') {
-            setOutcome({ unavailable: 'this diff tab has no file to compare' });
+            setOutcome({ unavailable: t('diff.noFile') });
             return;
         }
         const abort = new AbortController();
@@ -87,7 +89,7 @@ export function GitDiffBody({ sessionId, useTabInfo, gitDiff }) {
         };
     }, [path, staged, untracked]);
     if (outcome === null)
-        return _jsx("div", { style: { padding: '10px 12px' }, children: _jsx(Header, { text: "Reading the diff\u2026" }) });
+        return _jsx("div", { style: { padding: '10px 12px' }, children: _jsx(Header, { text: t('diff.reading') }) });
     if ('unavailable' in outcome) {
         return (_jsx("div", { style: { padding: '10px 12px', color: 'var(--dsw-alias-state-error-primary)' }, children: outcome.unavailable }));
     }
@@ -97,7 +99,7 @@ export function GitDiffBody({ sessionId, useTabInfo, gitDiff }) {
     // the Session's workspace — so the button only appears when the file lies inside it.
     const relative = diff.root === '' ? null : relativeToWorkspace(workspaceRoot, `${diff.root}/${diff.path}`);
     const openable = relative !== null && sessionId !== undefined && tabRef.current !== undefined;
-    return (_jsxs("div", { style: { padding: '10px 12px', minWidth: 0 }, children: [_jsxs("div", { style: { display: 'flex', gap: '8px', alignItems: 'baseline', paddingBottom: '6px' }, children: [_jsx("span", { style: { fontWeight: 600, wordBreak: 'break-all' }, children: diff.path }), _jsx("span", { style: { color: 'var(--dsw-alias-label-secondary)' }, children: staged ? 'index vs HEAD' : 'working tree vs index' }), totals === null
+    return (_jsxs("div", { style: { padding: '10px 12px', minWidth: 0 }, children: [_jsxs("div", { style: { display: 'flex', gap: '8px', alignItems: 'baseline', paddingBottom: '6px' }, children: [_jsx("span", { style: { fontWeight: 600, wordBreak: 'break-all' }, children: diff.path }), _jsx("span", { style: { color: 'var(--dsw-alias-label-secondary)' }, children: staged ? t('diff.stagedLabel') : t('diff.unstagedLabel') }), totals === null
                         ? null
                         : (_jsx("span", { style: { marginLeft: 'auto', color: 'var(--dsw-alias-label-secondary)' }, children: `+${String(totals.added)} −${String(totals.removed)}` })), openable
                         ? (_jsx("button", { type: "button", onClick: () => {
@@ -114,11 +116,11 @@ export function GitDiffBody({ sessionId, useTabInfo, gitDiff }) {
                                 flexShrink: 0,
                                 font: 'inherit',
                                 padding: '1px 8px',
-                            }, children: "Open file" }))
+                            }, children: t('action.openFile') }))
                         : null] }), diff.binary
-                ? _jsx(Header, { text: "A binary file has no text diff.", tone: "var(--dsw-alias-state-warn-label)" })
+                ? _jsx(Header, { text: t('diff.binary'), tone: "var(--dsw-alias-state-warn-label)" })
                 : null, diff.oversized
-                ? _jsx(Header, { text: "One side is larger than the read cap, so no diff is shown.", tone: "var(--dsw-alias-state-warn-label)" })
+                ? _jsx(Header, { text: t('diff.oversized'), tone: "var(--dsw-alias-state-warn-label)" })
                 : null, diff.note === '' ? null : _jsx(Header, { text: diff.note }), diff.binary || diff.oversized
                 ? null
                 : (_jsx(DiffBlock, { diffs: [{ path: diff.path, oldText: diff.oldText, newText: diff.newText }], labels: LABELS }))] }));

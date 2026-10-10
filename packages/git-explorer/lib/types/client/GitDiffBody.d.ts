@@ -10,6 +10,7 @@
  */
 import * as React from 'react';
 import type { GitFileDiffOutcome } from '../types.js';
+import { type Translate } from './locales.js';
 /** The tab-information hook the sidebar injects into every tab body. */
 type TabInfoHook = () => {
     tab: {
@@ -28,6 +29,8 @@ type TabInfoHook = () => {
 export interface GitDiffBodyProps {
     /** The Session the tab belongs to. */
     sessionId?: string;
+    /** The framework's translator for this plugin's namespace, when the slot named one. */
+    translate?: Translate;
     /** Framework hook: the tab's own navigation parameters. */
     useTabInfo?: TabInfoHook;
     /** The comparison read, contributed through the slot's `inject` face factory. */
@@ -39,5 +42,5 @@ export interface GitDiffBodyProps {
  * @param props - the session, the tab hook and the host bridge.
  * @returns the diff body.
  */
-export declare function GitDiffBody({ sessionId, useTabInfo, gitDiff }: GitDiffBodyProps): React.ReactElement;
+export declare function GitDiffBody({ sessionId, useTabInfo, translate, gitDiff }: GitDiffBodyProps): React.ReactElement;
 export {};

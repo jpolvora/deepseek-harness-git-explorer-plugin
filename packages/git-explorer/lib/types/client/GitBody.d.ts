@@ -12,6 +12,7 @@
  * Styling: inline styles over the documented `--dsw-alias-*` tokens, matching M1.
  */
 import * as React from 'react';
+import { type Translate } from './locales.js';
 import type { GitChangeStats, GitMutationResult, GitPingOutcome, GitStatusOutcome } from '../types.js';
 /** The session list face the framework hands a session-scoped body. */
 type SessionsHook = <T>(select: (state: SessionListState) => T) => T;
@@ -39,6 +40,8 @@ type TabInfoHook = () => {
 export interface GitBodyProps {
     /** The Session the tab belongs to, delivered by the sidebar's render call. */
     sessionId?: string;
+    /** The framework's translator for this plugin's namespace, when the slot named one. */
+    translate?: Translate;
     /** Framework hook: how to open another tab from this one. */
     useTabInfo?: TabInfoHook;
     /**

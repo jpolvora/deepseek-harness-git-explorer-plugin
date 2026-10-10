@@ -25,6 +25,7 @@ import {
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import { buildChangeTree, type ChangeTreeNode } from './change-tree.js'
 import { GIT_DIFF_TAB_KIND } from '../types.js'
+import { en, fill, translator, type Translate } from './locales.js'
 import type {
   GitChange,
   GitChangeStats,
@@ -56,6 +57,8 @@ type TabInfoHook = () => {
 export interface GitBodyProps {
   /** The Session the tab belongs to, delivered by the sidebar's render call. */
   sessionId?: string
+  /** The framework's translator for this plugin's namespace, when the slot named one. */
+  translate?: Translate
   /** Framework hook: how to open another tab from this one. */
   useTabInfo?: TabInfoHook
   /**
@@ -386,8 +389,8 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
 }
 
 /** The branch line: branch name, tracking drift and the repository root. */
-function BranchLine({ status }: { status: GitStatusSummary }): React.ReactElement {
-  const branch = status.branch ?? (status.detached ? '(detached HEAD)' : status.unborn ? '(no commits yet)' : '(unknown)')
+function BranchLine({ status, t }: { status: GitStatusSummary; t: Translate }): React.ReactElement {
+  const branch = status.branch ?? (status.detached ? t('panel.detached') : status.unborn ? t('panel.unborn') : t('panel.unknownBranch'))
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
@@ -397,7 +400,7 @@ function BranchLine({ status }: { status: GitStatusSummary }): React.ReactElemen
           : <span style={{ color: SECONDARY }}>{`↑${String(status.ahead)} ↓${String(status.behind)}`}</span>}
         {status.operation === null
           ? null
-          : <span style={{ color: 'var(--dsw-alias-state-warn-label)' }}>{`${status.operation} in progress`}</span>}
+          : <span style={{ color: 'var(--dsw-alias-state-warn-label)' }}>{t('panel.operation', { operation: status.operation })}</span>}
       </div>
       {status.root === null ? null : <div style={{ color: TERTIARY, wordBreak: 'break-all' }}>{status.root}</div>}
     </div>
@@ -405,7 +408,8 @@ function BranchLine({ status }: { status: GitStatusSummary }): React.ReactElemen
 }
 
 /** The message box and its Commit control. */
-function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit }: {
+function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit, t }: {
+  t: Translate
   message: string
   amend: boolean
   busy: boolean
@@ -418,8 +422,8 @@ function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit }: {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px' }}>
       <textarea
         value={message}
-        placeholder="Message (Ctrl+Enter to commit)"
-        aria-label="Commit message"
+        placeholder={t('commit.placeholder')}
+        aria-label={t('commit.aria')}
         rows={2}
         onChange={(event) => { onMessage(event.target.value) }}
         onKeyDown={(event) => {
@@ -456,13 +460,13 @@ function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit }: {
             padding: '3px 12px',
           }}
         >
-          {busy ? 'Committing…' : amend ? 'Amend' : 'Commit'}
+          {busy ? t('commit.busy') : amend ? t('commit.amendButton') : t('commit.button')}
         </button>
         <label style={{ color: SECONDARY, display: 'flex', alignItems: 'center', gap: '4px' }}>
           <input type="checkbox" checked={amend} onChange={(event) => { onAmend(event.target.checked) }} />
-          amend
+          {t('commit.amend')}
         </label>
-        <span style={{ color: TERTIARY, marginLeft: 'auto' }}>Ctrl+Enter</span>
+        <span style={{ color: TERTIARY, marginLeft: 'auto' }}>{t('commit.hint')}</span>
       </div>
     </div>
   )
@@ -510,7 +514,7 @@ class PanelBoundary extends React.Component<{ children: React.ReactNode }, { fai
     if (this.state.failure !== null) {
       return (
         <div style={{ padding: '10px 12px', color: 'var(--dsw-alias-state-error-primary)' }}>
-          {`The Git panel failed to render: ${this.state.failure}`}
+          {fill(en['panel.failed'], { message: this.state.failure })}
         </div>
       )
     }
@@ -590,6 +594,7 @@ export function GitBody(props: GitBodyProps): React.ReactElement {
  */
 function GitPanel({
   sessionId,
+  translate,
   useSessions,
   useTabInfo,
   openTab,
@@ -601,6 +606,7 @@ function GitPanel({
   gitDiscard,
   gitCommit,
 }: GitBodyProps): React.ReactElement {
+  const t = translator(translate)
   const [outcome, setOutcome] = React.useState<GitStatusOutcome | null>(null)
   const [stats, setStats] = React.useState<GitChangeStats[]>([])
   const [probe, setProbe] = React.useState<GitPingOutcome | null>(null)
@@ -772,7 +778,7 @@ function GitPanel({
     const isStaged = status !== null && status.staged.includes(change)
     if (isStaged) {
       return [{
-        title: 'Unstage',
+        title: t('action.unstage'),
         icon: IconCloseOutlineRegular,
         run: () => { mutate((signal) => unstage(requestRoot, [change.path], signal)) },
       }]
@@ -780,12 +786,12 @@ function GitPanel({
     const untracked = status !== null && status.untracked.includes(change)
     return [
       {
-        title: 'Stage',
+        title: t('action.stage'),
         icon: IconPlusOutlineRegular,
         run: () => { mutate((signal) => stage(requestRoot, [change.path], signal)) },
       },
       {
-        title: untracked ? 'Delete file' : 'Discard changes',
+        title: untracked ? t('action.discardUntracked') : t('action.discardTracked'),
         icon: IconTrashOutlineRegular,
         run: () => {
           setPendingDiscard(untracked ? { tracked: [], untracked: [change.path] } : { tracked: [change.path], untracked: [] })
@@ -826,9 +832,9 @@ function GitPanel({
         fallback(GIT_DIFF_TAB_KIND, { params })
         return
       }
-      setNotice({ ok: false, detail: 'this panel was given neither a tab host nor the sidebar opener' })
+      setNotice({ ok: false, detail: t('opener.missing') })
     } catch (error) {
-      setNotice({ ok: false, detail: `opening the comparison failed: ${error instanceof Error ? error.message : String(error)}` })
+      setNotice({ ok: false, detail: `opener.failed', { message: error instanceof Error ? error.message : String(error) })}` })
     }
   }
 
@@ -840,12 +846,13 @@ function GitPanel({
   return (
     <div style={{ padding: '10px 12px', lineHeight: 1.5 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-        {status === null ? <span style={{ fontWeight: 600 }}>Git</span> : <BranchLine status={status} />}
-        <Action label="Refresh" onClick={() => { setAttempt((value) => value + 1) }} />
+        {status === null ? <span style={{ fontWeight: 600 }}>{t('type.label')}</span> : <BranchLine status={status} t={t} />}
+        <Action label={t('panel.refresh')} onClick={() => { setAttempt((value) => value + 1) }} />
       </div>
 
       {status === null ? null : (
         <CommitBox
+          t={t}
           message={message}
           amend={amend}
           busy={busy}
@@ -885,7 +892,7 @@ function GitPanel({
           padding: '4px 6px',
         }}>
           <span style={{ color: 'var(--dsw-alias-state-warn-label)' }}>
-            {`Discard ${String(pendingDiscard.tracked.length + pendingDiscard.untracked.length)} change(s)? This cannot be undone.`}
+            {t('discard.confirm', { count: String(pendingDiscard.tracked.length + pendingDiscard.untracked.length) })}
           </span>
           <button
             type="button"
@@ -901,7 +908,7 @@ function GitPanel({
               padding: '1px 8px',
             }}
           >
-            Discard
+            {t('action.discard')}
           </button>
           <button
             type="button"
@@ -916,20 +923,20 @@ function GitPanel({
               padding: '1px 8px',
             }}
           >
-            Cancel
+            {t('action.cancel')}
           </button>
         </div>
       )}
 
       <div role="tree" style={{ paddingTop: '4px' }}>
         {outcome === null
-          ? <div style={{ color: SECONDARY }}>Reading the working tree…</div>
+          ? <div style={{ color: SECONDARY }}>{t('panel.reading')}</div>
           : 'unavailable' in outcome
             ? <div style={{ color: 'var(--dsw-alias-state-error-primary)' }}>{outcome.unavailable}</div>
             : !outcome.isRepo
               ? (
                 <div style={{ color: SECONDARY }}>
-                  Not a git repository.
+                  {t('panel.notRepo')}
                   {outcome.note === '' ? null : <div style={{ color: TERTIARY }}>{outcome.note}</div>}
                 </div>
               )
@@ -939,46 +946,46 @@ function GitPanel({
                     ? null
                     : (
                       <div style={{ color: 'var(--dsw-alias-state-warn-label)' }}>
-                        {`${String(outcome.conflicted.length)} conflicted file(s) need resolution`}
+                        {`${String(outcome.conflicted.length)} ${t('panel.conflicted')}`}
                       </div>
                     )}
                   <Group
-                    title="Staged changes"
+                    title={t('group.staged')}
                     changes={outcome.staged}
                     openFor={(change) => { openComparison(change, true, false) }}
-                    bulk={bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
+                    bulk={bulkFor(outcome.staged.map((change) => change.path), t('action.unstageAll'), (paths) => {
                       const unstage = bridge.current.gitUnstage
                       if (unstage !== undefined) mutate((signal) => unstage(requestRoot, paths, signal))
                     })}
                     {...groupProps}
                   />
                   <Group
-                    title="Changes"
+                    title={t('group.unstaged')}
                     changes={outcome.unstaged}
                     openFor={(change) => { openComparison(change, false, false) }}
-                    bulk={bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
+                    bulk={bulkFor(outcome.unstaged.map((change) => change.path), t('action.stageAll'), (paths) => {
                       const stage = bridge.current.gitStage
                       if (stage !== undefined) mutate((signal) => stage(requestRoot, paths, signal))
                     })}
                     {...groupProps}
                   />
                   <Group
-                    title="Conflicted"
+                    title={t('group.conflicted')}
                     changes={outcome.conflicted}
                     openFor={(change) => { openComparison(change, false, false) }}
                     {...groupProps}
                   />
                   <Group
-                    title="Untracked"
+                    title={t('group.untracked')}
                     changes={outcome.untracked}
                     openFor={(change) => { openComparison(change, false, true) }}
-                    bulk={bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
+                    bulk={bulkFor(outcome.untracked.map((change) => change.path), t('action.stageAll'), (paths) => {
                       const stage = bridge.current.gitStage
                       if (stage !== undefined) mutate((signal) => stage(requestRoot, paths, signal))
                     })}
                     {...groupProps}
                   />
-                  {total === 0 ? <div style={{ color: SECONDARY }}>No changes — the working tree is clean.</div> : null}
+                  {total === 0 ? <div style={{ color: SECONDARY }}>{t('panel.clean')}</div> : null}
                 </>
               )}
       </div>
@@ -991,28 +998,28 @@ function GitPanel({
           color: TERTIARY,
         }}
       >
-        <Row label="session" value={sessionId ?? '(none)'} />
-        <Row label="workspace" value={requestRoot === '' ? '(unknown to the panel)' : requestRoot} />
+        <Row label={t('diagnostics.session')} value={sessionId ?? '(none)'} />
+        <Row label={t('diagnostics.workspace')} value={requestRoot === '' ? t('diagnostics.unknown') : requestRoot} />
         {outcome !== null && !('unavailable' in outcome)
           ? (
             <>
-              <Row label="root source" value={outcome.rootSource} />
-              <Row label="git" value={outcome.gitVersion ?? '(not found)'} />
+              <Row label={t('diagnostics.rootSource')} value={outcome.rootSource} />
+              <Row label={t('diagnostics.git')} value={outcome.gitVersion ?? t('diagnostics.notFound')} />
               <Row
-                label="tab host"
+                label={t('diagnostics.tabHost')}
                 value={tabRef.current === undefined
-                  ? openerRef.current === undefined ? 'unavailable' : 'sidebar opener only'
-                  : 'panel host'}
+                  ? openerRef.current === undefined ? t('diagnostics.hostNone') : t('diagnostics.hostOpener')
+                  : t('diagnostics.hostPanel')}
               />
-              {outcome.note === '' ? null : <Row label="note" value={outcome.note} />}
+              {outcome.note === '' ? null : <Row label={t('diagnostics.note')} value={outcome.note} />}
             </>
           )
           : null}
         {probe === null
           ? null
           : 'unavailable' in probe
-            ? <Row label="probe" value={probe.unavailable} />
-            : <Row label="plugin build" value={probe.packageVersion} />}
+            ? <Row label={t('diagnostics.probe')} value={probe.unavailable} />
+            : <Row label={t('diagnostics.build')} value={probe.packageVersion} />}
       </div>
     </div>
   )

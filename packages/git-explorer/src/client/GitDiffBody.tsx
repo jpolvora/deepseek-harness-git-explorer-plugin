@@ -11,6 +11,7 @@
 import * as React from 'react'
 import { DiffBlock, diffTotals } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { GitFileDiffOutcome } from '../types.js'
+import { translator, type Translate } from './locales.js'
 
 /** The tab-information hook the sidebar injects into every tab body. */
 type TabInfoHook = () => {
@@ -42,6 +43,8 @@ function fileAddress(sessionId: string, workspaceRelative: string): string {
 export interface GitDiffBodyProps {
   /** The Session the tab belongs to. */
   sessionId?: string
+  /** The framework's translator for this plugin's namespace, when the slot named one. */
+  translate?: Translate
   /** Framework hook: the tab's own navigation parameters. */
   useTabInfo?: TabInfoHook
   /** The comparison read, contributed through the slot's `inject` face factory. */
@@ -77,7 +80,8 @@ function Header({ text, tone }: { text: string; tone?: string }): React.ReactEle
  * @param props - the session, the tab hook and the host bridge.
  * @returns the diff body.
  */
-export function GitDiffBody({ sessionId, useTabInfo, gitDiff }: GitDiffBodyProps): React.ReactElement {
+export function GitDiffBody({ sessionId, useTabInfo, translate, gitDiff }: GitDiffBodyProps): React.ReactElement {
+  const t = translator(translate)
   const tab = useTabInfo?.()
   const params = tab?.tab.navigation.params
   const path = typeof params?.path === 'string' ? params.path : ''
@@ -98,7 +102,7 @@ export function GitDiffBody({ sessionId, useTabInfo, gitDiff }: GitDiffBodyProps
       return
     }
     if (path === '') {
-      setOutcome({ unavailable: 'this diff tab has no file to compare' })
+      setOutcome({ unavailable: t('diff.noFile') })
       return
     }
     const abort = new AbortController()
@@ -117,7 +121,7 @@ export function GitDiffBody({ sessionId, useTabInfo, gitDiff }: GitDiffBodyProps
     }
   }, [path, staged, untracked])
 
-  if (outcome === null) return <div style={{ padding: '10px 12px' }}><Header text="Reading the diff…" /></div>
+  if (outcome === null) return <div style={{ padding: '10px 12px' }}><Header text={t('diff.reading')} /></div>
   if ('unavailable' in outcome) {
     return (
       <div style={{ padding: '10px 12px', color: 'var(--dsw-alias-state-error-primary)' }}>
@@ -138,7 +142,7 @@ export function GitDiffBody({ sessionId, useTabInfo, gitDiff }: GitDiffBodyProps
       <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline', paddingBottom: '6px' }}>
         <span style={{ fontWeight: 600, wordBreak: 'break-all' }}>{diff.path}</span>
         <span style={{ color: 'var(--dsw-alias-label-secondary)' }}>
-          {staged ? 'index vs HEAD' : 'working tree vs index'}
+          {staged ? t('diff.stagedLabel') : t('diff.unstagedLabel')}
         </span>
         {totals === null
           ? null
@@ -167,16 +171,16 @@ export function GitDiffBody({ sessionId, useTabInfo, gitDiff }: GitDiffBodyProps
                 padding: '1px 8px',
               }}
             >
-              Open file
+              {t('action.openFile')}
             </button>
           )
           : null}
       </div>
       {diff.binary
-        ? <Header text="A binary file has no text diff." tone="var(--dsw-alias-state-warn-label)" />
+        ? <Header text={t('diff.binary')} tone="var(--dsw-alias-state-warn-label)" />
         : null}
       {diff.oversized
-        ? <Header text="One side is larger than the read cap, so no diff is shown." tone="var(--dsw-alias-state-warn-label)" />
+        ? <Header text={t('diff.oversized')} tone="var(--dsw-alias-state-warn-label)" />
         : null}
       {diff.note === '' ? null : <Header text={diff.note} />}
       {diff.binary || diff.oversized

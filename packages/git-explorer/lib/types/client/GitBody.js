@@ -16,6 +16,7 @@ import * as React from 'react';
 import { FileTypeIcon, IconChevronDownOutlineRegular, IconChevronRightOutlineRegular, IconCloseOutlineRegular, IconFolderCloseRegular, IconFolderOpenRegular, IconPlusOutlineRegular, IconTrashOutlineRegular, classifyFileType, } from '@deepseek-ai/dsh-client-ui-primitives';
 import { buildChangeTree } from './change-tree.js';
 import { GIT_DIFF_TAB_KIND } from '../types.js';
+import { en, fill, translator } from './locales.js';
 /** How one status letter reads in the row badge. */
 const STATUS_LETTER = {
     modified: 'M',
@@ -145,18 +146,18 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
                 : (_jsx(TreeRows, { nodes: tree, depth: 1, collapsed: collapsedDirs, onToggle: onToggleDir, hovered: hovered, onHover: onHover, actionsFor: actionsFor, openFor: openFor, countsFor: countsFor }))] }));
 }
 /** The branch line: branch name, tracking drift and the repository root. */
-function BranchLine({ status }) {
-    const branch = status.branch ?? (status.detached ? '(detached HEAD)' : status.unborn ? '(no commits yet)' : '(unknown)');
+function BranchLine({ status, t }) {
+    const branch = status.branch ?? (status.detached ? t('panel.detached') : status.unborn ? t('panel.unborn') : t('panel.unknownBranch'));
     return (_jsxs("div", { style: { display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }, children: [_jsxs("div", { style: { display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }, children: [_jsx("span", { style: { fontWeight: 600 }, children: branch }), status.upstream === null
                         ? null
                         : _jsx("span", { style: { color: SECONDARY }, children: `↑${String(status.ahead)} ↓${String(status.behind)}` }), status.operation === null
                         ? null
-                        : _jsx("span", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${status.operation} in progress` })] }), status.root === null ? null : _jsx("div", { style: { color: TERTIARY, wordBreak: 'break-all' }, children: status.root })] }));
+                        : _jsx("span", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: t('panel.operation', { operation: status.operation }) })] }), status.root === null ? null : _jsx("div", { style: { color: TERTIARY, wordBreak: 'break-all' }, children: status.root })] }));
 }
 /** The message box and its Commit control. */
-function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit }) {
+function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit, t }) {
     const ready = message.trim() !== '' && !busy;
-    return (_jsxs("div", { style: { display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px' }, children: [_jsx("textarea", { value: message, placeholder: "Message (Ctrl+Enter to commit)", "aria-label": "Commit message", rows: 2, onChange: (event) => { onMessage(event.target.value); }, onKeyDown: (event) => {
+    return (_jsxs("div", { style: { display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px' }, children: [_jsx("textarea", { value: message, placeholder: t('commit.placeholder'), "aria-label": t('commit.aria'), rows: 2, onChange: (event) => { onMessage(event.target.value); }, onKeyDown: (event) => {
                     if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
                         event.preventDefault();
                         if (ready)
@@ -181,7 +182,7 @@ function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit }) {
                             font: 'inherit',
                             fontWeight: 600,
                             padding: '3px 12px',
-                        }, children: busy ? 'Committing…' : amend ? 'Amend' : 'Commit' }), _jsxs("label", { style: { color: SECONDARY, display: 'flex', alignItems: 'center', gap: '4px' }, children: [_jsx("input", { type: "checkbox", checked: amend, onChange: (event) => { onAmend(event.target.checked); } }), "amend"] }), _jsx("span", { style: { color: TERTIARY, marginLeft: 'auto' }, children: "Ctrl+Enter" })] })] }));
+                        }, children: busy ? t('commit.busy') : amend ? t('commit.amendButton') : t('commit.button') }), _jsxs("label", { style: { color: SECONDARY, display: 'flex', alignItems: 'center', gap: '4px' }, children: [_jsx("input", { type: "checkbox", checked: amend, onChange: (event) => { onAmend(event.target.checked); } }), t('commit.amend')] }), _jsx("span", { style: { color: TERTIARY, marginLeft: 'auto' }, children: t('commit.hint') })] })] }));
 }
 /** The panel's own small button, token-styled. */
 function Action({ label, onClick }) {
@@ -212,7 +213,7 @@ class PanelBoundary extends React.Component {
     }
     render() {
         if (this.state.failure !== null) {
-            return (_jsx("div", { style: { padding: '10px 12px', color: 'var(--dsw-alias-state-error-primary)' }, children: `The Git panel failed to render: ${this.state.failure}` }));
+            return (_jsx("div", { style: { padding: '10px 12px', color: 'var(--dsw-alias-state-error-primary)' }, children: fill(en['panel.failed'], { message: this.state.failure }) }));
         }
         return this.props.children;
     }
@@ -291,7 +292,8 @@ export function GitBody(props) {
  * @param props - the session, the session store and the host bridge.
  * @returns the panel body.
  */
-function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitStats, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit, }) {
+function GitPanel({ sessionId, translate, useSessions, useTabInfo, openTab, gitStatus, gitStats, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit, }) {
+    const t = translator(translate);
     const [outcome, setOutcome] = React.useState(null);
     const [stats, setStats] = React.useState([]);
     const [probe, setProbe] = React.useState(null);
@@ -445,7 +447,7 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitS
         const isStaged = status !== null && status.staged.includes(change);
         if (isStaged) {
             return [{
-                    title: 'Unstage',
+                    title: t('action.unstage'),
                     icon: IconCloseOutlineRegular,
                     run: () => { mutate((signal) => unstage(requestRoot, [change.path], signal)); },
                 }];
@@ -453,12 +455,12 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitS
         const untracked = status !== null && status.untracked.includes(change);
         return [
             {
-                title: 'Stage',
+                title: t('action.stage'),
                 icon: IconPlusOutlineRegular,
                 run: () => { mutate((signal) => stage(requestRoot, [change.path], signal)); },
             },
             {
-                title: untracked ? 'Delete file' : 'Discard changes',
+                title: untracked ? t('action.discardUntracked') : t('action.discardTracked'),
                 icon: IconTrashOutlineRegular,
                 run: () => {
                     setPendingDiscard(untracked ? { tracked: [], untracked: [change.path] } : { tracked: [change.path], untracked: [] });
@@ -497,17 +499,17 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitS
                 fallback(GIT_DIFF_TAB_KIND, { params });
                 return;
             }
-            setNotice({ ok: false, detail: 'this panel was given neither a tab host nor the sidebar opener' });
+            setNotice({ ok: false, detail: t('opener.missing') });
         }
         catch (error) {
-            setNotice({ ok: false, detail: `opening the comparison failed: ${error instanceof Error ? error.message : String(error)}` });
+            setNotice({ ok: false, detail: `opener.failed', { message: error instanceof Error ? error.message : String(error) })}` });
         }
     };
     const bulkFor = (paths, label, run) => ({
         label,
         run: () => { run(paths); },
     });
-    return (_jsxs("div", { style: { padding: '10px 12px', lineHeight: 1.5 }, children: [_jsxs("div", { style: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }, children: [status === null ? _jsx("span", { style: { fontWeight: 600 }, children: "Git" }) : _jsx(BranchLine, { status: status }), _jsx(Action, { label: "Refresh", onClick: () => { setAttempt((value) => value + 1); } })] }), status === null ? null : (_jsx(CommitBox, { message: message, amend: amend, busy: busy, onMessage: setMessage, onAmend: setAmend, onCommit: () => {
+    return (_jsxs("div", { style: { padding: '10px 12px', lineHeight: 1.5 }, children: [_jsxs("div", { style: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }, children: [status === null ? _jsx("span", { style: { fontWeight: 600 }, children: t('type.label') }) : _jsx(BranchLine, { status: status, t: t }), _jsx(Action, { label: t('panel.refresh'), onClick: () => { setAttempt((value) => value + 1); } })] }), status === null ? null : (_jsx(CommitBox, { t: t, message: message, amend: amend, busy: busy, onMessage: setMessage, onAmend: setAmend, onCommit: () => {
                     const commit = bridge.current.gitCommit;
                     if (commit === undefined)
                         return;
@@ -529,7 +531,7 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitS
                     gap: '8px',
                     marginTop: '6px',
                     padding: '4px 6px',
-                }, children: [_jsx("span", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `Discard ${String(pendingDiscard.tracked.length + pendingDiscard.untracked.length)} change(s)? This cannot be undone.` }), _jsx("button", { type: "button", onClick: confirmDiscard, style: {
+                }, children: [_jsx("span", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: t('discard.confirm', { count: String(pendingDiscard.tracked.length + pendingDiscard.untracked.length) }) }), _jsx("button", { type: "button", onClick: confirmDiscard, style: {
                             background: 'var(--dsw-alias-state-error-primary)',
                             border: 'none',
                             borderRadius: '4px',
@@ -538,7 +540,7 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitS
                             font: 'inherit',
                             marginLeft: 'auto',
                             padding: '1px 8px',
-                        }, children: "Discard" }), _jsx("button", { type: "button", onClick: () => { setPendingDiscard(null); }, style: {
+                        }, children: t('action.discard') }), _jsx("button", { type: "button", onClick: () => { setPendingDiscard(null); }, style: {
                             background: 'transparent',
                             border: '1px solid var(--dsw-alias-border-l3)',
                             borderRadius: '4px',
@@ -546,39 +548,39 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitS
                             cursor: 'pointer',
                             font: 'inherit',
                             padding: '1px 8px',
-                        }, children: "Cancel" })] })), _jsx("div", { role: "tree", style: { paddingTop: '4px' }, children: outcome === null
-                    ? _jsx("div", { style: { color: SECONDARY }, children: "Reading the working tree\u2026" })
+                        }, children: t('action.cancel') })] })), _jsx("div", { role: "tree", style: { paddingTop: '4px' }, children: outcome === null
+                    ? _jsx("div", { style: { color: SECONDARY }, children: t('panel.reading') })
                     : 'unavailable' in outcome
                         ? _jsx("div", { style: { color: 'var(--dsw-alias-state-error-primary)' }, children: outcome.unavailable })
                         : !outcome.isRepo
-                            ? (_jsxs("div", { style: { color: SECONDARY }, children: ["Not a git repository.", outcome.note === '' ? null : _jsx("div", { style: { color: TERTIARY }, children: outcome.note })] }))
+                            ? (_jsxs("div", { style: { color: SECONDARY }, children: [t('panel.notRepo'), outcome.note === '' ? null : _jsx("div", { style: { color: TERTIARY }, children: outcome.note })] }))
                             : (_jsxs(_Fragment, { children: [outcome.conflicted.length === 0
                                         ? null
-                                        : (_jsx("div", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${String(outcome.conflicted.length)} conflicted file(s) need resolution` })), _jsx(Group, { title: "Staged changes", changes: outcome.staged, openFor: (change) => { openComparison(change, true, false); }, bulk: bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
+                                        : (_jsx("div", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${String(outcome.conflicted.length)} ${t('panel.conflicted')}` })), _jsx(Group, { title: t('group.staged'), changes: outcome.staged, openFor: (change) => { openComparison(change, true, false); }, bulk: bulkFor(outcome.staged.map((change) => change.path), t('action.unstageAll'), (paths) => {
                                             const unstage = bridge.current.gitUnstage;
                                             if (unstage !== undefined)
                                                 mutate((signal) => unstage(requestRoot, paths, signal));
-                                        }), ...groupProps }), _jsx(Group, { title: "Changes", changes: outcome.unstaged, openFor: (change) => { openComparison(change, false, false); }, bulk: bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
+                                        }), ...groupProps }), _jsx(Group, { title: t('group.unstaged'), changes: outcome.unstaged, openFor: (change) => { openComparison(change, false, false); }, bulk: bulkFor(outcome.unstaged.map((change) => change.path), t('action.stageAll'), (paths) => {
                                             const stage = bridge.current.gitStage;
                                             if (stage !== undefined)
                                                 mutate((signal) => stage(requestRoot, paths, signal));
-                                        }), ...groupProps }), _jsx(Group, { title: "Conflicted", changes: outcome.conflicted, openFor: (change) => { openComparison(change, false, false); }, ...groupProps }), _jsx(Group, { title: "Untracked", changes: outcome.untracked, openFor: (change) => { openComparison(change, false, true); }, bulk: bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
+                                        }), ...groupProps }), _jsx(Group, { title: t('group.conflicted'), changes: outcome.conflicted, openFor: (change) => { openComparison(change, false, false); }, ...groupProps }), _jsx(Group, { title: t('group.untracked'), changes: outcome.untracked, openFor: (change) => { openComparison(change, false, true); }, bulk: bulkFor(outcome.untracked.map((change) => change.path), t('action.stageAll'), (paths) => {
                                             const stage = bridge.current.gitStage;
                                             if (stage !== undefined)
                                                 mutate((signal) => stage(requestRoot, paths, signal));
-                                        }), ...groupProps }), total === 0 ? _jsx("div", { style: { color: SECONDARY }, children: "No changes \u2014 the working tree is clean." }) : null] })) }), _jsxs("div", { style: {
+                                        }), ...groupProps }), total === 0 ? _jsx("div", { style: { color: SECONDARY }, children: t('panel.clean') }) : null] })) }), _jsxs("div", { style: {
                     paddingTop: '10px',
                     marginTop: '10px',
                     borderTop: '1px solid var(--dsw-alias-border-l3)',
                     color: TERTIARY,
-                }, children: [_jsx(Row, { label: "session", value: sessionId ?? '(none)' }), _jsx(Row, { label: "workspace", value: requestRoot === '' ? '(unknown to the panel)' : requestRoot }), outcome !== null && !('unavailable' in outcome)
-                        ? (_jsxs(_Fragment, { children: [_jsx(Row, { label: "root source", value: outcome.rootSource }), _jsx(Row, { label: "git", value: outcome.gitVersion ?? '(not found)' }), _jsx(Row, { label: "tab host", value: tabRef.current === undefined
-                                        ? openerRef.current === undefined ? 'unavailable' : 'sidebar opener only'
-                                        : 'panel host' }), outcome.note === '' ? null : _jsx(Row, { label: "note", value: outcome.note })] }))
+                }, children: [_jsx(Row, { label: t('diagnostics.session'), value: sessionId ?? '(none)' }), _jsx(Row, { label: t('diagnostics.workspace'), value: requestRoot === '' ? t('diagnostics.unknown') : requestRoot }), outcome !== null && !('unavailable' in outcome)
+                        ? (_jsxs(_Fragment, { children: [_jsx(Row, { label: t('diagnostics.rootSource'), value: outcome.rootSource }), _jsx(Row, { label: t('diagnostics.git'), value: outcome.gitVersion ?? t('diagnostics.notFound') }), _jsx(Row, { label: t('diagnostics.tabHost'), value: tabRef.current === undefined
+                                        ? openerRef.current === undefined ? t('diagnostics.hostNone') : t('diagnostics.hostOpener')
+                                        : t('diagnostics.hostPanel') }), outcome.note === '' ? null : _jsx(Row, { label: t('diagnostics.note'), value: outcome.note })] }))
                         : null, probe === null
                         ? null
                         : 'unavailable' in probe
-                            ? _jsx(Row, { label: "probe", value: probe.unavailable })
-                            : _jsx(Row, { label: "plugin build", value: probe.packageVersion })] })] }));
+                            ? _jsx(Row, { label: t('diagnostics.probe'), value: probe.unavailable })
+                            : _jsx(Row, { label: t('diagnostics.build'), value: probe.packageVersion })] })] }));
 }
 //# sourceMappingURL=GitBody.js.map

@@ -7,6 +7,7 @@ import { GIT_DIFF_ID, GIT_DIFF_TAB_KIND, GIT_EXPLORER_ID, GIT_TAB_KIND, } from '
 import { GitBody } from './GitBody.js';
 import { GitDiffBody } from './GitDiffBody.js';
 import { GitTitle } from './GitTitle.js';
+import { NS, en, zh } from './locales.js';
 export const name = 'git-explorer-client';
 /** Services this half needs to exist before it applies. */
 export const inject = ['slots', 'sidebarRightTabs', 'sidebarRight', 'remote'];
@@ -74,6 +75,12 @@ export async function apply(ctx) {
     // namespaced service becomes injectable the moment this resolves.
     const unmount = await faces.remote.$mount(TYPERT_REMOTE);
     ctx.effect(() => () => unmount(), 'git-explorer: remote contract');
+    // The panel's words, in the locales this build ships. A body receives `t` because its
+    // slot registration names this namespace.
+    ctx.inject(['locale'], (scope) => {
+        const locale = scope.locale;
+        return locale.register(NS, { en, zh });
+    });
     const hostFor = hostCalls(ctx);
     ctx.effect(() => faces.sidebarRightTabs.register({
         id: GIT_EXPLORER_ID,
@@ -91,6 +98,7 @@ export async function apply(ctx) {
     ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab', () => faces.slots.register({
         name: 'sidebar.right.pane.tab',
         key: GIT_EXPLORER_ID,
+        locale: NS,
         // The slot's `inject` is a factory called per (session, actions); its return value
         // becomes the body's business props. Returning a plain object renders an empty pane.
         inject: (sessionId) => {
@@ -114,6 +122,7 @@ export async function apply(ctx) {
     ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab.title', () => faces.slots.register({
         name: 'sidebar.right.pane.tab.title',
         key: GIT_EXPLORER_ID,
+        locale: NS,
     }, GitTitle)), 'git-explorer: tab title');
     // The comparison tab: one instance per file, opened by the panel with the path and
     // which comparison to show. `multiple: true` is what gives each file its own tab.
@@ -127,6 +136,7 @@ export async function apply(ctx) {
     ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab', () => faces.slots.register({
         name: 'sidebar.right.pane.tab',
         key: GIT_DIFF_ID,
+        locale: NS,
         inject: (sessionId) => {
             const host = hostFor(sessionId);
             return {
@@ -137,6 +147,7 @@ export async function apply(ctx) {
     ctx.effect(() => faces.slots.inject('sidebar.right.pane.tab.title', () => faces.slots.register({
         name: 'sidebar.right.pane.tab.title',
         key: GIT_DIFF_ID,
+        locale: NS,
     }, DiffTitle)), 'git-explorer: diff title');
 }
 /**
