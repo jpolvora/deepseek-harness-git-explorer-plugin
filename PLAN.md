@@ -732,6 +732,8 @@ Known gap: the diff tab does not yet offer "open the file itself at a line"; tha
 
 Both are now covered: the panel reports the opener it actually got (a `tab host` diagnostic row reading `panel host`, `sidebar opener only` or `unavailable`), prefers its own tab host, and falls back to the column's `sidebarRight.openTab` service so a body without that hook still works.
 
+**Verified in the running GUI**: clicking a changed file opens a tab named after it and renders the unified diff of the two sides with `+N −M` totals. Commits: `c2f0828` (feature), `afbe726` (opener fix), `4c92e11` (notes).
+
 ---
 
 ## Appendix A — research artifacts produced for this plan
