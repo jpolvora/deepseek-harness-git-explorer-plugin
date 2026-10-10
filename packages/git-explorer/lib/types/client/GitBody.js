@@ -252,7 +252,7 @@ export function GitBody(props) {
  * @param props - the session, the session store and the host bridge.
  * @returns the panel body.
  */
-function GitPanel({ sessionId, useSessions, useTabInfo, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit, }) {
+function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit, }) {
     const [outcome, setOutcome] = React.useState(null);
     const [probe, setProbe] = React.useState(null);
     const [attempt, setAttempt] = React.useState(0);
@@ -271,6 +271,14 @@ function GitPanel({ sessionId, useSessions, useTabInfo, gitStatus, gitPing, gitS
     // read through a ref: depending on their identity in an effect would loop.
     const bridge = React.useRef({});
     bridge.current = { gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit };
+    // The tab host is a *hook*, so it is called during render (never from a handler) and
+    // its result is kept in a ref for the click handlers to use. Calling it from the
+    // handler is React error #321: invalid hook call.
+    const tab = useTabInfo?.();
+    const tabRef = React.useRef(tab);
+    tabRef.current = tab;
+    const openerRef = React.useRef(openTab);
+    openerRef.current = openTab;
     // The client's own view of the session's working directory: the host prefers its own
     // Session lookup and uses this only when that lookup cannot answer.
     const sessionCwd = useSessions === undefined || sessionId === undefined
@@ -406,11 +414,32 @@ function GitPanel({ sessionId, useSessions, useTabInfo, gitStatus, gitPing, gitS
         onHover: setHovered,
         actionsFor,
     };
-    /** Open (or focus) the comparison tab for one file. */
-    const openFor = (change, staged, untracked) => () => {
-        useTabInfo?.().tab.actions.openTab(GIT_DIFF_TAB_KIND, {
-            params: { path: change.path, staged, untracked },
-        });
+    /**
+     * Open (or focus) the comparison tab for one file.
+     *
+     * The panel's own tab host is preferred, because it puts the diff in the pane the
+     * panel lives in; when a body is not handed that hook the column's navigation service
+     * opens it instead. A failure is reported rather than swallowed — "clicking does
+     * nothing" is the least debuggable outcome there is.
+     */
+    const openComparison = (change, staged, untracked) => {
+        const params = { path: change.path, staged, untracked };
+        try {
+            const actions = tabRef.current?.tab.actions;
+            if (actions !== undefined) {
+                actions.openTab(GIT_DIFF_TAB_KIND, { params });
+                return;
+            }
+            const fallback = openerRef.current;
+            if (fallback !== undefined) {
+                fallback(GIT_DIFF_TAB_KIND, { params });
+                return;
+            }
+            setNotice({ ok: false, detail: 'this panel was given neither a tab host nor the sidebar opener' });
+        }
+        catch (error) {
+            setNotice({ ok: false, detail: `opening the comparison failed: ${error instanceof Error ? error.message : String(error)}` });
+        }
     };
     const bulkFor = (paths, label, run) => ({
         label,
@@ -463,15 +492,15 @@ function GitPanel({ sessionId, useSessions, useTabInfo, gitStatus, gitPing, gitS
                             ? (_jsxs("div", { style: { color: SECONDARY }, children: ["Not a git repository.", outcome.note === '' ? null : _jsx("div", { style: { color: TERTIARY }, children: outcome.note })] }))
                             : (_jsxs(_Fragment, { children: [outcome.conflicted.length === 0
                                         ? null
-                                        : (_jsx("div", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${String(outcome.conflicted.length)} conflicted file(s) need resolution` })), _jsx(Group, { title: "Staged changes", changes: outcome.staged, openFor: (change) => { openFor(change, true, false)(); }, bulk: bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
+                                        : (_jsx("div", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${String(outcome.conflicted.length)} conflicted file(s) need resolution` })), _jsx(Group, { title: "Staged changes", changes: outcome.staged, openFor: (change) => { openComparison(change, true, false); }, bulk: bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
                                             const unstage = bridge.current.gitUnstage;
                                             if (unstage !== undefined)
                                                 mutate((signal) => unstage(requestRoot, paths, signal));
-                                        }), ...groupProps }), _jsx(Group, { title: "Changes", changes: outcome.unstaged, openFor: (change) => { openFor(change, false, false)(); }, bulk: bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
+                                        }), ...groupProps }), _jsx(Group, { title: "Changes", changes: outcome.unstaged, openFor: (change) => { openComparison(change, false, false); }, bulk: bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
                                             const stage = bridge.current.gitStage;
                                             if (stage !== undefined)
                                                 mutate((signal) => stage(requestRoot, paths, signal));
-                                        }), ...groupProps }), _jsx(Group, { title: "Conflicted", changes: outcome.conflicted, openFor: (change) => { openFor(change, false, false)(); }, ...groupProps }), _jsx(Group, { title: "Untracked", changes: outcome.untracked, openFor: (change) => { openFor(change, false, true)(); }, bulk: bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
+                                        }), ...groupProps }), _jsx(Group, { title: "Conflicted", changes: outcome.conflicted, openFor: (change) => { openComparison(change, false, false); }, ...groupProps }), _jsx(Group, { title: "Untracked", changes: outcome.untracked, openFor: (change) => { openComparison(change, false, true); }, bulk: bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
                                             const stage = bridge.current.gitStage;
                                             if (stage !== undefined)
                                                 mutate((signal) => stage(requestRoot, paths, signal));
@@ -481,7 +510,9 @@ function GitPanel({ sessionId, useSessions, useTabInfo, gitStatus, gitPing, gitS
                     borderTop: '1px solid var(--dsw-alias-border-l3)',
                     color: TERTIARY,
                 }, children: [_jsx(Row, { label: "session", value: sessionId ?? '(none)' }), _jsx(Row, { label: "workspace", value: requestRoot === '' ? '(unknown to the panel)' : requestRoot }), outcome !== null && !('unavailable' in outcome)
-                        ? (_jsxs(_Fragment, { children: [_jsx(Row, { label: "root source", value: outcome.rootSource }), _jsx(Row, { label: "git", value: outcome.gitVersion ?? '(not found)' }), outcome.note === '' ? null : _jsx(Row, { label: "note", value: outcome.note })] }))
+                        ? (_jsxs(_Fragment, { children: [_jsx(Row, { label: "root source", value: outcome.rootSource }), _jsx(Row, { label: "git", value: outcome.gitVersion ?? '(not found)' }), _jsx(Row, { label: "tab host", value: tabRef.current === undefined
+                                        ? openerRef.current === undefined ? 'unavailable' : 'sidebar opener only'
+                                        : 'panel host' }), outcome.note === '' ? null : _jsx(Row, { label: "note", value: outcome.note })] }))
                         : null, probe === null
                         ? null
                         : 'unavailable' in probe

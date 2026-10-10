@@ -45,7 +45,7 @@ import { GitTitle } from './GitTitle.js'
 export const name = 'git-explorer-client'
 
 /** Services this half needs to exist before it applies. */
-export const inject = ['slots', 'sidebarRightTabs', 'remote']
+export const inject = ['slots', 'sidebarRightTabs', 'sidebarRight', 'remote']
 
 /** One guide entry: the "Git" card on the Start page. */
 interface GuideEntrySpec {
@@ -89,6 +89,8 @@ interface ClientFaces {
   slots: SlotRegistrar
   sidebarRightTabs: TabTypeRegistry
   remote: RemoteRegistry
+  /** The column's navigation controller: the fallback way to open a tab. */
+  sidebarRight: { openTab(kind: string, options?: { params?: Record<string, unknown> }): void }
 }
 
 /**
@@ -243,6 +245,11 @@ export async function apply(ctx: Context): Promise<void> {
     inject: (sessionId: string) => {
       const host = hostFor(sessionId)
       return {
+        // Opening a tab prefers the panel's own tab host (it lands in the same pane);
+        // this service call is the fallback for a body that was not handed that hook.
+        openTab: (kind: string, options?: { params?: Record<string, unknown> }) => {
+          faces.sidebarRight.openTab(kind, options)
+        },
         gitStatus: (requestRoot: string, signal: AbortSignal) => host.status(requestRoot, signal),
         gitPing: (requestRoot: string, signal: AbortSignal) => host.ping(requestRoot, signal),
         gitStage: (requestRoot: string, paths: string[], signal: AbortSignal) =>

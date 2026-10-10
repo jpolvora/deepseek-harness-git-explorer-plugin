@@ -41,6 +41,13 @@ export interface GitBodyProps {
     sessionId?: string;
     /** Framework hook: how to open another tab from this one. */
     useTabInfo?: TabInfoHook;
+    /**
+     * Fallback opener for a body that was not handed the tab hook: the column's own
+     * navigation controller, contributed through the inject face.
+     */
+    openTab?: (kind: string, options?: {
+        params?: Record<string, unknown>;
+    }) => void;
     /** The client session store, part of the session standard kit. */
     useSessions?: SessionsHook;
     /** The status read, contributed through the slot's `inject` face factory. */

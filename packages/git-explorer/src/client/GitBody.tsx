@@ -57,6 +57,11 @@ export interface GitBodyProps {
   sessionId?: string
   /** Framework hook: how to open another tab from this one. */
   useTabInfo?: TabInfoHook
+  /**
+   * Fallback opener for a body that was not handed the tab hook: the column's own
+   * navigation controller, contributed through the inject face.
+   */
+  openTab?: (kind: string, options?: { params?: Record<string, unknown> }) => void
   /** The client session store, part of the session standard kit. */
   useSessions?: SessionsHook
   /** The status read, contributed through the slot's `inject` face factory. */
@@ -539,6 +544,7 @@ function GitPanel({
   sessionId,
   useSessions,
   useTabInfo,
+  openTab,
   gitStatus,
   gitPing,
   gitStage,
@@ -571,6 +577,15 @@ function GitPanel({
     gitCommit?: GitBodyProps['gitCommit']
   }>({})
   bridge.current = { gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }
+
+  // The tab host is a *hook*, so it is called during render (never from a handler) and
+  // its result is kept in a ref for the click handlers to use. Calling it from the
+  // handler is React error #321: invalid hook call.
+  const tab = useTabInfo?.()
+  const tabRef = React.useRef<ReturnType<TabInfoHook> | undefined>(tab)
+  tabRef.current = tab
+  const openerRef = React.useRef<GitBodyProps['openTab']>(openTab)
+  openerRef.current = openTab
 
   // The client's own view of the session's working directory: the host prefers its own
   // Session lookup and uses this only when that lookup cannot answer.
@@ -714,11 +729,31 @@ function GitPanel({
     actionsFor,
   }
 
-  /** Open (or focus) the comparison tab for one file. */
-  const openFor = (change: GitChange, staged: boolean, untracked: boolean): (() => void) => () => {
-    useTabInfo?.().tab.actions.openTab(GIT_DIFF_TAB_KIND, {
-      params: { path: change.path, staged, untracked },
-    })
+  /**
+   * Open (or focus) the comparison tab for one file.
+   *
+   * The panel's own tab host is preferred, because it puts the diff in the pane the
+   * panel lives in; when a body is not handed that hook the column's navigation service
+   * opens it instead. A failure is reported rather than swallowed — "clicking does
+   * nothing" is the least debuggable outcome there is.
+   */
+  const openComparison = (change: GitChange, staged: boolean, untracked: boolean): void => {
+    const params = { path: change.path, staged, untracked }
+    try {
+      const actions = tabRef.current?.tab.actions
+      if (actions !== undefined) {
+        actions.openTab(GIT_DIFF_TAB_KIND, { params })
+        return
+      }
+      const fallback = openerRef.current
+      if (fallback !== undefined) {
+        fallback(GIT_DIFF_TAB_KIND, { params })
+        return
+      }
+      setNotice({ ok: false, detail: 'this panel was given neither a tab host nor the sidebar opener' })
+    } catch (error) {
+      setNotice({ ok: false, detail: `opening the comparison failed: ${error instanceof Error ? error.message : String(error)}` })
+    }
   }
 
   const bulkFor = (paths: string[], label: string, run: (paths: string[]) => void): { label: string; run: () => void } => ({
@@ -834,7 +869,7 @@ function GitPanel({
                   <Group
                     title="Staged changes"
                     changes={outcome.staged}
-                    openFor={(change) => { openFor(change, true, false)() }}
+                    openFor={(change) => { openComparison(change, true, false) }}
                     bulk={bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
                       const unstage = bridge.current.gitUnstage
                       if (unstage !== undefined) mutate((signal) => unstage(requestRoot, paths, signal))
@@ -844,7 +879,7 @@ function GitPanel({
                   <Group
                     title="Changes"
                     changes={outcome.unstaged}
-                    openFor={(change) => { openFor(change, false, false)() }}
+                    openFor={(change) => { openComparison(change, false, false) }}
                     bulk={bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
                       const stage = bridge.current.gitStage
                       if (stage !== undefined) mutate((signal) => stage(requestRoot, paths, signal))
@@ -854,13 +889,13 @@ function GitPanel({
                   <Group
                     title="Conflicted"
                     changes={outcome.conflicted}
-                    openFor={(change) => { openFor(change, false, false)() }}
+                    openFor={(change) => { openComparison(change, false, false) }}
                     {...groupProps}
                   />
                   <Group
                     title="Untracked"
                     changes={outcome.untracked}
-                    openFor={(change) => { openFor(change, false, true)() }}
+                    openFor={(change) => { openComparison(change, false, true) }}
                     bulk={bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
                       const stage = bridge.current.gitStage
                       if (stage !== undefined) mutate((signal) => stage(requestRoot, paths, signal))
@@ -887,6 +922,12 @@ function GitPanel({
             <>
               <Row label="root source" value={outcome.rootSource} />
               <Row label="git" value={outcome.gitVersion ?? '(not found)'} />
+              <Row
+                label="tab host"
+                value={tabRef.current === undefined
+                  ? openerRef.current === undefined ? 'unavailable' : 'sidebar opener only'
+                  : 'panel host'}
+              />
               {outcome.note === '' ? null : <Row label="note" value={outcome.note} />}
             </>
           )

@@ -9,7 +9,7 @@ import { GitDiffBody } from './GitDiffBody.js';
 import { GitTitle } from './GitTitle.js';
 export const name = 'git-explorer-client';
 /** Services this half needs to exist before it applies. */
-export const inject = ['slots', 'sidebarRightTabs', 'remote'];
+export const inject = ['slots', 'sidebarRightTabs', 'sidebarRight', 'remote'];
 const GUIDE_DESCRIPTION = 'Stage, commit and review working-tree changes.';
 /** How long a call waits for the mounted namespace to become injectable. */
 const BRIDGE_READY_TIMEOUT_MS = 3_000;
@@ -92,6 +92,11 @@ export async function apply(ctx) {
         inject: (sessionId) => {
             const host = hostFor(sessionId);
             return {
+                // Opening a tab prefers the panel's own tab host (it lands in the same pane);
+                // this service call is the fallback for a body that was not handed that hook.
+                openTab: (kind, options) => {
+                    faces.sidebarRight.openTab(kind, options);
+                },
                 gitStatus: (requestRoot, signal) => host.status(requestRoot, signal),
                 gitPing: (requestRoot, signal) => host.ping(requestRoot, signal),
                 gitStage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.stage(sessionId, root, paths, inner), requestRoot, signal),

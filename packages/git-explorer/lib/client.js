@@ -6437,7 +6437,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		* @param props - the session, the session store and the host bridge.
 		* @returns the panel body.
 		*/
-		function GitPanel({ sessionId, useSessions, useTabInfo, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }) {
+		function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }) {
 			const [outcome, setOutcome] = react.useState(null);
 			const [probe, setProbe] = react.useState(null);
 			const [attempt, setAttempt] = react.useState(0);
@@ -6460,6 +6460,11 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				gitDiscard,
 				gitCommit
 			};
+			const tab = useTabInfo?.();
+			const tabRef = react.useRef(tab);
+			tabRef.current = tab;
+			const openerRef = react.useRef(openTab);
+			openerRef.current = openTab;
 			const requestRoot = (useSessions === void 0 || sessionId === void 0 ? void 0 : useSessions((state) => state?.byId?.[sessionId]?.cwd)) ?? "";
 			react.useEffect(() => {
 				const readStatus = bridge.current.gitStatus;
@@ -6584,13 +6589,41 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				onHover: setHovered,
 				actionsFor
 			};
-			/** Open (or focus) the comparison tab for one file. */
-			const openFor = (change, staged, untracked) => () => {
-				useTabInfo?.().tab.actions.openTab(GIT_DIFF_TAB_KIND, { params: {
+			/**
+			* Open (or focus) the comparison tab for one file.
+			*
+			* The panel's own tab host is preferred, because it puts the diff in the pane the
+			* panel lives in; when a body is not handed that hook the column's navigation service
+			* opens it instead. A failure is reported rather than swallowed — "clicking does
+			* nothing" is the least debuggable outcome there is.
+			*/
+			const openComparison = (change, staged, untracked) => {
+				const params = {
 					path: change.path,
 					staged,
 					untracked
-				} });
+				};
+				try {
+					const actions = tabRef.current?.tab.actions;
+					if (actions !== void 0) {
+						actions.openTab(GIT_DIFF_TAB_KIND, { params });
+						return;
+					}
+					const fallback = openerRef.current;
+					if (fallback !== void 0) {
+						fallback(GIT_DIFF_TAB_KIND, { params });
+						return;
+					}
+					setNotice({
+						ok: false,
+						detail: "this panel was given neither a tab host nor the sidebar opener"
+					});
+				} catch (error) {
+					setNotice({
+						ok: false,
+						detail: `opening the comparison failed: ${error instanceof Error ? error.message : String(error)}`
+					});
+				}
 			};
 			const bulkFor = (paths, label, run) => ({
 				label,
@@ -6721,7 +6754,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								title: "Staged changes",
 								changes: outcome.staged,
 								openFor: (change) => {
-									openFor(change, true, false)();
+									openComparison(change, true, false);
 								},
 								bulk: bulkFor(outcome.staged.map((change) => change.path), "Unstage all", (paths) => {
 									const unstage = bridge.current.gitUnstage;
@@ -6733,7 +6766,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								title: "Changes",
 								changes: outcome.unstaged,
 								openFor: (change) => {
-									openFor(change, false, false)();
+									openComparison(change, false, false);
 								},
 								bulk: bulkFor(outcome.unstaged.map((change) => change.path), "Stage all", (paths) => {
 									const stage = bridge.current.gitStage;
@@ -6745,7 +6778,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								title: "Conflicted",
 								changes: outcome.conflicted,
 								openFor: (change) => {
-									openFor(change, false, false)();
+									openComparison(change, false, false);
 								},
 								...groupProps
 							}),
@@ -6753,7 +6786,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								title: "Untracked",
 								changes: outcome.untracked,
 								openFor: (change) => {
-									openFor(change, false, true)();
+									openComparison(change, false, true);
 								},
 								bulk: bulkFor(outcome.untracked.map((change) => change.path), "Stage all", (paths) => {
 									const stage = bridge.current.gitStage;
@@ -6791,6 +6824,10 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 								(0, react_jsx_runtime.jsx)(Row, {
 									label: "git",
 									value: outcome.gitVersion ?? "(not found)"
+								}),
+								(0, react_jsx_runtime.jsx)(Row, {
+									label: "tab host",
+									value: tabRef.current === void 0 ? openerRef.current === void 0 ? "unavailable" : "sidebar opener only" : "panel host"
 								}),
 								outcome.note === "" ? null : (0, react_jsx_runtime.jsx)(Row, {
 									label: "note",
@@ -6971,6 +7008,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		const inject = [
 			"slots",
 			"sidebarRightTabs",
+			"sidebarRight",
 			"remote"
 		];
 		const GUIDE_DESCRIPTION = "Stage, commit and review working-tree changes.";
@@ -7046,6 +7084,9 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				inject: (sessionId) => {
 					const host = hostFor(sessionId);
 					return {
+						openTab: (kind, options) => {
+							faces.sidebarRight.openTab(kind, options);
+						},
 						gitStatus: (requestRoot, signal) => host.status(requestRoot, signal),
 						gitPing: (requestRoot, signal) => host.ping(requestRoot, signal),
 						gitStage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.stage(sessionId, root, paths, inner), requestRoot, signal),
