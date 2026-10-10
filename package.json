@@ -1,0 +1,21 @@
+{
+  "name": "dsh-git-explorer-plugin",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "scripts": {
+    "build": "pnpm --filter @jpolv/dsh-git-explorer run build",
+    "build:host": "pnpm --filter @jpolv/dsh-git-explorer run build:host",
+    "build:client": "pnpm --filter @jpolv/dsh-git-explorer run build:client",
+    "watch:client": "pnpm --filter @jpolv/dsh-git-explorer run watch:client",
+    "typecheck": "pnpm --filter @jpolv/dsh-git-explorer run typecheck",
+    "test": "pnpm --filter @jpolv/dsh-git-explorer run test",
+    "pack:plugin": "pnpm --filter @jpolv/dsh-git-explorer run pack:plugin"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "scenario": "partially-staged",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "src/app.js"
+  ],
+  "notes": "A file is staged and then edited again, so one record carries MM and must be listed in both the staged and the unstaged group. Exercises the split-staging case where a parser must not drop the entry from either group."
+}

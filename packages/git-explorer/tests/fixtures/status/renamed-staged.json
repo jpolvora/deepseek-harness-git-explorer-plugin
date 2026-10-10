@@ -1,0 +1,10 @@
+{
+  "scenario": "renamed-staged",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "old.txt"
+  ],
+  "notes": "git mv renames a tracked file, producing a `2` record whose own token holds the new path while the original path arrives as the next NUL-separated token (the split that only exists in -z). Exercises rename-score parsing (R100) and the separate original-path field."
+}

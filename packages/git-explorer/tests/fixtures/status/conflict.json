@@ -1,0 +1,9 @@
+{
+  "scenario": "conflict",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "conflict.txt"
+  ],
+  "notes": "Two branches edit the same line of conflict.txt and the merge is left unresolved, so the file is reported as a `u` record with a UU pair and three distinct stage object ids. Exercises the unmerged record shape, which carries two extra object ids compared with `1`/`2` records."
+}

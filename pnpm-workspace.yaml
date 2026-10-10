@@ -1,0 +1,7 @@
+# The machine-global pnpm store-dir points at G:\packages\pnpm, but this machine has no
+# G: drive, so installs fail with `ENOENT ... mkdir '\\?'` unless the store is overridden.
+# pnpm 11 reads settings from this file (a project .npmrc is not consulted for storeDir here).
+storeDir: D:/packages/pnpm
+
+packages:
+  - packages/*

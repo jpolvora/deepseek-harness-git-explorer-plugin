@@ -1,0 +1,31 @@
+{
+  "name": "@deepseek-ai/dsh-typert-protocol",
+  "version": "0.2.0-rc.2",
+  "private": true,
+  "description": "Generated type-only mirror of @deepseek-ai/dsh-typert-protocol, used solely so the Typert analyzer can register the protocol as a workspace project.",
+  "type": "module",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts"
+    },
+    "./types": {
+      "types": "./lib/types/types.d.ts"
+    },
+    "./typert": {
+      "types": "./lib/typert.host.d.ts",
+      "default": "./lib/typert.host.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/types",
+    "lib/typert.host.js",
+    "lib/typert.host.d.ts",
+    "src"
+  ],
+  "dependencies": {
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-brand": "0.2.0-rc.2"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "scenario": "unborn",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [],
+  "notes": "A repository with a staged file and no commit yet, so branch.oid reports the sentinel `(initial)` while the index still yields a normal `1 A.` record with a zeroed head object id. Exercises the unborn-HEAD header, where there is no commit hash to report."
+}

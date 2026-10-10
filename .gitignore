@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.tgz
+*.tsbuildinfo
+
+# Research-only extraction of the installed runtime (recreate with .tools/asar-extract.mjs)
+.tools/runtime-0.2.0-rc.2/
+
+# Throwaway material produced while investigating the platform: variant bundles and
+# scratch repositories. The durable notes under .tools/notes/ are kept.
+.tools/scratch/
+.tools/notes/scratch/
+.tools/notes/_*

@@ -1,0 +1,29 @@
+{
+  // Workspace aggregate for the Host face. Two jobs:
+  //  1. it is the marker the Typert tsdown plugin walks up to find (the nearest
+  //     `tsconfig.host.json` above a package's `lib` is treated as the workspace root);
+  //  2. its `references` are the package inventory the Typert analyzer enumerates —
+  //     a package that is not referenced here is invisible to generation.
+  // Package build configs therefore must NOT use this file name.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // No explicit `lib`: the default list (which includes DOM) is where the global
+    // `AbortSignal` a Remote cancellation parameter must use comes from. Naming
+    // `lib: ["es2024"]` alone resolves AbortSignal from @types/node instead and the
+    // generator rejects every Remote method.
+    "noEmit": true,
+    "paths": {
+      // The analyzer resolves protocol symbols through the generated mirror under
+      // packages/, and it later looks the same module up by the mirror's *source*
+      // path — so this face maps to `src`, while the package build (which must not
+      // pull foreign sources into its rootDir) maps to the declarations.
+      "@deepseek-ai/dsh-typert-protocol": ["./packages/typert-protocol/src/index.ts"],
+      "@deepseek-ai/dsh-typert-protocol/types": ["./packages/typert-protocol/src/types.ts"]
+    }
+  },
+  "files": [],
+  "references": [
+    { "path": "./packages/typert-protocol/tsconfig.json" },
+    { "path": "./packages/git-explorer/tsconfig.build.host.json" }
+  ]
+}

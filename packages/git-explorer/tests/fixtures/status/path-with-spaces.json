@@ -1,0 +1,10 @@
+{
+  "scenario": "path-with-spaces",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "docs/my notes file.txt"
+  ],
+  "notes": "Three records carry paths containing spaces: a modified tracked file (docs/my notes file.txt), a staged addition (staged file.txt) and an untracked file (loose file.txt). Exercises path extraction, since the path is the whole remainder of the record and a parser that splits on spaces would truncate or mis-split every one of them."
+}

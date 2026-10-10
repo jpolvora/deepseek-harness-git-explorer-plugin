@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "lib": ["es2024", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "paths": {
+      "@deepseek-ai/dsh-typert-protocol": ["../../packages/typert-protocol/lib/types/index.d.ts"],
+      "@deepseek-ai/dsh-typert-protocol/types": ["../../packages/typert-protocol/lib/types/types.d.ts"]
+    }
+  },
+  "include": ["src/client/**/*.ts", "src/client/**/*.tsx", "src/types.ts"]
+}

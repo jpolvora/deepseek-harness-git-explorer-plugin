@@ -1,0 +1,10 @@
+{
+  "scenario": "staged-modified",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "src/app.js"
+  ],
+  "notes": "A tracked file is edited and staged, so the index letter is M and the worktree letter is a dot (XY = M.). Exercises the staged-only classification in group `staged`."
+}

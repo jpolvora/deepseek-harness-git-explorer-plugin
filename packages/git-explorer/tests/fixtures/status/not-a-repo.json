@@ -1,0 +1,7 @@
+{
+  "scenario": "not-a-repo",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [],
+  "notes": "A directory that is not a git repository at all: git exits 128, writes nothing to stdout and explains itself on stderr, which is captured verbatim in not-a-repo.stderr.bin. GIT_CEILING_DIRECTORIES is set to the scratch root for this run so the search for a .git directory cannot escape upward into the enclosing project checkout."
+}

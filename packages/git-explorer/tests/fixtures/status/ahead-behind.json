@@ -1,0 +1,11 @@
+{
+  "scenario": "ahead-behind",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "src/app.js",
+    "local.txt"
+  ],
+  "notes": "Two commits live in the fixture repo and two in its upstream (a bare clone published by a peer clone), so the branch has diverged by one commit in each direction and the working tree is clean. Exercises the `# branch.upstream` and `# branch.ab +1 -1` headers, whose numbers exist only once an upstream ref is known. (peer.txt is committed in the peer clone, not in the fixture repo.)"
+}

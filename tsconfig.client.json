@@ -1,0 +1,20 @@
+{
+  // Workspace aggregate for the Client face (browser). Referenced package projects
+  // establish their client-face membership; the Host face projection of a Remote
+  // contract is emitted from the Host pass, not from here.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["es2024", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "paths": {
+      "@deepseek-ai/dsh-typert-protocol": ["./packages/typert-protocol/src/index.ts"],
+      "@deepseek-ai/dsh-typert-protocol/types": ["./packages/typert-protocol/src/types.ts"]
+    }
+  },
+  "files": [],
+  "references": [
+    { "path": "./packages/typert-protocol/tsconfig.json" },
+    { "path": "./packages/git-explorer/tsconfig.build.client.json" }
+  ]
+}

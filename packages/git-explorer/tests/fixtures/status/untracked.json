@@ -1,0 +1,10 @@
+{
+  "scenario": "untracked",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "src/app.js"
+  ],
+  "notes": "A top-level file and a file inside a new directory are both never added, so --untracked-files=all lists the nested file individually instead of collapsing `dir/`. Exercises `?` records for untracked paths at two depths."
+}

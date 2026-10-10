@@ -1,0 +1,10 @@
+{
+  "scenario": "clean",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "src/app.js"
+  ],
+  "notes": "One commit and a pristine working tree: only the branch headers appear, with no file records at all. Exercises the empty-status path and the branch.oid/branch.head header pair."
+}

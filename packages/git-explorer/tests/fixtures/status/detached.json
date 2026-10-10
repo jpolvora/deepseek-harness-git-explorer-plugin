@@ -1,0 +1,10 @@
+{
+  "scenario": "detached",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "src/app.js"
+  ],
+  "notes": "HEAD is detached at the single commit, so branch.head reports the sentinel `(detached)` and no upstream or ahead/behind headers are emitted. Exercises the detached state a parser must map to a null branch name instead of the literal string."
+}

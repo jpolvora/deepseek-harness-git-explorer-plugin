@@ -1,0 +1,10 @@
+{
+  "scenario": "deleted-unstaged",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "src/app.js"
+  ],
+  "notes": "A plain filesystem delete leaves the index untouched, so the record is `1 .D` with a zeroed worktree mode and a real index object id. Exercises the unstaged deletion that git only notices as a missing worktree file."
+}

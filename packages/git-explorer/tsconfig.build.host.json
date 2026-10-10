@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    // No explicit `lib`: see ../../tsconfig.host.json — the global AbortSignal a
+    // Remote cancellation parameter needs lives in the default (DOM-including) list.
+    "paths": {
+      // Declarations, not the mirror's sources: a source file outside this
+      // project's rootDir would fail the build and misplace its output.
+      "@deepseek-ai/dsh-typert-protocol": ["../../packages/typert-protocol/lib/types/index.d.ts"],
+      "@deepseek-ai/dsh-typert-protocol/types": ["../../packages/typert-protocol/lib/types/types.d.ts"]
+    }
+  },
+  "include": ["src/index.ts", "src/types.ts", "src/git/**/*.ts"]
+}

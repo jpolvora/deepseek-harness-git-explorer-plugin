@@ -1,0 +1,9 @@
+# The Git Explorer bundle patch: inserts this package as one Web row that carries
+# both halves — the host plugin (main entry: the Git Remote service) and the
+# client plugin (the "Git" tab type in the right sidebar, exported as ./client).
+#
+# The row name must be the package root; a subpath row never produces a browser row.
+
+- insert:
+    - id: git-explorer
+      name: '@jpolv/dsh-git-explorer'

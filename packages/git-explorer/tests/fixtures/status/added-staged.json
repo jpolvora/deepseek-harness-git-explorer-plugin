@@ -1,0 +1,10 @@
+{
+  "scenario": "added-staged",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "src/app.js"
+  ],
+  "notes": "A brand-new file is staged, so the record is `1 A.` with zeroed head mode and head object id. Exercises the added-file record, whose old-side identity fields are all zeros rather than a hash."
+}

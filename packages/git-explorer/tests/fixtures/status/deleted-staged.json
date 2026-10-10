@@ -1,0 +1,10 @@
+{
+  "scenario": "deleted-staged",
+  "command": "git -c core.quotepath=false status --porcelain=v2 -z --branch --untracked-files=all",
+  "gitVersion": "git version 2.53.0.windows.2",
+  "repoFiles": [
+    "README.md",
+    "src/app.js"
+  ],
+  "notes": "git rm removes README.md from the index and the worktree, so the record is `1 D.` with the index and worktree modes both zeroed (only the head side still has a real object id). Exercises a staged deletion, where the path no longer exists on disk and must come from the record and not from the filesystem."
+}
