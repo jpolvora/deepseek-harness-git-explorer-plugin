@@ -725,6 +725,13 @@ Verification: `scripts/probe-diff.mjs` drives the real service through a real Co
 
 Known gap: the diff tab does not yet offer "open the file itself at a line"; that needs the resource-address helper the Files panel uses and is deferred to the next UI pass.
 
+**Two defects the GUI verification caught** (both fixed, both worth remembering):
+
+1. **Invalid hook call (React error #321).** The panel called `useTabInfo()` from inside the row's click handler to open the tab. Hooks must run during render; the handler now uses the value render captured in a ref. The panel's own error path is what made this visible — a bare "clicking does nothing" would have cost far longer.
+2. **A stale host half reads as a product bug.** After the client shipped, the diff tab opened and its call failed with `HTTP 404` on `/api/git/fileDiff`, because the running process still had the previous host build loaded: client-only changes ride a page reload, host changes require an app restart. Comparing the installed `lib/index.js` timestamp with the process start time is the quick way to tell the two apart.
+
+Both are now covered: the panel reports the opener it actually got (a `tab host` diagnostic row reading `panel host`, `sidebar opener only` or `unavailable`), prefers its own tab host, and falls back to the column's `sidebarRight.openTab` service so a body without that hook still works.
+
 ---
 
 ## Appendix A — research artifacts produced for this plan
