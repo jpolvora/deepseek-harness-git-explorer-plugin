@@ -5321,6 +5321,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		let _jpolv_dsh_git_explorer_git_fileDiff_result$schema$value;
 		const _jpolv_dsh_git_explorer_git_fileDiff_result$schema = () => _jpolv_dsh_git_explorer_git_fileDiff_result$schema$value ??= object({
 			"path": string(),
+			"root": string(),
 			"staged": boolean(),
 			"oldText": string(),
 			"newText": string(),
@@ -5328,6 +5329,18 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			"oversized": boolean(),
 			"note": string()
 		});
+		let _jpolv_dsh_git_explorer_git_fileStats_parameter_0$schema$value;
+		const _jpolv_dsh_git_explorer_git_fileStats_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_fileStats_parameter_0$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_fileStats_parameter_1$schema$value;
+		const _jpolv_dsh_git_explorer_git_fileStats_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_fileStats_parameter_1$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_fileStats_result$schema$value;
+		const _jpolv_dsh_git_explorer_git_fileStats_result$schema = () => _jpolv_dsh_git_explorer_git_fileStats_result$schema$value ??= array(object({
+			"path": string(),
+			"staged": boolean(),
+			"added": number(),
+			"removed": number(),
+			"binary": boolean()
+		}));
 		let _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value;
 		const _jpolv_dsh_git_explorer_git_ping_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value ??= string();
 		let _jpolv_dsh_git_explorer_git_ping_parameter_1$schema$value;
@@ -5534,7 +5547,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 342,
+						"line": 369,
 						"column": 9
 					}
 				},
@@ -5604,7 +5617,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 299,
+						"line": 326,
 						"column": 9
 					}
 				},
@@ -5674,7 +5687,44 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 207,
+						"line": 233,
+						"column": 9
+					}
+				},
+				{
+					id: "@jpolv/dsh-git-explorer#git/fileStats",
+					service: "git",
+					namespace: "git",
+					method: "fileStats",
+					invocation: { kind: "direct" },
+					parameters: [{
+						name: "sessionId",
+						wire: "sessionId",
+						source: "json",
+						codec: {
+							mode: "strict",
+							typeSymbol: "@jpolv/dsh-git-explorer#git/fileStats:sessionId",
+							create: _jpolv_dsh_git_explorer_git_fileStats_parameter_0$schema
+						}
+					}, {
+						name: "requestRoot",
+						wire: "requestRoot",
+						source: "json",
+						codec: {
+							mode: "strict",
+							typeSymbol: "@jpolv/dsh-git-explorer#git/fileStats:requestRoot",
+							create: _jpolv_dsh_git_explorer_git_fileStats_parameter_1$schema
+						}
+					}],
+					cancellation: { parameter: "signal" },
+					result: {
+						mode: "strict",
+						typeSymbol: "@jpolv/dsh-git-explorer#git/fileStats:result",
+						create: _jpolv_dsh_git_explorer_git_fileStats_result$schema
+					},
+					sourceLocation: {
+						"file": "packages/git-explorer/src/index.ts",
+						"line": 205,
 						"column": 9
 					}
 				},
@@ -5711,7 +5761,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 408,
+						"line": 435,
 						"column": 9
 					}
 				},
@@ -5761,7 +5811,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 255,
+						"line": 282,
 						"column": 9
 					}
 				},
@@ -5798,7 +5848,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 122,
+						"line": 123,
 						"column": 9
 					}
 				},
@@ -5848,7 +5898,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					},
 					sourceLocation: {
 						"file": "packages/git-explorer/src/index.ts",
-						"line": 274,
+						"line": 301,
 						"column": 9
 					}
 				}
@@ -6081,9 +6131,9 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				]
 			});
 		}
-		/** A file row: glyph, name, right-aligned status letter, hover actions, and a click that
-		* opens the comparison for this file. */
-		function FileRow({ node, depth, hovered, onHover, actions, onOpen }) {
+		/** A file row: glyph, name, right-aligned line counts, status letter, hover actions, and a
+		* click that opens the comparison for this file. */
+		function FileRow({ node, depth, hovered, onHover, actions, onOpen, counts }) {
 			const change = node.change;
 			if (change === void 0) return (0, react_jsx_runtime.jsx)("div", {
 				style: rowStyle(depth, false),
@@ -6125,6 +6175,14 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						},
 						children: change.origPath.split("/").pop()
 					}),
+					counts === void 0 || counts.binary ? null : (0, react_jsx_runtime.jsx)("span", {
+						style: {
+							color: TERTIARY,
+							flexShrink: 0,
+							paddingLeft: "6px"
+						},
+						children: `+${String(counts.added)} −${String(counts.removed)}`
+					}),
 					hovered ? actions.map((action) => (0, react_jsx_runtime.jsx)(IconAction, { ...action }, action.title)) : (0, react_jsx_runtime.jsx)("span", {
 						style: {
 							color: STATUS_TONE[change.status],
@@ -6137,7 +6195,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			});
 		}
 		/** Rows for one level, recursing into directories that are expanded. */
-		function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor, openFor }) {
+		function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor, openFor, countsFor }) {
 			return (0, react_jsx_runtime.jsx)(react_jsx_runtime.Fragment, { children: nodes.map((node) => node.kind === "directory" ? (0, react_jsx_runtime.jsxs)(react.Fragment, { children: [(0, react_jsx_runtime.jsx)(DirectoryRow, {
 				node,
 				depth,
@@ -6151,7 +6209,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				hovered,
 				onHover,
 				actionsFor,
-				openFor
+				openFor,
+				countsFor
 			})] }, `d:${node.path}`) : (0, react_jsx_runtime.jsx)(FileRow, {
 				node,
 				depth,
@@ -6160,11 +6219,12 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				actions: node.change === void 0 ? [] : actionsFor(node.change),
 				onOpen: () => {
 					if (node.change !== void 0) openFor(node.change);
-				}
+				},
+				...node.change === void 0 ? {} : { counts: countsFor(node.change) }
 			}, `f:${node.path}`)) });
 		}
 		/** One collapsible group with its count badge, its bulk action and its tree. */
-		function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor, openFor }) {
+		function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor, openFor, countsFor }) {
 			const tree = react.useMemo(() => buildChangeTree(changes), [changes]);
 			if (changes.length === 0) return null;
 			const isCollapsed = collapsedGroups.has(title);
@@ -6222,7 +6282,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					hovered,
 					onHover,
 					actionsFor,
-					openFor
+					openFor,
+					countsFor
 				})]
 			});
 		}
@@ -6393,6 +6454,45 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				return this.props.children;
 			}
 		};
+		/** The localStorage key holding this tab's unsent commit message. */
+		const DRAFT_KEY_PREFIX = "dsh.git-explorer.draft.v1.";
+		/** Read the unsent commit message and amend flag for this Session. */
+		function readDraft(sessionId) {
+			if (sessionId === void 0) return {
+				message: "",
+				amend: false
+			};
+			try {
+				const raw = window.localStorage.getItem(`${DRAFT_KEY_PREFIX}${sessionId}`);
+				if (raw === null) return {
+					message: "",
+					amend: false
+				};
+				const parsed = JSON.parse(raw);
+				if (typeof parsed !== "object" || parsed === null) return {
+					message: "",
+					amend: false
+				};
+				const value = parsed;
+				return {
+					message: typeof value.message === "string" ? value.message : "",
+					amend: value.amend === true
+				};
+			} catch {
+				return {
+					message: "",
+					amend: false
+				};
+			}
+		}
+		/** Remember the unsent commit message, so a closed tab does not lose a half-written one. */
+		function writeDraft(sessionId, draft) {
+			if (sessionId === void 0) return;
+			try {
+				if (draft.message === "" && !draft.amend) window.localStorage.removeItem(`${DRAFT_KEY_PREFIX}${sessionId}`);
+				else window.localStorage.setItem(`${DRAFT_KEY_PREFIX}${sessionId}`, JSON.stringify(draft));
+			} catch {}
+		}
 		/** Read this tab's collapsed groups and directories. */
 		function readCollapsed(sessionId) {
 			if (sessionId === void 0) return {
@@ -6437,13 +6537,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		* @param props - the session, the session store and the host bridge.
 		* @returns the panel body.
 		*/
-		function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }) {
+		function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitStats, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }) {
 			const [outcome, setOutcome] = react.useState(null);
+			const [stats, setStats] = react.useState([]);
 			const [probe, setProbe] = react.useState(null);
 			const [attempt, setAttempt] = react.useState(0);
 			const [hovered, setHovered] = react.useState(void 0);
-			const [message, setMessage] = react.useState("");
-			const [amend, setAmend] = react.useState(false);
+			const draft = react.useRef(null);
+			if (draft.current === null) draft.current = readDraft(sessionId);
+			const [message, setMessage] = react.useState(draft.current.message);
+			const [amend, setAmend] = react.useState(draft.current.amend);
 			const [busy, setBusy] = react.useState(false);
 			const [notice, setNotice] = react.useState(null);
 			const [pendingDiscard, setPendingDiscard] = react.useState(null);
@@ -6454,6 +6557,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			const bridge = react.useRef({});
 			bridge.current = {
 				gitStatus,
+				gitStats,
 				gitPing,
 				gitStage,
 				gitUnstage,
@@ -6483,6 +6587,10 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				if (readProbe !== void 0) readProbe(requestRoot, abort.signal).then((result) => {
 					if (live) setProbe(result);
 				}, () => void 0);
+				const readStats = bridge.current.gitStats;
+				if (readStats !== void 0) readStats(requestRoot, abort.signal).then((result) => {
+					if (live) setStats(result);
+				}, () => void 0);
 				return () => {
 					live = false;
 					abort.abort();
@@ -6502,6 +6610,22 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				collapsedGroups,
 				collapsedDirs
 			]);
+			/** Keep the unsent message across a tab switch or a reload. */
+			react.useEffect(() => {
+				writeDraft(sessionId, {
+					message,
+					amend
+				});
+			}, [
+				sessionId,
+				message,
+				amend
+			]);
+			/** The line counts reported for one row, matched by path and side. */
+			const countsFor = (change) => {
+				const staged = statusRef.current?.staged.some((entry) => entry.path === change.path) === true;
+				return stats.find((entry) => entry.path === change.path && entry.staged === staged);
+			};
 			/** Run one mutation, report what it said, and re-read the status. */
 			const mutate = (run) => {
 				setBusy(true);
@@ -6546,6 +6670,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				});
 			};
 			const status = outcome !== null && !("unavailable" in outcome) && outcome.isRepo ? outcome : null;
+			const statusRef = react.useRef(status);
+			statusRef.current = status;
 			const total = status === null ? 0 : status.staged.length + status.unstaged.length + status.untracked.length + status.conflicted.length;
 			/** The hover actions one row offers, depending on the group it sits in. */
 			const actionsFor = (change) => {
@@ -6587,7 +6713,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				onToggleDir: toggleDir,
 				hovered,
 				onHover: setHovered,
-				actionsFor
+				actionsFor,
+				countsFor
 			};
 			/**
 			* Open (or focus) the comparison tab for one file.
@@ -6601,7 +6728,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				const params = {
 					path: change.path,
 					staged,
-					untracked
+					untracked,
+					workspaceRoot: requestRoot
 				};
 				try {
 					const actions = tabRef.current?.tab.actions;
@@ -6858,6 +6986,20 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		* The tab is opened with `params: { path, staged, untracked }`, which is how the panel
 		* tells this body what to compare.
 		*/
+		/** The workspace-relative path of an absolute path, or null when it lies outside. */
+		function relativeToWorkspace(workspaceRoot, absolute) {
+			const root = workspaceRoot.replace(/\\/g, "/").split("/").filter((segment) => segment !== "");
+			const target = absolute.replace(/\\/g, "/").split("/").filter((segment) => segment !== "");
+			let index = 0;
+			while (index < root.length && index < target.length && root[index]?.toLowerCase() === target[index]?.toLowerCase()) index += 1;
+			if (index === 0) return null;
+			return target.slice(index).join("/");
+		}
+		/** The resource address the Files panel's text preview uses for one Session path. */
+		function fileAddress(sessionId, workspaceRelative) {
+			const encoded = workspaceRelative.split("/").map((segment) => encodeURIComponent(segment)).join("/");
+			return `dsh-resource://file/session/${encodeURIComponent(sessionId)}/${encoded}`;
+		}
 		/** Localized chrome for the diff primitive; the product's own words are reused. */
 		const LABELS = {
 			codeLabel: "text",
@@ -6886,11 +7028,15 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		* @param props - the session, the tab hook and the host bridge.
 		* @returns the diff body.
 		*/
-		function GitDiffBody({ useTabInfo, gitDiff }) {
-			const params = useTabInfo?.().tab.navigation.params;
+		function GitDiffBody({ sessionId, useTabInfo, gitDiff }) {
+			const tab = useTabInfo?.();
+			const params = tab?.tab.navigation.params;
 			const path = typeof params?.path === "string" ? params.path : "";
 			const staged = params?.staged === true;
 			const untracked = params?.untracked === true;
+			const workspaceRoot = typeof params?.workspaceRoot === "string" ? params.workspaceRoot : "";
+			const tabRef = react.useRef(tab);
+			tabRef.current = tab;
 			const [outcome, setOutcome] = react.useState(null);
 			const bridge = react.useRef(gitDiff);
 			bridge.current = gitDiff;
@@ -6937,6 +7083,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				oldText: diff.oldText,
 				newText: diff.newText
 			}]);
+			const relative = diff.root === "" ? null : relativeToWorkspace(workspaceRoot, `${diff.root}/${diff.path}`);
+			const openable = relative !== null && sessionId !== void 0 && tabRef.current !== void 0;
 			return (0, react_jsx_runtime.jsxs)("div", {
 				style: {
 					padding: "10px 12px",
@@ -6968,7 +7116,26 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 									color: "var(--dsw-alias-label-secondary)"
 								},
 								children: `+${String(totals.added)} −${String(totals.removed)}`
-							})
+							}),
+							openable ? (0, react_jsx_runtime.jsx)("button", {
+								type: "button",
+								onClick: () => {
+									const actions = tabRef.current?.tab.actions;
+									if (actions === void 0 || relative === null || sessionId === void 0) return;
+									actions.openResource(fileAddress(sessionId, relative));
+								},
+								style: {
+									background: "transparent",
+									border: "1px solid var(--dsw-alias-border-l3)",
+									borderRadius: "4px",
+									color: "var(--dsw-alias-label-primary)",
+									cursor: "pointer",
+									flexShrink: 0,
+									font: "inherit",
+									padding: "1px 8px"
+								},
+								children: "Open file"
+							}) : null
 						]
 					}),
 					diff.binary ? (0, react_jsx_runtime.jsx)(Header, {
@@ -7045,6 +7212,10 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				status: (requestRoot, signal) => call((namespace) => namespace.status(sessionId, requestRoot, signal)),
 				ping: (requestRoot, signal) => call((namespace) => namespace.ping(sessionId, requestRoot, signal)),
 				fileDiff: (requestRoot, path, staged, untracked, signal) => call((namespace) => namespace.fileDiff(sessionId, requestRoot, path, staged, untracked, signal)),
+				fileStats: async (requestRoot, signal) => {
+					const result = await call((namespace) => namespace.fileStats(sessionId, requestRoot, signal));
+					return "unavailable" in result ? [] : result;
+				},
 				mutate: async (run, requestRoot, signal) => {
 					const result = await call((namespace) => run(namespace, requestRoot, signal));
 					if ("unavailable" in result) return {
@@ -7088,6 +7259,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							faces.sidebarRight.openTab(kind, options);
 						},
 						gitStatus: (requestRoot, signal) => host.status(requestRoot, signal),
+						gitStats: (requestRoot, signal) => host.fileStats(requestRoot, signal),
 						gitPing: (requestRoot, signal) => host.ping(requestRoot, signal),
 						gitStage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.stage(sessionId, root, paths, inner), requestRoot, signal),
 						gitUnstage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.unstage(sessionId, root, paths, inner), requestRoot, signal),

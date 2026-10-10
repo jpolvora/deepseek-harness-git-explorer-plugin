@@ -36,6 +36,7 @@ export async function readFileDiff(ctx, limits, options) {
     const { root, path, staged, untracked, maxFileBytes, signal } = options;
     const base = {
         path,
+        root,
         staged,
         oldText: '',
         newText: '',
@@ -86,11 +87,11 @@ export async function readFileDiff(ctx, limits, options) {
                 return { ...base, oldText, oversized: true, note: 'the working copy exceeds the read cap' };
             }
             if (/not-found|ENOENT|no such file/i.test(message)) {
-                return { path, staged, oldText, newText: '', binary: false, oversized: false, note: 'the file is deleted in the working tree' };
+                return { path, root, staged, oldText, newText: '', binary: false, oversized: false, note: 'the file is deleted in the working tree' };
             }
             return { ...base, oldText, note: message.slice(0, 200) };
         }
     }
-    return { path, staged, oldText, newText, binary: false, oversized: false, note: '' };
+    return { path, root, staged, oldText, newText, binary: false, oversized: false, note: '' };
 }
 //# sourceMappingURL=diff.js.map

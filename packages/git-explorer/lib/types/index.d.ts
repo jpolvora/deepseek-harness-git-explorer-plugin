@@ -15,7 +15,7 @@ import type { Context } from '@deepseek-ai/cordis';
 import z from '@deepseek-ai/schemastery';
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol';
 import { type GitCommandLimits } from './git/commands.js';
-import type { GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from './types.js';
+import type { GitChangeStats, GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from './types.js';
 /**
  * Declare this package as the owner of the `git` Host service. Besides giving Host
  * consumers a typed handle, this augmentation is what makes the package a Typert
@@ -79,6 +79,15 @@ export declare class GitExplorerService extends TypertRemoteService {
      * @returns the status summary the panel renders.
      */
     status(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<GitStatusSummary>;
+    /**
+     * Read the per-file line counts both comparisons report.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param signal - the invocation's cancellation signal.
+     * @returns one entry per changed path, or none when the repository cannot be read.
+     */
+    fileStats(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<GitChangeStats[]>;
     /**
      * Read both sides of one changed file for the diff view.
      *

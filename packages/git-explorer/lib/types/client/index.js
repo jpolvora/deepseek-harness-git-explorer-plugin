@@ -49,6 +49,10 @@ function hostCalls(ctx) {
         status: (requestRoot, signal) => call((namespace) => namespace.status(sessionId, requestRoot, signal)),
         ping: (requestRoot, signal) => call((namespace) => namespace.ping(sessionId, requestRoot, signal)),
         fileDiff: (requestRoot, path, staged, untracked, signal) => call((namespace) => namespace.fileDiff(sessionId, requestRoot, path, staged, untracked, signal)),
+        fileStats: async (requestRoot, signal) => {
+            const result = await call((namespace) => namespace.fileStats(sessionId, requestRoot, signal));
+            return 'unavailable' in result ? [] : result;
+        },
         mutate: async (run, requestRoot, signal) => {
             const result = await call((namespace) => run(namespace, requestRoot, signal));
             // A mutation always answers with a payload (`ok` plus a line to show); only a
@@ -98,6 +102,7 @@ export async function apply(ctx) {
                     faces.sidebarRight.openTab(kind, options);
                 },
                 gitStatus: (requestRoot, signal) => host.status(requestRoot, signal),
+                gitStats: (requestRoot, signal) => host.fileStats(requestRoot, signal),
                 gitPing: (requestRoot, signal) => host.ping(requestRoot, signal),
                 gitStage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.stage(sessionId, root, paths, inner), requestRoot, signal),
                 gitUnstage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.unstage(sessionId, root, paths, inner), requestRoot, signal),

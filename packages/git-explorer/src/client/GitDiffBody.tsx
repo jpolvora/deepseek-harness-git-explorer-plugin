@@ -17,7 +17,25 @@ type TabInfoHook = () => {
   tab: {
     id: string
     navigation: { params?: Record<string, unknown> }
+    actions: { openResource(address: string, options?: { params?: Record<string, unknown> }): void }
   }
+}
+
+/** The workspace-relative path of an absolute path, or null when it lies outside. */
+function relativeToWorkspace(workspaceRoot: string, absolute: string): string | null {
+  const root = workspaceRoot.replace(/\\/g, '/').split('/').filter((segment) => segment !== '')
+  const target = absolute.replace(/\\/g, '/').split('/').filter((segment) => segment !== '')
+  let index = 0
+  while (index < root.length && index < target.length
+    && root[index]?.toLowerCase() === target[index]?.toLowerCase()) index += 1
+  if (index === 0) return null
+  return target.slice(index).join('/')
+}
+
+/** The resource address the Files panel's text preview uses for one Session path. */
+function fileAddress(sessionId: string, workspaceRelative: string): string {
+  const encoded = workspaceRelative.split('/').map((segment) => encodeURIComponent(segment)).join('/')
+  return `dsh-resource://file/session/${encodeURIComponent(sessionId)}/${encoded}`
 }
 
 /** Props the framework and this plugin's business face deliver to the diff body. */
@@ -59,11 +77,15 @@ function Header({ text, tone }: { text: string; tone?: string }): React.ReactEle
  * @param props - the session, the tab hook and the host bridge.
  * @returns the diff body.
  */
-export function GitDiffBody({ useTabInfo, gitDiff }: GitDiffBodyProps): React.ReactElement {
-  const params = useTabInfo?.().tab.navigation.params
+export function GitDiffBody({ sessionId, useTabInfo, gitDiff }: GitDiffBodyProps): React.ReactElement {
+  const tab = useTabInfo?.()
+  const params = tab?.tab.navigation.params
   const path = typeof params?.path === 'string' ? params.path : ''
   const staged = params?.staged === true
   const untracked = params?.untracked === true
+  const workspaceRoot = typeof params?.workspaceRoot === 'string' ? params.workspaceRoot : ''
+  const tabRef = React.useRef(tab)
+  tabRef.current = tab
   const [outcome, setOutcome] = React.useState<GitFileDiffOutcome | null>(null)
 
   const bridge = React.useRef<GitDiffBodyProps['gitDiff']>(gitDiff)
@@ -106,6 +128,10 @@ export function GitDiffBody({ useTabInfo, gitDiff }: GitDiffBodyProps): React.Re
 
   const diff = outcome
   const totals = diff.binary || diff.oversized ? null : diffTotals([{ path: diff.path, oldText: diff.oldText, newText: diff.newText }])
+  // The file opens through the shipped text preview, which addresses a path relative to
+  // the Session's workspace — so the button only appears when the file lies inside it.
+  const relative = diff.root === '' ? null : relativeToWorkspace(workspaceRoot, `${diff.root}/${diff.path}`)
+  const openable = relative !== null && sessionId !== undefined && tabRef.current !== undefined
 
   return (
     <div style={{ padding: '10px 12px', minWidth: 0 }}>
@@ -121,6 +147,30 @@ export function GitDiffBody({ useTabInfo, gitDiff }: GitDiffBodyProps): React.Re
               {`+${String(totals.added)} −${String(totals.removed)}`}
             </span>
           )}
+        {openable
+          ? (
+            <button
+              type="button"
+              onClick={() => {
+                const actions = tabRef.current?.tab.actions
+                if (actions === undefined || relative === null || sessionId === undefined) return
+                actions.openResource(fileAddress(sessionId, relative))
+              }}
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--dsw-alias-border-l3)',
+                borderRadius: '4px',
+                color: 'var(--dsw-alias-label-primary)',
+                cursor: 'pointer',
+                flexShrink: 0,
+                font: 'inherit',
+                padding: '1px 8px',
+              }}
+            >
+              Open file
+            </button>
+          )
+          : null}
       </div>
       {diff.binary
         ? <Header text="A binary file has no text diff." tone="var(--dsw-alias-state-warn-label)" />

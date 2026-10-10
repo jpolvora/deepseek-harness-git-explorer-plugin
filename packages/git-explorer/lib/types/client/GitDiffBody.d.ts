@@ -17,6 +17,11 @@ type TabInfoHook = () => {
         navigation: {
             params?: Record<string, unknown>;
         };
+        actions: {
+            openResource(address: string, options?: {
+                params?: Record<string, unknown>;
+            }): void;
+        };
     };
 };
 /** Props the framework and this plugin's business face deliver to the diff body. */
@@ -34,5 +39,5 @@ export interface GitDiffBodyProps {
  * @param props - the session, the tab hook and the host bridge.
  * @returns the diff body.
  */
-export declare function GitDiffBody({ useTabInfo, gitDiff }: GitDiffBodyProps): React.ReactElement;
+export declare function GitDiffBody({ sessionId, useTabInfo, gitDiff }: GitDiffBodyProps): React.ReactElement;
 export {};

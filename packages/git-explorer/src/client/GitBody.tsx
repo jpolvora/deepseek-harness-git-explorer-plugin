@@ -27,6 +27,7 @@ import { buildChangeTree, type ChangeTreeNode } from './change-tree.js'
 import { GIT_DIFF_TAB_KIND } from '../types.js'
 import type {
   GitChange,
+  GitChangeStats,
   GitFileStatus,
   GitMutationResult,
   GitPingOutcome,
@@ -66,6 +67,8 @@ export interface GitBodyProps {
   useSessions?: SessionsHook
   /** The status read, contributed through the slot's `inject` face factory. */
   gitStatus?: (requestRoot: string, signal: AbortSignal) => Promise<GitStatusOutcome>
+  /** The per-file line counts; an empty list simply means the rows show no numbers. */
+  gitStats?: (requestRoot: string, signal: AbortSignal) => Promise<GitChangeStats[]>
   /** The diagnostic probe, contributed through the same factory. */
   gitPing?: (requestRoot: string, signal: AbortSignal) => Promise<GitPingOutcome>
   /** Stage paths. */
@@ -204,15 +207,17 @@ function DirectoryRow({ node, depth, collapsed, onToggle }: {
   )
 }
 
-/** A file row: glyph, name, right-aligned status letter, hover actions, and a click that
- * opens the comparison for this file. */
-function FileRow({ node, depth, hovered, onHover, actions, onOpen }: {
+/** A file row: glyph, name, right-aligned line counts, status letter, hover actions, and a
+ * click that opens the comparison for this file. */
+function FileRow({ node, depth, hovered, onHover, actions, onOpen, counts }: {
   node: ChangeTreeNode
   depth: number
   hovered: boolean
   onHover: (path: string | undefined) => void
   actions: RowAction[]
   onOpen: () => void
+  /** Line counts for this path, when the host reported them. */
+  counts?: GitChangeStats
 }): React.ReactElement {
   const change = node.change
   if (change === undefined) {
@@ -235,6 +240,13 @@ function FileRow({ node, depth, hovered, onHover, actions, onOpen }: {
       {change.origPath === undefined
         ? null
         : <span style={{ color: TERTIARY, flexShrink: 0 }}>{change.origPath.split('/').pop()}</span>}
+      {counts === undefined || counts.binary
+        ? null
+        : (
+          <span style={{ color: TERTIARY, flexShrink: 0, paddingLeft: '6px' }}>
+            {`+${String(counts.added)} −${String(counts.removed)}`}
+          </span>
+        )}
       {hovered
         ? actions.map((action) => <IconAction key={action.title} {...action} />)
         : (
@@ -247,7 +259,7 @@ function FileRow({ node, depth, hovered, onHover, actions, onOpen }: {
 }
 
 /** Rows for one level, recursing into directories that are expanded. */
-function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor, openFor }: {
+function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor, openFor, countsFor }: {
   nodes: readonly ChangeTreeNode[]
   depth: number
   collapsed: ReadonlySet<string>
@@ -256,6 +268,7 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actions
   onHover: (path: string | undefined) => void
   actionsFor: (change: GitChange) => RowAction[]
   openFor: (change: GitChange) => void
+  countsFor: (change: GitChange) => GitChangeStats | undefined
 }): React.ReactElement {
   return (
     <>
@@ -275,6 +288,7 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actions
                   onHover={onHover}
                   actionsFor={actionsFor}
                   openFor={openFor}
+                  countsFor={countsFor}
                 />
               )}
           </React.Fragment>
@@ -288,6 +302,7 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actions
             onHover={onHover}
             actions={node.change === undefined ? [] : actionsFor(node.change)}
             onOpen={() => { if (node.change !== undefined) openFor(node.change) }}
+            {...(node.change === undefined ? {} : { counts: countsFor(node.change) })}
           />
         ))}
     </>
@@ -295,7 +310,7 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actions
 }
 
 /** One collapsible group with its count badge, its bulk action and its tree. */
-function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor, openFor }: {
+function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor, openFor, countsFor }: {
   title: string
   changes: readonly GitChange[]
   bulk?: { label: string; run: () => void }
@@ -307,6 +322,7 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
   onHover: (path: string | undefined) => void
   actionsFor: (change: GitChange) => RowAction[]
   openFor: (change: GitChange) => void
+  countsFor: (change: GitChange) => GitChangeStats | undefined
 }): React.ReactElement | null {
   const tree = React.useMemo(() => buildChangeTree(changes), [changes])
   if (changes.length === 0) return null
@@ -362,6 +378,7 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
             onHover={onHover}
             actionsFor={actionsFor}
             openFor={openFor}
+            countsFor={countsFor}
           />
         )}
     </div>
@@ -501,9 +518,40 @@ class PanelBoundary extends React.Component<{ children: React.ReactNode }, { fai
   }
 }
 
+/** The localStorage key holding this tab's unsent commit message. */
+const DRAFT_KEY_PREFIX = 'dsh.git-explorer.draft.v1.'
+
+/** Read the unsent commit message and amend flag for this Session. */
+function readDraft(sessionId: string | undefined): { message: string; amend: boolean } {
+  if (sessionId === undefined) return { message: '', amend: false }
+  try {
+    const raw = window.localStorage.getItem(`${DRAFT_KEY_PREFIX}${sessionId}`)
+    if (raw === null) return { message: '', amend: false }
+    const parsed: unknown = JSON.parse(raw)
+    if (typeof parsed !== 'object' || parsed === null) return { message: '', amend: false }
+    const value = parsed as { message?: unknown; amend?: unknown }
+    return {
+      message: typeof value.message === 'string' ? value.message : '',
+      amend: value.amend === true,
+    }
+  } catch {
+    return { message: '', amend: false }
+  }
+}
+
+/** Remember the unsent commit message, so a closed tab does not lose a half-written one. */
+function writeDraft(sessionId: string | undefined, draft: { message: string; amend: boolean }): void {
+  if (sessionId === undefined) return
+  try {
+    if (draft.message === '' && !draft.amend) window.localStorage.removeItem(`${DRAFT_KEY_PREFIX}${sessionId}`)
+    else window.localStorage.setItem(`${DRAFT_KEY_PREFIX}${sessionId}`, JSON.stringify(draft))
+  } catch {
+    // Storage is best-effort; the box keeps working in memory.
+  }
+}
+
 /** Read this tab's collapsed groups and directories. */
-function readCollapsed(sessionId: string | undefined): { groups: string[]; directories: string[] } {
-  if (sessionId === undefined) return { groups: [], directories: [] }
+function readCollapsed(sessionId: string | undefined): { groups: string[]; directories: string[] } {  if (sessionId === undefined) return { groups: [], directories: [] }
   try {
     const raw = window.localStorage.getItem(`${COLLAPSE_KEY_PREFIX}${sessionId}`)
     if (raw === null) return { groups: [], directories: [] }
@@ -546,6 +594,7 @@ function GitPanel({
   useTabInfo,
   openTab,
   gitStatus,
+  gitStats,
   gitPing,
   gitStage,
   gitUnstage,
@@ -553,11 +602,14 @@ function GitPanel({
   gitCommit,
 }: GitBodyProps): React.ReactElement {
   const [outcome, setOutcome] = React.useState<GitStatusOutcome | null>(null)
+  const [stats, setStats] = React.useState<GitChangeStats[]>([])
   const [probe, setProbe] = React.useState<GitPingOutcome | null>(null)
   const [attempt, setAttempt] = React.useState(0)
   const [hovered, setHovered] = React.useState<string | undefined>(undefined)
-  const [message, setMessage] = React.useState('')
-  const [amend, setAmend] = React.useState(false)
+  const draft = React.useRef<{ message: string; amend: boolean } | null>(null)
+  if (draft.current === null) draft.current = readDraft(sessionId)
+  const [message, setMessage] = React.useState(draft.current.message)
+  const [amend, setAmend] = React.useState(draft.current.amend)
   const [busy, setBusy] = React.useState(false)
   const [notice, setNotice] = React.useState<GitMutationResult | null>(null)
   const [pendingDiscard, setPendingDiscard] = React.useState<{ tracked: string[]; untracked: string[] } | null>(null)
@@ -570,13 +622,14 @@ function GitPanel({
   // read through a ref: depending on their identity in an effect would loop.
   const bridge = React.useRef<{
     gitStatus?: GitBodyProps['gitStatus']
+    gitStats?: GitBodyProps['gitStats']
     gitPing?: GitBodyProps['gitPing']
     gitStage?: GitBodyProps['gitStage']
     gitUnstage?: GitBodyProps['gitUnstage']
     gitDiscard?: GitBodyProps['gitDiscard']
     gitCommit?: GitBodyProps['gitCommit']
   }>({})
-  bridge.current = { gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }
+  bridge.current = { gitStatus, gitStats, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }
 
   // The tab host is a *hook*, so it is called during render (never from a handler) and
   // its result is kept in a ref for the click handlers to use. Calling it from the
@@ -619,6 +672,15 @@ function GitPanel({
         () => undefined,
       )
     }
+    const readStats = bridge.current.gitStats
+    if (readStats !== undefined) {
+      void readStats(requestRoot, abort.signal).then(
+        (result) => {
+          if (live) setStats(result)
+        },
+        () => undefined,
+      )
+    }
     return () => {
       live = false
       abort.abort()
@@ -637,6 +699,17 @@ function GitPanel({
       // Storage is best-effort; the panel keeps working in memory.
     }
   }, [sessionId, collapsedGroups, collapsedDirs])
+
+  /** Keep the unsent message across a tab switch or a reload. */
+  React.useEffect(() => {
+    writeDraft(sessionId, { message, amend })
+  }, [sessionId, message, amend])
+
+  /** The line counts reported for one row, matched by path and side. */
+  const countsFor = (change: GitChange): GitChangeStats | undefined => {
+    const staged = statusRef.current?.staged.some((entry) => entry.path === change.path) === true
+    return stats.find((entry) => entry.path === change.path && entry.staged === staged)
+  }
 
   /** Run one mutation, report what it said, and re-read the status. */
   const mutate = (run: (signal: AbortSignal) => Promise<GitMutationResult>): void => {
@@ -685,6 +758,8 @@ function GitPanel({
   }
 
   const status = outcome !== null && !('unavailable' in outcome) && outcome.isRepo ? outcome : null
+  const statusRef = React.useRef<GitStatusSummary | null>(status)
+  statusRef.current = status
   const total = status === null
     ? 0
     : status.staged.length + status.unstaged.length + status.untracked.length + status.conflicted.length
@@ -727,6 +802,7 @@ function GitPanel({
     hovered,
     onHover: setHovered,
     actionsFor,
+    countsFor,
   }
 
   /**
@@ -738,7 +814,7 @@ function GitPanel({
    * nothing" is the least debuggable outcome there is.
    */
   const openComparison = (change: GitChange, staged: boolean, untracked: boolean): void => {
-    const params = { path: change.path, staged, untracked }
+    const params = { path: change.path, staged, untracked, workspaceRoot: requestRoot }
     try {
       const actions = tabRef.current?.tab.actions
       if (actions !== undefined) {

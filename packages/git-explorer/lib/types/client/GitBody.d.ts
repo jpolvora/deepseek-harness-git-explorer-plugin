@@ -12,7 +12,7 @@
  * Styling: inline styles over the documented `--dsw-alias-*` tokens, matching M1.
  */
 import * as React from 'react';
-import type { GitMutationResult, GitPingOutcome, GitStatusOutcome } from '../types.js';
+import type { GitChangeStats, GitMutationResult, GitPingOutcome, GitStatusOutcome } from '../types.js';
 /** The session list face the framework hands a session-scoped body. */
 type SessionsHook = <T>(select: (state: SessionListState) => T) => T;
 /** The slice of the client session store this panel reads. */
@@ -52,6 +52,8 @@ export interface GitBodyProps {
     useSessions?: SessionsHook;
     /** The status read, contributed through the slot's `inject` face factory. */
     gitStatus?: (requestRoot: string, signal: AbortSignal) => Promise<GitStatusOutcome>;
+    /** The per-file line counts; an empty list simply means the rows show no numbers. */
+    gitStats?: (requestRoot: string, signal: AbortSignal) => Promise<GitChangeStats[]>;
     /** The diagnostic probe, contributed through the same factory. */
     gitPing?: (requestRoot: string, signal: AbortSignal) => Promise<GitPingOutcome>;
     /** Stage paths. */

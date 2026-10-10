@@ -25,8 +25,9 @@ import {
   stageArgs,
   unstageArgs,
 } from './git/mutations.js'
-import type { GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from './types.js'
+import type { GitChangeStats, GitFileDiff, GitMutationResult, GitPingResult, GitStatusSummary } from './types.js'
 import { readFileDiff } from './git/diff.js'
+import { readStats } from './git/numstat.js'
 
 /**
  * Declare this package as the owner of the `git` Host service. Besides giving Host
@@ -42,7 +43,7 @@ declare module '@deepseek-ai/cordis' {
 }
 
 /** The plugin's own version, reported to the panel so a build is identifiable. */
-const PACKAGE_VERSION = '0.1.0-m3'
+const PACKAGE_VERSION = '0.1.0-m4'
 
 /** `rev-parse` output that locates the repository. */
 const REV_PARSE_ARGS = ['rev-parse', '--show-toplevel', '--absolute-git-dir'] as const
@@ -193,6 +194,31 @@ export class GitExplorerService extends TypertRemoteService {
   }
 
   /**
+   * Read the per-file line counts both comparisons report.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param signal - the invocation's cancellation signal.
+   * @returns one entry per changed path, or none when the repository cannot be read.
+   */
+  @Remote
+  async fileStats(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<GitChangeStats[]> {
+    const scope = this.scope
+    if (scope === undefined) return []
+    const resolved = await resolveRoot(scope, sessionId, requestRoot)
+    if (resolved.root === null) return []
+    const located = await runGit(scope, this.limits, {
+      cwd: resolved.root,
+      args: [...REV_PARSE_ARGS],
+      signal,
+    })
+    if (located.exitCode !== 0) return []
+    const [toplevel] = located.stdout.split('\n')
+    const root = toplevel === undefined || toplevel === '' ? resolved.root : toplevel
+    return await readStats(scope, this.limits, { root, signal })
+  }
+
+  /**
    * Read both sides of one changed file for the diff view.
    *
    * @param sessionId - the Session identity received on the wire.
@@ -213,7 +239,8 @@ export class GitExplorerService extends TypertRemoteService {
     signal: AbortSignal,
   ): Promise<GitFileDiff> {
     const empty = (note: string): GitFileDiff => ({
-      path, staged, oldText: '', newText: '', binary: false, oversized: false, note,
+      // The root is filled in once it is known; an empty one means the read never got that far.
+      path, root: '', staged, oldText: '', newText: '', binary: false, oversized: false, note,
     })
     const scope = this.scope
     if (scope === undefined) return empty('the host git services are not available yet')

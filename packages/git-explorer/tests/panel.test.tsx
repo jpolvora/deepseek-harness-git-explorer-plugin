@@ -291,7 +291,10 @@ describe('Git panel actions', () => {
     })
     render(<GitBody sessionId="session-1" useTabInfo={useTabInfo} {...bridge(summary())} />)
     fireEvent.click(await screen.findByTitle('src/other.ts'))
-    expect(opened).toEqual([{ kind: 'git-diff', params: { path: 'src/other.ts', staged: false, untracked: false } }])
+    expect(opened).toEqual([{
+      kind: 'git-diff',
+      params: { path: 'src/other.ts', staged: false, untracked: false, workspaceRoot: '' },
+    }])
   })
 
   it('marks an untracked file as having no old side when opening its comparison', async () => {
@@ -309,6 +312,37 @@ describe('Git panel actions', () => {
     })
     render(<GitBody sessionId="session-1" useTabInfo={useTabInfo} {...bridge(summary())} />)
     fireEvent.click(await screen.findByTitle('notes.md'))
-    expect(opened).toEqual([{ path: 'notes.md', staged: false, untracked: true }])
+    expect(opened).toEqual([{ path: 'notes.md', staged: false, untracked: true, workspaceRoot: '' }])
+  })
+
+  it('shows the line counts the host reported for each row', async () => {
+    const props = {
+      ...bridge(summary()),
+      gitStats: async () => [
+        { path: 'src/app.ts', staged: true, added: 4, removed: 1, binary: false },
+        { path: 'src/other.ts', staged: false, added: 2, removed: 0, binary: false },
+        { path: 'notes.md', staged: false, added: 0, removed: 0, binary: true },
+      ],
+    }
+    render(<GitBody sessionId="session-1" {...props} />)
+    await waitFor(() => {
+      expect(screen.getByText('+4 −1')).toBeDefined()
+    })
+    expect(screen.getByText('+2 −0')).toBeDefined()
+    // A binary side reports no counts rather than a misleading +0 −0.
+    expect(screen.queryByText('+0 −0')).toBeNull()
+  })
+
+  it('keeps a half-written commit message across a remount', async () => {
+    const first = render(<GitBody sessionId="session-1" {...bridge(summary())} />)
+    fireEvent.change(await screen.findByLabelText('Commit message'), { target: { value: 'wip: tree rows' } })
+    await waitFor(() => {
+      expect(window.localStorage.getItem('dsh.git-explorer.draft.v1.session-1')).toContain('wip: tree rows')
+    })
+    first.unmount()
+    render(<GitBody sessionId="session-1" {...bridge(summary())} />)
+    await waitFor(() => {
+      expect((screen.getByLabelText('Commit message') as HTMLTextAreaElement).value).toBe('wip: tree rows')
+    })
   })
 })

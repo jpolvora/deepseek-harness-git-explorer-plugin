@@ -30,6 +30,7 @@ import {
   GIT_DIFF_TAB_KIND,
   GIT_EXPLORER_ID,
   GIT_TAB_KIND,
+  type GitChangeStats,
   type GitFileDiff,
   type GitFileDiffOutcome,
   type GitMutationResult,
@@ -133,6 +134,7 @@ interface GitNamespace {
     untracked: boolean,
     signal: AbortSignal,
   ): Promise<RemoteEnvelope<GitFileDiff>>
+  fileStats(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<RemoteEnvelope<GitChangeStats[]>>
 }
 
 const GUIDE_DESCRIPTION = 'Stage, commit and review working-tree changes.'
@@ -152,6 +154,8 @@ interface HostCalls {
     untracked: boolean,
     signal: AbortSignal,
   ): Promise<GitFileDiffOutcome>
+  /** Per-file line counts; an empty list is the graceful answer when they cannot be read. */
+  fileStats(requestRoot: string, signal: AbortSignal): Promise<GitChangeStats[]>
   /** Every mutation resolves the same way; the panel reports `detail` either way. */
   mutate(
     run: (namespace: GitNamespace, requestRoot: string, signal: AbortSignal) => Promise<RemoteEnvelope<GitMutationResult>>,
@@ -198,6 +202,10 @@ function hostCalls(ctx: Context): (sessionId: string) => HostCalls {
     ping: (requestRoot, signal) => call((namespace) => namespace.ping(sessionId, requestRoot, signal)),
     fileDiff: (requestRoot, path, staged, untracked, signal) =>
       call((namespace) => namespace.fileDiff(sessionId, requestRoot, path, staged, untracked, signal)),
+    fileStats: async (requestRoot, signal) => {
+      const result = await call((namespace) => namespace.fileStats(sessionId, requestRoot, signal))
+      return 'unavailable' in result ? [] : result
+    },
     mutate: async (run, requestRoot, signal) => {
       const result = await call((namespace) => run(namespace, requestRoot, signal))
       // A mutation always answers with a payload (`ok` plus a line to show); only a
@@ -251,6 +259,7 @@ export async function apply(ctx: Context): Promise<void> {
           faces.sidebarRight.openTab(kind, options)
         },
         gitStatus: (requestRoot: string, signal: AbortSignal) => host.status(requestRoot, signal),
+        gitStats: (requestRoot: string, signal: AbortSignal) => host.fileStats(requestRoot, signal),
         gitPing: (requestRoot: string, signal: AbortSignal) => host.ping(requestRoot, signal),
         gitStage: (requestRoot: string, paths: string[], signal: AbortSignal) =>
           host.mutate((namespace, root, inner) => namespace.stage(sessionId, root, paths, inner), requestRoot, signal),

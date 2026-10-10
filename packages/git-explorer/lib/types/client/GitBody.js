@@ -89,30 +89,32 @@ function DirectoryRow({ node, depth, collapsed, onToggle }) {
     const Folder = isCollapsed ? IconFolderCloseRegular : IconFolderOpenRegular;
     return (_jsxs("div", { role: "treeitem", "aria-expanded": !isCollapsed, onClick: () => { onToggle(node.path); }, style: rowStyle(depth, false), children: [_jsx(Chevron, { size: 16 }), _jsx(Folder, { size: 16 }), _jsx("span", { style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, children: node.name })] }));
 }
-/** A file row: glyph, name, right-aligned status letter, hover actions, and a click that
- * opens the comparison for this file. */
-function FileRow({ node, depth, hovered, onHover, actions, onOpen }) {
+/** A file row: glyph, name, right-aligned line counts, status letter, hover actions, and a
+ * click that opens the comparison for this file. */
+function FileRow({ node, depth, hovered, onHover, actions, onOpen, counts }) {
     const change = node.change;
     if (change === undefined) {
         return _jsx("div", { style: rowStyle(depth, false), children: _jsx("span", { children: node.name }) });
     }
     return (_jsxs("div", { role: "treeitem", title: change.origPath === undefined ? change.path : `${change.origPath} → ${change.path}`, onClick: onOpen, onMouseEnter: () => { onHover(change.path); }, onMouseLeave: () => { onHover(undefined); }, style: rowStyle(depth, hovered), children: [_jsx("span", { style: { width: 16, flexShrink: 0 } }), _jsx(FileTypeIcon, { kind: classifyFileType(node.name), size: 16 }), _jsx("span", { style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, children: node.name }), change.origPath === undefined
                 ? null
-                : _jsx("span", { style: { color: TERTIARY, flexShrink: 0 }, children: change.origPath.split('/').pop() }), hovered
+                : _jsx("span", { style: { color: TERTIARY, flexShrink: 0 }, children: change.origPath.split('/').pop() }), counts === undefined || counts.binary
+                ? null
+                : (_jsx("span", { style: { color: TERTIARY, flexShrink: 0, paddingLeft: '6px' }, children: `+${String(counts.added)} −${String(counts.removed)}` })), hovered
                 ? actions.map((action) => _jsx(IconAction, { ...action }, action.title))
                 : (_jsx("span", { style: { color: STATUS_TONE[change.status], flexShrink: 0, paddingLeft: '6px' }, children: STATUS_LETTER[change.status] }))] }));
 }
 /** Rows for one level, recursing into directories that are expanded. */
-function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor, openFor }) {
+function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor, openFor, countsFor }) {
     return (_jsx(_Fragment, { children: nodes.map((node) => node.kind === 'directory'
             ? (_jsxs(React.Fragment, { children: [_jsx(DirectoryRow, { node: node, depth: depth, collapsed: collapsed, onToggle: onToggle }), collapsed.has(node.path)
                         ? null
-                        : (_jsx(TreeRows, { nodes: node.children, depth: depth + 1, collapsed: collapsed, onToggle: onToggle, hovered: hovered, onHover: onHover, actionsFor: actionsFor, openFor: openFor }))] }, `d:${node.path}`))
+                        : (_jsx(TreeRows, { nodes: node.children, depth: depth + 1, collapsed: collapsed, onToggle: onToggle, hovered: hovered, onHover: onHover, actionsFor: actionsFor, openFor: openFor, countsFor: countsFor }))] }, `d:${node.path}`))
             : (_jsx(FileRow, { node: node, depth: depth, hovered: hovered === node.path, onHover: onHover, actions: node.change === undefined ? [] : actionsFor(node.change), onOpen: () => { if (node.change !== undefined)
-                    openFor(node.change); } }, `f:${node.path}`))) }));
+                    openFor(node.change); }, ...(node.change === undefined ? {} : { counts: countsFor(node.change) }) }, `f:${node.path}`))) }));
 }
 /** One collapsible group with its count badge, its bulk action and its tree. */
-function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor, openFor }) {
+function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor, openFor, countsFor }) {
     const tree = React.useMemo(() => buildChangeTree(changes), [changes]);
     if (changes.length === 0)
         return null;
@@ -140,7 +142,7 @@ function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsed
                                 padding: '0 2px',
                             }, children: bulk.label }))] }), isCollapsed
                 ? null
-                : (_jsx(TreeRows, { nodes: tree, depth: 1, collapsed: collapsedDirs, onToggle: onToggleDir, hovered: hovered, onHover: onHover, actionsFor: actionsFor, openFor: openFor }))] }));
+                : (_jsx(TreeRows, { nodes: tree, depth: 1, collapsed: collapsedDirs, onToggle: onToggleDir, hovered: hovered, onHover: onHover, actionsFor: actionsFor, openFor: openFor, countsFor: countsFor }))] }));
 }
 /** The branch line: branch name, tracking drift and the repository root. */
 function BranchLine({ status }) {
@@ -215,6 +217,43 @@ class PanelBoundary extends React.Component {
         return this.props.children;
     }
 }
+/** The localStorage key holding this tab's unsent commit message. */
+const DRAFT_KEY_PREFIX = 'dsh.git-explorer.draft.v1.';
+/** Read the unsent commit message and amend flag for this Session. */
+function readDraft(sessionId) {
+    if (sessionId === undefined)
+        return { message: '', amend: false };
+    try {
+        const raw = window.localStorage.getItem(`${DRAFT_KEY_PREFIX}${sessionId}`);
+        if (raw === null)
+            return { message: '', amend: false };
+        const parsed = JSON.parse(raw);
+        if (typeof parsed !== 'object' || parsed === null)
+            return { message: '', amend: false };
+        const value = parsed;
+        return {
+            message: typeof value.message === 'string' ? value.message : '',
+            amend: value.amend === true,
+        };
+    }
+    catch {
+        return { message: '', amend: false };
+    }
+}
+/** Remember the unsent commit message, so a closed tab does not lose a half-written one. */
+function writeDraft(sessionId, draft) {
+    if (sessionId === undefined)
+        return;
+    try {
+        if (draft.message === '' && !draft.amend)
+            window.localStorage.removeItem(`${DRAFT_KEY_PREFIX}${sessionId}`);
+        else
+            window.localStorage.setItem(`${DRAFT_KEY_PREFIX}${sessionId}`, JSON.stringify(draft));
+    }
+    catch {
+        // Storage is best-effort; the box keeps working in memory.
+    }
+}
 /** Read this tab's collapsed groups and directories. */
 function readCollapsed(sessionId) {
     if (sessionId === undefined)
@@ -252,13 +291,17 @@ export function GitBody(props) {
  * @param props - the session, the session store and the host bridge.
  * @returns the panel body.
  */
-function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit, }) {
+function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitStats, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit, }) {
     const [outcome, setOutcome] = React.useState(null);
+    const [stats, setStats] = React.useState([]);
     const [probe, setProbe] = React.useState(null);
     const [attempt, setAttempt] = React.useState(0);
     const [hovered, setHovered] = React.useState(undefined);
-    const [message, setMessage] = React.useState('');
-    const [amend, setAmend] = React.useState(false);
+    const draft = React.useRef(null);
+    if (draft.current === null)
+        draft.current = readDraft(sessionId);
+    const [message, setMessage] = React.useState(draft.current.message);
+    const [amend, setAmend] = React.useState(draft.current.amend);
     const [busy, setBusy] = React.useState(false);
     const [notice, setNotice] = React.useState(null);
     const [pendingDiscard, setPendingDiscard] = React.useState(null);
@@ -270,7 +313,7 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitP
     // The slot engine may hand a fresh business face on every render, so the callbacks are
     // read through a ref: depending on their identity in an effect would loop.
     const bridge = React.useRef({});
-    bridge.current = { gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit };
+    bridge.current = { gitStatus, gitStats, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit };
     // The tab host is a *hook*, so it is called during render (never from a handler) and
     // its result is kept in a ref for the click handlers to use. Calling it from the
     // handler is React error #321: invalid hook call.
@@ -307,6 +350,13 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitP
                     setProbe(result);
             }, () => undefined);
         }
+        const readStats = bridge.current.gitStats;
+        if (readStats !== undefined) {
+            void readStats(requestRoot, abort.signal).then((result) => {
+                if (live)
+                    setStats(result);
+            }, () => undefined);
+        }
         return () => {
             live = false;
             abort.abort();
@@ -326,6 +376,15 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitP
             // Storage is best-effort; the panel keeps working in memory.
         }
     }, [sessionId, collapsedGroups, collapsedDirs]);
+    /** Keep the unsent message across a tab switch or a reload. */
+    React.useEffect(() => {
+        writeDraft(sessionId, { message, amend });
+    }, [sessionId, message, amend]);
+    /** The line counts reported for one row, matched by path and side. */
+    const countsFor = (change) => {
+        const staged = statusRef.current?.staged.some((entry) => entry.path === change.path) === true;
+        return stats.find((entry) => entry.path === change.path && entry.staged === staged);
+    };
     /** Run one mutation, report what it said, and re-read the status. */
     const mutate = (run) => {
         setBusy(true);
@@ -372,6 +431,8 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitP
         });
     };
     const status = outcome !== null && !('unavailable' in outcome) && outcome.isRepo ? outcome : null;
+    const statusRef = React.useRef(status);
+    statusRef.current = status;
     const total = status === null
         ? 0
         : status.staged.length + status.unstaged.length + status.untracked.length + status.conflicted.length;
@@ -413,6 +474,7 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitP
         hovered,
         onHover: setHovered,
         actionsFor,
+        countsFor,
     };
     /**
      * Open (or focus) the comparison tab for one file.
@@ -423,7 +485,7 @@ function GitPanel({ sessionId, useSessions, useTabInfo, openTab, gitStatus, gitP
      * nothing" is the least debuggable outcome there is.
      */
     const openComparison = (change, staged, untracked) => {
-        const params = { path: change.path, staged, untracked };
+        const params = { path: change.path, staged, untracked, workspaceRoot: requestRoot };
         try {
             const actions = tabRef.current?.tab.actions;
             if (actions !== undefined) {

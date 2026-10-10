@@ -85,9 +85,22 @@ export interface GitStatusSummary {
   note: string
 }
 
+/** Line counts for one changed path. */
+export interface GitChangeStats {
+  path: string
+  /** True for the index comparison, false for the work-tree one. */
+  staged: boolean
+  added: number
+  removed: number
+  /** A binary side reports no counts. */
+  binary: boolean
+}
+
 /** Both sides of one changed file, as the diff view renders them. */
 export interface GitFileDiff {
   path: string
+  /** The repository root, so the view can address the file in the workspace. */
+  root: string
   /** True when the comparison is the index against HEAD rather than the work tree against the index. */
   staged: boolean
   /** The prior side; empty when there is none (an added or untracked file). */
