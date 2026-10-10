@@ -63,6 +63,12 @@ export interface GitStatusSummary {
     /** Human-readable context when something could not be resolved. */
     note: string;
 }
+/** What one mutating call did. */
+export interface GitMutationResult {
+    ok: boolean;
+    /** A short line: what happened, or the first line of git's refusal. */
+    detail: string;
+}
 /** What the bridge probe reports back to the panel. */
 export interface GitPingResult {
     ok: true;

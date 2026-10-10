@@ -17,7 +17,15 @@ import { Remote, TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { runGit, type GitCommandLimits } from './git/commands.js'
 import { resolveRoot } from './git/repo.js'
 import { parsePorcelainV2, toStatusSummary } from './git/status.js'
-import type { GitPingResult, GitStatusSummary } from './types.js'
+import {
+  commitArgs,
+  discardTrackedArgs,
+  discardUntrackedArgs,
+  runMutation,
+  stageArgs,
+  unstageArgs,
+} from './git/mutations.js'
+import type { GitMutationResult, GitPingResult, GitStatusSummary } from './types.js'
 
 /**
  * Declare this package as the owner of the `git` Host service. Besides giving Host
@@ -33,7 +41,7 @@ declare module '@deepseek-ai/cordis' {
 }
 
 /** The plugin's own version, reported to the panel so a build is identifiable. */
-const PACKAGE_VERSION = '0.1.0-m1.3'
+const PACKAGE_VERSION = '0.1.0-m2'
 
 /** `rev-parse` output that locates the repository. */
 const REV_PARSE_ARGS = ['rev-parse', '--show-toplevel', '--absolute-git-dir'] as const
@@ -177,6 +185,158 @@ export class GitExplorerService extends TypertRemoteService {
       operation: await this.detectOperation(scope, root, signal),
       gitVersion: version,
       note,
+    })
+  }
+
+  /**
+   * Stage the given paths.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param paths - repository-relative paths, as the panel rendered them.
+   * @param signal - the invocation's cancellation signal.
+   * @returns what the mutation did.
+   */
+  @Remote
+  async stage(
+    sessionId: string,
+    requestRoot: string,
+    paths: string[],
+    signal: AbortSignal,
+  ): Promise<GitMutationResult> {
+    return await this.mutate(sessionId, requestRoot, signal, (cwd) => ({ cwd, args: stageArgs(paths) }))
+  }
+
+  /**
+   * Unstage the given paths, leaving the work tree untouched.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param paths - repository-relative paths.
+   * @param signal - the invocation's cancellation signal.
+   * @returns what the mutation did.
+   */
+  @Remote
+  async unstage(
+    sessionId: string,
+    requestRoot: string,
+    paths: string[],
+    signal: AbortSignal,
+  ): Promise<GitMutationResult> {
+    return await this.mutate(sessionId, requestRoot, signal, (cwd) => ({ cwd, args: unstageArgs(paths) }))
+  }
+
+  /**
+   * Discard work-tree changes.
+   *
+   * Destructive, so the caller must pass `confirmed` after asking the person; without it
+   * the call is refused rather than performed. Tracked paths are restored from the index
+   * and untracked ones are removed, because git spells those two operations differently.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param trackedPaths - paths git already tracks.
+   * @param untrackedPaths - paths git does not track yet.
+   * @param confirmed - true only after an explicit confirmation.
+   * @param signal - the invocation's cancellation signal.
+   * @returns what the mutations did.
+   */
+  @Remote
+  async discard(
+    sessionId: string,
+    requestRoot: string,
+    trackedPaths: string[],
+    untrackedPaths: string[],
+    confirmed: boolean,
+    signal: AbortSignal,
+  ): Promise<GitMutationResult> {
+    if (!confirmed) {
+      return { ok: false, detail: 'discarding changes requires an explicit confirmation' }
+    }
+    const details: string[] = []
+    if (trackedPaths.length > 0) {
+      const restored = await this.mutate(sessionId, requestRoot, signal, (cwd) => ({
+        cwd,
+        args: discardTrackedArgs(trackedPaths),
+      }))
+      if (!restored.ok) return restored
+      details.push(`restored ${String(trackedPaths.length)} tracked file(s)`)
+    }
+    if (untrackedPaths.length > 0) {
+      const removed = await this.mutate(sessionId, requestRoot, signal, (cwd) => ({
+        cwd,
+        args: discardUntrackedArgs(untrackedPaths),
+      }))
+      if (!removed.ok) return removed
+      details.push(`removed ${String(untrackedPaths.length)} untracked file(s)`)
+    }
+    if (details.length === 0) return { ok: false, detail: 'nothing to discard' }
+    return { ok: true, detail: details.join('; ') }
+  }
+
+  /**
+   * Commit the index.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param message - the commit message; it travels on stdin.
+   * @param amend - true to replace the previous commit.
+   * @param signal - the invocation's cancellation signal.
+   * @returns what the commit did, including git's own refusals (nothing staged, no identity).
+   */
+  @Remote
+  async commit(
+    sessionId: string,
+    requestRoot: string,
+    message: string,
+    amend: boolean,
+    signal: AbortSignal,
+  ): Promise<GitMutationResult> {
+    if (message.trim() === '') return { ok: false, detail: 'a commit message is required' }
+    return await this.mutate(sessionId, requestRoot, signal, (cwd) => ({
+      cwd,
+      args: commitArgs({ amend }),
+      stdin: message,
+    }))
+  }
+
+  /**
+   * Resolve the repository and run one mutation in it.
+   *
+   * @param sessionId - the Session identity received on the wire.
+   * @param requestRoot - the working directory the panel offers, if any.
+   * @param signal - caller cancellation.
+   * @param build - how to spell the command once the directory is known.
+   * @returns what the mutation did.
+   */
+  private async mutate(
+    sessionId: string,
+    requestRoot: string,
+    signal: AbortSignal,
+    build: (cwd: string) => { cwd: string; args: readonly string[]; stdin?: string },
+  ): Promise<GitMutationResult> {
+    const scope = this.scope
+    if (scope === undefined) return { ok: false, detail: 'the host git services are not available yet' }
+    const resolved = await resolveRoot(scope, sessionId, requestRoot)
+    if (resolved.root === null) return { ok: false, detail: resolved.note }
+
+    const located = await runGit(scope, this.limits, {
+      cwd: resolved.root,
+      args: [...REV_PARSE_ARGS],
+      signal,
+    })
+    if (located.exitCode !== 0) {
+      return { ok: false, detail: (located.stderr.trim().split('\n')[0] ?? 'not a git repository').slice(0, 200) }
+    }
+    const [toplevel] = located.stdout.split('\n')
+    const root = toplevel === undefined || toplevel === '' ? resolved.root : toplevel
+
+    const command = build(root)
+    return await runMutation(scope, this.limits, {
+      cwd: command.cwd,
+      args: command.args,
+      ...(command.stdin === undefined ? {} : { stdin: command.stdin }),
+      signal,
     })
   }
 

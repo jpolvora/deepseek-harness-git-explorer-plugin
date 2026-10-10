@@ -36,6 +36,10 @@ async function runGit(ctx, limits, options) {
 	const outcome = await handle.done;
 	const stdout = handle.collected.stdout?.readFrom(0);
 	const stderr = handle.collected.stderr?.readFrom(0);
+	if (process.env.DSH_GIT_EXPLORER_DEBUG === "1") {
+		console.error(`[git-explorer] cwd=${options.cwd} $ git ${options.args.join(" ")} -> ${String(outcome.exitCode ?? -1)}`);
+		if (stderr?.text !== void 0 && stderr.text.trim() !== "") console.error(`[git-explorer] stderr: ${stderr.text.trim()}`);
+	}
 	return {
 		exitCode: outcome.exitCode ?? -1,
 		stdout: stdout?.text ?? "",
@@ -248,6 +252,90 @@ function toStatusSummary(parsed, extra) {
 	};
 }
 //#endregion
+//#region lib/types/git/mutations.js
+/** Stage the given paths. */
+function stageArgs(paths) {
+	return [
+		"add",
+		"--",
+		...paths
+	];
+}
+/** Unstage the given paths, leaving the work tree untouched. */
+function unstageArgs(paths) {
+	return [
+		"restore",
+		"--staged",
+		"--",
+		...paths
+	];
+}
+/** Restore tracked paths from the index, discarding their work-tree edits. */
+function discardTrackedArgs(paths) {
+	return [
+		"restore",
+		"--",
+		...paths
+	];
+}
+/** Remove untracked paths from the work tree. */
+function discardUntrackedArgs(paths) {
+	return [
+		"clean",
+		"-f",
+		"--",
+		...paths
+	];
+}
+/** Commit the index; the message travels on stdin so quoting cannot bite. */
+function commitArgs(options) {
+	return options.amend ? [
+		"commit",
+		"--amend",
+		"-F",
+		"-"
+	] : [
+		"commit",
+		"-F",
+		"-"
+	];
+}
+/** The first non-empty line of a git refusal. */
+function firstLine(text, fallback) {
+	return (text.trim().split("\n").map((candidate) => candidate.trim()).find((candidate) => candidate !== "") ?? fallback).slice(0, 300);
+}
+/**
+* Run one mutating command.
+*
+* @param ctx - the injected host scope.
+* @param limits - the configured runner limits.
+* @param options - the argv, the directory, optional stdin, and cancellation.
+* @returns the outcome the panel reports.
+*/
+async function runMutation(ctx, limits, options) {
+	try {
+		const result = await runGit(ctx, limits, {
+			cwd: options.cwd,
+			args: options.args,
+			...options.stdin === void 0 ? {} : { stdin: options.stdin },
+			signal: options.signal
+		});
+		if (result.exitCode === 0) return {
+			ok: true,
+			detail: firstLine(result.stdout, "done")
+		};
+		return {
+			ok: false,
+			detail: firstLine(result.stderr, `git exited ${String(result.exitCode)}`)
+		};
+	} catch (error) {
+		return {
+			ok: false,
+			detail: error instanceof Error ? error.message : String(error)
+		};
+	}
+}
+//#endregion
 //#region lib/types/index.js
 var __runInitializers = function(thisArg, initializers, value) {
 	var useValue = arguments.length > 2;
@@ -290,7 +378,7 @@ var __esDecorate = function(ctor, descriptorIn, decorators, contextIn, initializ
 	done = true;
 };
 /** The plugin's own version, reported to the panel so a build is identifiable. */
-const PACKAGE_VERSION = "0.1.0-m1.3";
+const PACKAGE_VERSION = "0.1.0-m2";
 /** `rev-parse` output that locates the repository. */
 const REV_PARSE_ARGS = [
 	"rev-parse",
@@ -316,11 +404,19 @@ let GitExplorerService = (() => {
 	let _classSuper = TypertRemoteService;
 	let _instanceExtraInitializers = [];
 	let _status_decorators;
+	let _stage_decorators;
+	let _unstage_decorators;
+	let _discard_decorators;
+	let _commit_decorators;
 	let _ping_decorators;
 	return class GitExplorerService extends _classSuper {
 		static {
 			const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;
 			_status_decorators = [Remote];
+			_stage_decorators = [Remote];
+			_unstage_decorators = [Remote];
+			_discard_decorators = [Remote];
+			_commit_decorators = [Remote];
 			_ping_decorators = [Remote];
 			__esDecorate(this, null, _status_decorators, {
 				kind: "method",
@@ -330,6 +426,50 @@ let GitExplorerService = (() => {
 				access: {
 					has: (obj) => "status" in obj,
 					get: (obj) => obj.status
+				},
+				metadata: _metadata
+			}, null, _instanceExtraInitializers);
+			__esDecorate(this, null, _stage_decorators, {
+				kind: "method",
+				name: "stage",
+				static: false,
+				private: false,
+				access: {
+					has: (obj) => "stage" in obj,
+					get: (obj) => obj.stage
+				},
+				metadata: _metadata
+			}, null, _instanceExtraInitializers);
+			__esDecorate(this, null, _unstage_decorators, {
+				kind: "method",
+				name: "unstage",
+				static: false,
+				private: false,
+				access: {
+					has: (obj) => "unstage" in obj,
+					get: (obj) => obj.unstage
+				},
+				metadata: _metadata
+			}, null, _instanceExtraInitializers);
+			__esDecorate(this, null, _discard_decorators, {
+				kind: "method",
+				name: "discard",
+				static: false,
+				private: false,
+				access: {
+					has: (obj) => "discard" in obj,
+					get: (obj) => obj.discard
+				},
+				metadata: _metadata
+			}, null, _instanceExtraInitializers);
+			__esDecorate(this, null, _commit_decorators, {
+				kind: "method",
+				name: "commit",
+				static: false,
+				private: false,
+				access: {
+					has: (obj) => "commit" in obj,
+					get: (obj) => obj.commit
 				},
 				metadata: _metadata
 			}, null, _instanceExtraInitializers);
@@ -450,6 +590,141 @@ let GitExplorerService = (() => {
 				operation: await this.detectOperation(scope, root, signal),
 				gitVersion: version,
 				note
+			});
+		}
+		/**
+		* Stage the given paths.
+		*
+		* @param sessionId - the Session identity received on the wire.
+		* @param requestRoot - the working directory the panel offers, if any.
+		* @param paths - repository-relative paths, as the panel rendered them.
+		* @param signal - the invocation's cancellation signal.
+		* @returns what the mutation did.
+		*/
+		async stage(sessionId, requestRoot, paths, signal) {
+			return await this.mutate(sessionId, requestRoot, signal, (cwd) => ({
+				cwd,
+				args: stageArgs(paths)
+			}));
+		}
+		/**
+		* Unstage the given paths, leaving the work tree untouched.
+		*
+		* @param sessionId - the Session identity received on the wire.
+		* @param requestRoot - the working directory the panel offers, if any.
+		* @param paths - repository-relative paths.
+		* @param signal - the invocation's cancellation signal.
+		* @returns what the mutation did.
+		*/
+		async unstage(sessionId, requestRoot, paths, signal) {
+			return await this.mutate(sessionId, requestRoot, signal, (cwd) => ({
+				cwd,
+				args: unstageArgs(paths)
+			}));
+		}
+		/**
+		* Discard work-tree changes.
+		*
+		* Destructive, so the caller must pass `confirmed` after asking the person; without it
+		* the call is refused rather than performed. Tracked paths are restored from the index
+		* and untracked ones are removed, because git spells those two operations differently.
+		*
+		* @param sessionId - the Session identity received on the wire.
+		* @param requestRoot - the working directory the panel offers, if any.
+		* @param trackedPaths - paths git already tracks.
+		* @param untrackedPaths - paths git does not track yet.
+		* @param confirmed - true only after an explicit confirmation.
+		* @param signal - the invocation's cancellation signal.
+		* @returns what the mutations did.
+		*/
+		async discard(sessionId, requestRoot, trackedPaths, untrackedPaths, confirmed, signal) {
+			if (!confirmed) return {
+				ok: false,
+				detail: "discarding changes requires an explicit confirmation"
+			};
+			const details = [];
+			if (trackedPaths.length > 0) {
+				const restored = await this.mutate(sessionId, requestRoot, signal, (cwd) => ({
+					cwd,
+					args: discardTrackedArgs(trackedPaths)
+				}));
+				if (!restored.ok) return restored;
+				details.push(`restored ${String(trackedPaths.length)} tracked file(s)`);
+			}
+			if (untrackedPaths.length > 0) {
+				const removed = await this.mutate(sessionId, requestRoot, signal, (cwd) => ({
+					cwd,
+					args: discardUntrackedArgs(untrackedPaths)
+				}));
+				if (!removed.ok) return removed;
+				details.push(`removed ${String(untrackedPaths.length)} untracked file(s)`);
+			}
+			if (details.length === 0) return {
+				ok: false,
+				detail: "nothing to discard"
+			};
+			return {
+				ok: true,
+				detail: details.join("; ")
+			};
+		}
+		/**
+		* Commit the index.
+		*
+		* @param sessionId - the Session identity received on the wire.
+		* @param requestRoot - the working directory the panel offers, if any.
+		* @param message - the commit message; it travels on stdin.
+		* @param amend - true to replace the previous commit.
+		* @param signal - the invocation's cancellation signal.
+		* @returns what the commit did, including git's own refusals (nothing staged, no identity).
+		*/
+		async commit(sessionId, requestRoot, message, amend, signal) {
+			if (message.trim() === "") return {
+				ok: false,
+				detail: "a commit message is required"
+			};
+			return await this.mutate(sessionId, requestRoot, signal, (cwd) => ({
+				cwd,
+				args: commitArgs({ amend }),
+				stdin: message
+			}));
+		}
+		/**
+		* Resolve the repository and run one mutation in it.
+		*
+		* @param sessionId - the Session identity received on the wire.
+		* @param requestRoot - the working directory the panel offers, if any.
+		* @param signal - caller cancellation.
+		* @param build - how to spell the command once the directory is known.
+		* @returns what the mutation did.
+		*/
+		async mutate(sessionId, requestRoot, signal, build) {
+			const scope = this.scope;
+			if (scope === void 0) return {
+				ok: false,
+				detail: "the host git services are not available yet"
+			};
+			const resolved = await resolveRoot(scope, sessionId, requestRoot);
+			if (resolved.root === null) return {
+				ok: false,
+				detail: resolved.note
+			};
+			const located = await runGit(scope, this.limits, {
+				cwd: resolved.root,
+				args: [...REV_PARSE_ARGS],
+				signal
+			});
+			if (located.exitCode !== 0) return {
+				ok: false,
+				detail: (located.stderr.trim().split("\n")[0] ?? "not a git repository").slice(0, 200)
+			};
+			const [toplevel] = located.stdout.split("\n");
+			const command = build(toplevel === void 0 || toplevel === "" ? resolved.root : toplevel);
+			return await runMutation(scope, this.limits, {
+				cwd: command.cwd,
+				args: command.args,
+				...command.stdin === void 0 ? {} : { stdin: command.stdin },
+				signal
 			});
 		}
 		/**

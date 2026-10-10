@@ -3,16 +3,24 @@ import type {
   RemoteResult,
   TypertRemoteContribution,
 } from '@deepseek-ai/dsh-typert-protocol'
-import type { GitPingResult, GitStatusSummary } from '@jpolv/dsh-git-explorer/types'
+import type { GitMutationResult, GitPingResult, GitStatusSummary } from '@jpolv/dsh-git-explorer/types'
 
 declare module '@deepseek-ai/dsh-typert-protocol' {
   interface TypertRemoteNamespace$676974 {
+    commit: (sessionId: string, requestRoot: string, message: string, amend: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
+    discard: (sessionId: string, requestRoot: string, trackedPaths: string[], untrackedPaths: string[], confirmed: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     ping: (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitPingResult>>
+    stage: (sessionId: string, requestRoot: string, paths: string[], signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     status: (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitStatusSummary>>
+    unstage: (sessionId: string, requestRoot: string, paths: string[], signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
   }
   interface TypertRemoteMap {
+    'git/commit': (sessionId: string, requestRoot: string, message: string, amend: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
+    'git/discard': (sessionId: string, requestRoot: string, trackedPaths: string[], untrackedPaths: string[], confirmed: boolean, signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     'git/ping': (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitPingResult>>
+    'git/stage': (sessionId: string, requestRoot: string, paths: string[], signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
     'git/status': (sessionId: string, requestRoot: string, signal?: AbortSignal) => Promise<RemoteResult<GitStatusSummary>>
+    'git/unstage': (sessionId: string, requestRoot: string, paths: string[], signal?: AbortSignal) => Promise<RemoteResult<GitMutationResult>>
   }
   interface TypertRemoteNamespaceMap {
     'git': TypertRemoteNamespace$676974

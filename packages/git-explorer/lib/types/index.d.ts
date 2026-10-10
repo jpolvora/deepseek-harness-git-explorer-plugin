@@ -15,7 +15,7 @@ import type { Context } from '@deepseek-ai/cordis';
 import z from '@deepseek-ai/schemastery';
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol';
 import { type GitCommandLimits } from './git/commands.js';
-import type { GitPingResult, GitStatusSummary } from './types.js';
+import type { GitMutationResult, GitPingResult, GitStatusSummary } from './types.js';
 /**
  * Declare this package as the owner of the `git` Host service. Besides giving Host
  * consumers a typed handle, this augmentation is what makes the package a Typert
@@ -75,6 +75,63 @@ export declare class GitExplorerService extends TypertRemoteService {
      * @returns the status summary the panel renders.
      */
     status(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<GitStatusSummary>;
+    /**
+     * Stage the given paths.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param paths - repository-relative paths, as the panel rendered them.
+     * @param signal - the invocation's cancellation signal.
+     * @returns what the mutation did.
+     */
+    stage(sessionId: string, requestRoot: string, paths: string[], signal: AbortSignal): Promise<GitMutationResult>;
+    /**
+     * Unstage the given paths, leaving the work tree untouched.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param paths - repository-relative paths.
+     * @param signal - the invocation's cancellation signal.
+     * @returns what the mutation did.
+     */
+    unstage(sessionId: string, requestRoot: string, paths: string[], signal: AbortSignal): Promise<GitMutationResult>;
+    /**
+     * Discard work-tree changes.
+     *
+     * Destructive, so the caller must pass `confirmed` after asking the person; without it
+     * the call is refused rather than performed. Tracked paths are restored from the index
+     * and untracked ones are removed, because git spells those two operations differently.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param trackedPaths - paths git already tracks.
+     * @param untrackedPaths - paths git does not track yet.
+     * @param confirmed - true only after an explicit confirmation.
+     * @param signal - the invocation's cancellation signal.
+     * @returns what the mutations did.
+     */
+    discard(sessionId: string, requestRoot: string, trackedPaths: string[], untrackedPaths: string[], confirmed: boolean, signal: AbortSignal): Promise<GitMutationResult>;
+    /**
+     * Commit the index.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param message - the commit message; it travels on stdin.
+     * @param amend - true to replace the previous commit.
+     * @param signal - the invocation's cancellation signal.
+     * @returns what the commit did, including git's own refusals (nothing staged, no identity).
+     */
+    commit(sessionId: string, requestRoot: string, message: string, amend: boolean, signal: AbortSignal): Promise<GitMutationResult>;
+    /**
+     * Resolve the repository and run one mutation in it.
+     *
+     * @param sessionId - the Session identity received on the wire.
+     * @param requestRoot - the working directory the panel offers, if any.
+     * @param signal - caller cancellation.
+     * @param build - how to spell the command once the directory is known.
+     * @returns what the mutation did.
+     */
+    private mutate;
     /**
      * Report what the host can see for this Session: the plugin build, git itself, and
      * the working directory the Session resolves to. Kept beside {@link status} as the

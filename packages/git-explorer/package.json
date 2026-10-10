@@ -1,6 +1,6 @@
 {
   "name": "@jpolv/dsh-git-explorer",
-  "version": "0.1.0-m1.3",
+  "version": "0.1.0-m2",
   "description": "Git (Source Control) panel for the DeepSeek Harness Web GUI: a right-sidebar Git tab with staging, commits and diffs.",
   "type": "module",
   "license": "MIT",

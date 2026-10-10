@@ -19,6 +19,9 @@ export const IconChevronRightOutlineRegular = icon('chevron-right')
 export const IconChevronDownOutlineRegular = icon('chevron-down')
 export const IconFolderOpenRegular = icon('folder-open')
 export const IconFolderCloseRegular = icon('folder-close')
+export const IconPlusOutlineRegular = icon('plus')
+export const IconCloseOutlineRegular = icon('close')
+export const IconTrashOutlineRegular = icon('trash')
 
 /** A stand-in file glyph carrying the classified kind. */
 export function FileTypeIcon({ kind, size }: { kind?: string; size?: number }): React.ReactElement {

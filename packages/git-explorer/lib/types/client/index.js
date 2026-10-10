@@ -46,6 +46,14 @@ function hostCalls(ctx) {
     return (sessionId) => ({
         status: (requestRoot, signal) => call((namespace) => namespace.status(sessionId, requestRoot, signal)),
         ping: (requestRoot, signal) => call((namespace) => namespace.ping(sessionId, requestRoot, signal)),
+        mutate: async (run, requestRoot, signal) => {
+            const result = await call((namespace) => run(namespace, requestRoot, signal));
+            // A mutation always answers with a payload (`ok` plus a line to show); only a
+            // transport failure arrives as the panel's `unavailable` shape.
+            if ('unavailable' in result)
+                return { ok: false, detail: result.unavailable };
+            return result;
+        },
     });
 }
 /**
@@ -83,6 +91,10 @@ export async function apply(ctx) {
             return {
                 gitStatus: (requestRoot, signal) => host.status(requestRoot, signal),
                 gitPing: (requestRoot, signal) => host.ping(requestRoot, signal),
+                gitStage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.stage(sessionId, root, paths, inner), requestRoot, signal),
+                gitUnstage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.unstage(sessionId, root, paths, inner), requestRoot, signal),
+                gitDiscard: (requestRoot, trackedPaths, untrackedPaths, confirmed, signal) => host.mutate((namespace, root, inner) => namespace.discard(sessionId, root, trackedPaths, untrackedPaths, confirmed, inner), requestRoot, signal),
+                gitCommit: (requestRoot, message, amend, signal) => host.mutate((namespace, root, inner) => namespace.commit(sessionId, root, message, amend, inner), requestRoot, signal),
             };
         },
     }, GitBody)), 'git-explorer: tab body');

@@ -5280,6 +5280,34 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		}
 		//#endregion
 		//#region lib/typert.remote-client.js
+		let _jpolv_dsh_git_explorer_git_commit_parameter_0$schema$value;
+		const _jpolv_dsh_git_explorer_git_commit_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_commit_parameter_0$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_commit_parameter_1$schema$value;
+		const _jpolv_dsh_git_explorer_git_commit_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_commit_parameter_1$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_commit_parameter_2$schema$value;
+		const _jpolv_dsh_git_explorer_git_commit_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_commit_parameter_2$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_commit_parameter_3$schema$value;
+		const _jpolv_dsh_git_explorer_git_commit_parameter_3$schema = () => _jpolv_dsh_git_explorer_git_commit_parameter_3$schema$value ??= boolean();
+		let _jpolv_dsh_git_explorer_git_commit_result$schema$value;
+		const _jpolv_dsh_git_explorer_git_commit_result$schema = () => _jpolv_dsh_git_explorer_git_commit_result$schema$value ??= object({
+			"ok": boolean(),
+			"detail": string()
+		});
+		let _jpolv_dsh_git_explorer_git_discard_parameter_0$schema$value;
+		const _jpolv_dsh_git_explorer_git_discard_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_0$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_discard_parameter_1$schema$value;
+		const _jpolv_dsh_git_explorer_git_discard_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_1$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_discard_parameter_2$schema$value;
+		const _jpolv_dsh_git_explorer_git_discard_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_2$schema$value ??= array(string());
+		let _jpolv_dsh_git_explorer_git_discard_parameter_3$schema$value;
+		const _jpolv_dsh_git_explorer_git_discard_parameter_3$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_3$schema$value ??= array(string());
+		let _jpolv_dsh_git_explorer_git_discard_parameter_4$schema$value;
+		const _jpolv_dsh_git_explorer_git_discard_parameter_4$schema = () => _jpolv_dsh_git_explorer_git_discard_parameter_4$schema$value ??= boolean();
+		let _jpolv_dsh_git_explorer_git_discard_result$schema$value;
+		const _jpolv_dsh_git_explorer_git_discard_result$schema = () => _jpolv_dsh_git_explorer_git_discard_result$schema$value ??= object({
+			"ok": boolean(),
+			"detail": string()
+		});
 		let _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value;
 		const _jpolv_dsh_git_explorer_git_ping_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_ping_parameter_0$schema$value ??= string();
 		let _jpolv_dsh_git_explorer_git_ping_parameter_1$schema$value;
@@ -5305,6 +5333,17 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				literal("none")
 			]).optional(),
 			"note": union([_undefined(), string()]).optional()
+		});
+		let _jpolv_dsh_git_explorer_git_stage_parameter_0$schema$value;
+		const _jpolv_dsh_git_explorer_git_stage_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_stage_parameter_0$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_stage_parameter_1$schema$value;
+		const _jpolv_dsh_git_explorer_git_stage_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_stage_parameter_1$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_stage_parameter_2$schema$value;
+		const _jpolv_dsh_git_explorer_git_stage_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_stage_parameter_2$schema$value ??= array(string());
+		let _jpolv_dsh_git_explorer_git_stage_result$schema$value;
+		const _jpolv_dsh_git_explorer_git_stage_result$schema = () => _jpolv_dsh_git_explorer_git_stage_result$schema$value ??= object({
+			"ok": boolean(),
+			"detail": string()
 		});
 		let _jpolv_dsh_git_explorer_git_status_parameter_0$schema$value;
 		const _jpolv_dsh_git_explorer_git_status_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_status_parameter_0$schema$value ??= string();
@@ -5405,81 +5444,325 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			"skipped": array(string()),
 			"note": string()
 		});
+		let _jpolv_dsh_git_explorer_git_unstage_parameter_0$schema$value;
+		const _jpolv_dsh_git_explorer_git_unstage_parameter_0$schema = () => _jpolv_dsh_git_explorer_git_unstage_parameter_0$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_unstage_parameter_1$schema$value;
+		const _jpolv_dsh_git_explorer_git_unstage_parameter_1$schema = () => _jpolv_dsh_git_explorer_git_unstage_parameter_1$schema$value ??= string();
+		let _jpolv_dsh_git_explorer_git_unstage_parameter_2$schema$value;
+		const _jpolv_dsh_git_explorer_git_unstage_parameter_2$schema = () => _jpolv_dsh_git_explorer_git_unstage_parameter_2$schema$value ??= array(string());
+		let _jpolv_dsh_git_explorer_git_unstage_result$schema$value;
+		const _jpolv_dsh_git_explorer_git_unstage_result$schema = () => _jpolv_dsh_git_explorer_git_unstage_result$schema$value ??= object({
+			"ok": boolean(),
+			"detail": string()
+		});
 		const TYPERT_REMOTE = {
 			package: "@jpolv/dsh-git-explorer",
-			descriptors: [{
-				id: "@jpolv/dsh-git-explorer#git/ping",
-				service: "git",
-				namespace: "git",
-				method: "ping",
-				invocation: { kind: "direct" },
-				parameters: [{
-					name: "sessionId",
-					wire: "sessionId",
-					source: "json",
-					codec: {
+			descriptors: [
+				{
+					id: "@jpolv/dsh-git-explorer#git/commit",
+					service: "git",
+					namespace: "git",
+					method: "commit",
+					invocation: { kind: "direct" },
+					parameters: [
+						{
+							name: "sessionId",
+							wire: "sessionId",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/commit:sessionId",
+								create: _jpolv_dsh_git_explorer_git_commit_parameter_0$schema
+							}
+						},
+						{
+							name: "requestRoot",
+							wire: "requestRoot",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/commit:requestRoot",
+								create: _jpolv_dsh_git_explorer_git_commit_parameter_1$schema
+							}
+						},
+						{
+							name: "message",
+							wire: "message",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/commit:message",
+								create: _jpolv_dsh_git_explorer_git_commit_parameter_2$schema
+							}
+						},
+						{
+							name: "amend",
+							wire: "amend",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/commit:amend",
+								create: _jpolv_dsh_git_explorer_git_commit_parameter_3$schema
+							}
+						}
+					],
+					cancellation: { parameter: "signal" },
+					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer#git/ping:sessionId",
-						create: _jpolv_dsh_git_explorer_git_ping_parameter_0$schema
+						typeSymbol: "@jpolv/dsh-git-explorer/types#GitMutationResult",
+						create: _jpolv_dsh_git_explorer_git_commit_result$schema
+					},
+					sourceLocation: {
+						"file": "packages/git-explorer/src/index.ts",
+						"line": 288,
+						"column": 9
 					}
-				}, {
-					name: "requestRoot",
-					wire: "requestRoot",
-					source: "json",
-					codec: {
-						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer#git/ping:requestRoot",
-						create: _jpolv_dsh_git_explorer_git_ping_parameter_1$schema
-					}
-				}],
-				cancellation: { parameter: "signal" },
-				result: {
-					mode: "strict",
-					typeSymbol: "@jpolv/dsh-git-explorer/types#GitPingResult",
-					create: _jpolv_dsh_git_explorer_git_ping_result$schema
 				},
-				sourceLocation: {
-					"file": "packages/git-explorer/src/index.ts",
-					"line": 194,
-					"column": 9
-				}
-			}, {
-				id: "@jpolv/dsh-git-explorer#git/status",
-				service: "git",
-				namespace: "git",
-				method: "status",
-				invocation: { kind: "direct" },
-				parameters: [{
-					name: "sessionId",
-					wire: "sessionId",
-					source: "json",
-					codec: {
+				{
+					id: "@jpolv/dsh-git-explorer#git/discard",
+					service: "git",
+					namespace: "git",
+					method: "discard",
+					invocation: { kind: "direct" },
+					parameters: [
+						{
+							name: "sessionId",
+							wire: "sessionId",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:sessionId",
+								create: _jpolv_dsh_git_explorer_git_discard_parameter_0$schema
+							}
+						},
+						{
+							name: "requestRoot",
+							wire: "requestRoot",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:requestRoot",
+								create: _jpolv_dsh_git_explorer_git_discard_parameter_1$schema
+							}
+						},
+						{
+							name: "trackedPaths",
+							wire: "trackedPaths",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:trackedPaths",
+								create: _jpolv_dsh_git_explorer_git_discard_parameter_2$schema
+							}
+						},
+						{
+							name: "untrackedPaths",
+							wire: "untrackedPaths",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:untrackedPaths",
+								create: _jpolv_dsh_git_explorer_git_discard_parameter_3$schema
+							}
+						},
+						{
+							name: "confirmed",
+							wire: "confirmed",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/discard:confirmed",
+								create: _jpolv_dsh_git_explorer_git_discard_parameter_4$schema
+							}
+						}
+					],
+					cancellation: { parameter: "signal" },
+					result: {
 						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer#git/status:sessionId",
-						create: _jpolv_dsh_git_explorer_git_status_parameter_0$schema
+						typeSymbol: "@jpolv/dsh-git-explorer/types#GitMutationResult",
+						create: _jpolv_dsh_git_explorer_git_discard_result$schema
+					},
+					sourceLocation: {
+						"file": "packages/git-explorer/src/index.ts",
+						"line": 245,
+						"column": 9
 					}
-				}, {
-					name: "requestRoot",
-					wire: "requestRoot",
-					source: "json",
-					codec: {
-						mode: "strict",
-						typeSymbol: "@jpolv/dsh-git-explorer#git/status:requestRoot",
-						create: _jpolv_dsh_git_explorer_git_status_parameter_1$schema
-					}
-				}],
-				cancellation: { parameter: "signal" },
-				result: {
-					mode: "strict",
-					typeSymbol: "@jpolv/dsh-git-explorer/types#GitStatusSummary",
-					create: _jpolv_dsh_git_explorer_git_status_result$schema
 				},
-				sourceLocation: {
-					"file": "packages/git-explorer/src/index.ts",
-					"line": 110,
-					"column": 9
+				{
+					id: "@jpolv/dsh-git-explorer#git/ping",
+					service: "git",
+					namespace: "git",
+					method: "ping",
+					invocation: { kind: "direct" },
+					parameters: [{
+						name: "sessionId",
+						wire: "sessionId",
+						source: "json",
+						codec: {
+							mode: "strict",
+							typeSymbol: "@jpolv/dsh-git-explorer#git/ping:sessionId",
+							create: _jpolv_dsh_git_explorer_git_ping_parameter_0$schema
+						}
+					}, {
+						name: "requestRoot",
+						wire: "requestRoot",
+						source: "json",
+						codec: {
+							mode: "strict",
+							typeSymbol: "@jpolv/dsh-git-explorer#git/ping:requestRoot",
+							create: _jpolv_dsh_git_explorer_git_ping_parameter_1$schema
+						}
+					}],
+					cancellation: { parameter: "signal" },
+					result: {
+						mode: "strict",
+						typeSymbol: "@jpolv/dsh-git-explorer/types#GitPingResult",
+						create: _jpolv_dsh_git_explorer_git_ping_result$schema
+					},
+					sourceLocation: {
+						"file": "packages/git-explorer/src/index.ts",
+						"line": 354,
+						"column": 9
+					}
+				},
+				{
+					id: "@jpolv/dsh-git-explorer#git/stage",
+					service: "git",
+					namespace: "git",
+					method: "stage",
+					invocation: { kind: "direct" },
+					parameters: [
+						{
+							name: "sessionId",
+							wire: "sessionId",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/stage:sessionId",
+								create: _jpolv_dsh_git_explorer_git_stage_parameter_0$schema
+							}
+						},
+						{
+							name: "requestRoot",
+							wire: "requestRoot",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/stage:requestRoot",
+								create: _jpolv_dsh_git_explorer_git_stage_parameter_1$schema
+							}
+						},
+						{
+							name: "paths",
+							wire: "paths",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/stage:paths",
+								create: _jpolv_dsh_git_explorer_git_stage_parameter_2$schema
+							}
+						}
+					],
+					cancellation: { parameter: "signal" },
+					result: {
+						mode: "strict",
+						typeSymbol: "@jpolv/dsh-git-explorer/types#GitMutationResult",
+						create: _jpolv_dsh_git_explorer_git_stage_result$schema
+					},
+					sourceLocation: {
+						"file": "packages/git-explorer/src/index.ts",
+						"line": 201,
+						"column": 9
+					}
+				},
+				{
+					id: "@jpolv/dsh-git-explorer#git/status",
+					service: "git",
+					namespace: "git",
+					method: "status",
+					invocation: { kind: "direct" },
+					parameters: [{
+						name: "sessionId",
+						wire: "sessionId",
+						source: "json",
+						codec: {
+							mode: "strict",
+							typeSymbol: "@jpolv/dsh-git-explorer#git/status:sessionId",
+							create: _jpolv_dsh_git_explorer_git_status_parameter_0$schema
+						}
+					}, {
+						name: "requestRoot",
+						wire: "requestRoot",
+						source: "json",
+						codec: {
+							mode: "strict",
+							typeSymbol: "@jpolv/dsh-git-explorer#git/status:requestRoot",
+							create: _jpolv_dsh_git_explorer_git_status_parameter_1$schema
+						}
+					}],
+					cancellation: { parameter: "signal" },
+					result: {
+						mode: "strict",
+						typeSymbol: "@jpolv/dsh-git-explorer/types#GitStatusSummary",
+						create: _jpolv_dsh_git_explorer_git_status_result$schema
+					},
+					sourceLocation: {
+						"file": "packages/git-explorer/src/index.ts",
+						"line": 118,
+						"column": 9
+					}
+				},
+				{
+					id: "@jpolv/dsh-git-explorer#git/unstage",
+					service: "git",
+					namespace: "git",
+					method: "unstage",
+					invocation: { kind: "direct" },
+					parameters: [
+						{
+							name: "sessionId",
+							wire: "sessionId",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/unstage:sessionId",
+								create: _jpolv_dsh_git_explorer_git_unstage_parameter_0$schema
+							}
+						},
+						{
+							name: "requestRoot",
+							wire: "requestRoot",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/unstage:requestRoot",
+								create: _jpolv_dsh_git_explorer_git_unstage_parameter_1$schema
+							}
+						},
+						{
+							name: "paths",
+							wire: "paths",
+							source: "json",
+							codec: {
+								mode: "strict",
+								typeSymbol: "@jpolv/dsh-git-explorer#git/unstage:paths",
+								create: _jpolv_dsh_git_explorer_git_unstage_parameter_2$schema
+							}
+						}
+					],
+					cancellation: { parameter: "signal" },
+					result: {
+						mode: "strict",
+						typeSymbol: "@jpolv/dsh-git-explorer/types#GitMutationResult",
+						create: _jpolv_dsh_git_explorer_git_unstage_result$schema
+					},
+					sourceLocation: {
+						"file": "packages/git-explorer/src/index.ts",
+						"line": 220,
+						"column": 9
+					}
 				}
-			}]
+			]
 		};
 		//#endregion
 		//#region lib/types/types.js
@@ -5577,16 +5860,17 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		//#endregion
 		//#region lib/types/client/GitBody.js
 		/**
-		* The Git panel body — the read-only Source Control view.
+		* The Git panel body — the Source Control view.
 		*
-		* Each group renders its changes as a directory tree, following the shape VS Code's
-		* Source Control view uses: one row per (compacted) directory with a chevron, files
-		* nested underneath with a file-type glyph, and the status letter right-aligned. The
-		* grouping itself lives in `change-tree.ts` so it is unit-testable on its own.
+		* Groups render as directory trees (VS Code's shape): collapsible folders with compacted
+		* chains, file-type glyphs, right-aligned status letters. On top of the read-only view it
+		* offers the actions the screenshot asks for: hover stage/unstage/discard on a row,
+		* stage-all/unstage-all on a group, and a message box with Commit (Ctrl+Enter).
 		*
-		* Styling note: this file uses inline styles over the documented `--dsw-alias-*` tokens.
-		* Moving to CSS Modules with the shipped primitives is a separate step, because plugin
-		* CSS is inlined at build time and the markup has to change in one go.
+		* Destructive work is gated twice: the panel asks inline before calling, and the host
+		* refuses a discard that arrives without `confirmed`.
+		*
+		* Styling: inline styles over the documented `--dsw-alias-*` tokens, matching M1.
 		*/
 		/** How one status letter reads in the row badge. */
 		const STATUS_LETTER = {
@@ -5656,6 +5940,27 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				boxSizing: "border-box"
 			};
 		}
+		/** A borderless icon control, sized for a tree row. */
+		function IconAction({ title, icon: Icon, run }) {
+			return (0, react_jsx_runtime.jsx)("button", {
+				type: "button",
+				title,
+				"aria-label": title,
+				onClick: (event) => {
+					event.stopPropagation();
+					run();
+				},
+				style: {
+					background: "transparent",
+					border: "none",
+					color: SECONDARY,
+					cursor: "pointer",
+					display: "flex",
+					padding: "0 2px"
+				},
+				children: (0, react_jsx_runtime.jsx)(Icon, { size: 14 })
+			});
+		}
 		/** A directory row: chevron, folder glyph, compacted label. */
 		function DirectoryRow({ node, depth, collapsed, onToggle }) {
 			const isCollapsed = collapsed.has(node.path);
@@ -5682,8 +5987,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				]
 			});
 		}
-		/** A file row: glyph, name, right-aligned status letter. */
-		function FileRow({ node, depth, hovered, onHover }) {
+		/** A file row: glyph, name, right-aligned status letter, hover actions. */
+		function FileRow({ node, depth, hovered, onHover, actions }) {
 			const change = node.change;
 			if (change === void 0) return (0, react_jsx_runtime.jsx)("div", {
 				style: rowStyle(depth, false),
@@ -5724,7 +6029,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						},
 						children: change.origPath.split("/").pop()
 					}),
-					(0, react_jsx_runtime.jsx)("span", {
+					hovered ? actions.map((action) => (0, react_jsx_runtime.jsx)(IconAction, { ...action }, action.title)) : (0, react_jsx_runtime.jsx)("span", {
 						style: {
 							color: STATUS_TONE[change.status],
 							flexShrink: 0,
@@ -5736,7 +6041,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			});
 		}
 		/** Rows for one level, recursing into directories that are expanded. */
-		function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover }) {
+		function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor }) {
 			return (0, react_jsx_runtime.jsx)(react_jsx_runtime.Fragment, { children: nodes.map((node) => node.kind === "directory" ? (0, react_jsx_runtime.jsxs)(react.Fragment, { children: [(0, react_jsx_runtime.jsx)(DirectoryRow, {
 				node,
 				depth,
@@ -5748,16 +6053,18 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				collapsed,
 				onToggle,
 				hovered,
-				onHover
+				onHover,
+				actionsFor
 			})] }, `d:${node.path}`) : (0, react_jsx_runtime.jsx)(FileRow, {
 				node,
 				depth,
 				hovered: hovered === node.path,
-				onHover
+				onHover,
+				actions: node.change === void 0 ? [] : actionsFor(node.change)
 			}, `f:${node.path}`)) });
 		}
-		/** One collapsible group with its count badge and tree. */
-		function Group({ title, changes, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover }) {
+		/** One collapsible group with its count badge, its bulk action and its tree. */
+		function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor }) {
 			const tree = react.useMemo(() => buildChangeTree(changes), [changes]);
 			if (changes.length === 0) return null;
 			const isCollapsed = collapsedGroups.has(title);
@@ -5780,14 +6087,31 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						}),
 						(0, react_jsx_runtime.jsx)("span", {
 							style: {
-								marginLeft: "auto",
 								background: "var(--dsw-alias-bg-layer-3)",
 								borderRadius: "8px",
 								color: SECONDARY,
 								fontSize: "0.85em",
+								marginLeft: "4px",
 								padding: "0 6px"
 							},
 							children: changes.length
+						}),
+						bulk === void 0 ? null : (0, react_jsx_runtime.jsx)("button", {
+							type: "button",
+							onClick: (event) => {
+								event.stopPropagation();
+								bulk.run();
+							},
+							style: {
+								background: "transparent",
+								border: "none",
+								color: SECONDARY,
+								cursor: "pointer",
+								font: "inherit",
+								marginLeft: "auto",
+								padding: "0 2px"
+							},
+							children: bulk.label
 						})
 					]
 				}), isCollapsed ? null : (0, react_jsx_runtime.jsx)(TreeRows, {
@@ -5796,7 +6120,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					collapsed: collapsedDirs,
 					onToggle: onToggleDir,
 					hovered,
-					onHover
+					onHover,
+					actionsFor
 				})]
 			});
 		}
@@ -5837,6 +6162,90 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 						wordBreak: "break-all"
 					},
 					children: status.root
+				})]
+			});
+		}
+		/** The message box and its Commit control. */
+		function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit }) {
+			const ready = message.trim() !== "" && !busy;
+			return (0, react_jsx_runtime.jsxs)("div", {
+				style: {
+					display: "flex",
+					flexDirection: "column",
+					gap: "4px",
+					paddingTop: "8px"
+				},
+				children: [(0, react_jsx_runtime.jsx)("textarea", {
+					value: message,
+					placeholder: "Message (Ctrl+Enter to commit)",
+					"aria-label": "Commit message",
+					rows: 2,
+					onChange: (event) => {
+						onMessage(event.target.value);
+					},
+					onKeyDown: (event) => {
+						if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+							event.preventDefault();
+							if (ready) onCommit();
+						}
+					},
+					style: {
+						background: "var(--dsw-alias-bg-layer-2)",
+						border: "1px solid var(--dsw-alias-border-l3)",
+						borderRadius: "4px",
+						color: "inherit",
+						font: "inherit",
+						padding: "4px 6px",
+						resize: "vertical",
+						width: "100%",
+						boxSizing: "border-box"
+					}
+				}), (0, react_jsx_runtime.jsxs)("div", {
+					style: {
+						display: "flex",
+						alignItems: "center",
+						gap: "8px"
+					},
+					children: [
+						(0, react_jsx_runtime.jsx)("button", {
+							type: "button",
+							disabled: !ready,
+							onClick: onCommit,
+							style: {
+								background: ready ? "var(--dsw-alias-state-business-primary)" : "var(--dsw-alias-bg-layer-3)",
+								border: "none",
+								borderRadius: "4px",
+								color: ready ? "var(--dsw-alias-label-primary-inverted)" : SECONDARY,
+								cursor: ready ? "pointer" : "default",
+								font: "inherit",
+								fontWeight: 600,
+								padding: "3px 12px"
+							},
+							children: busy ? "Committing…" : amend ? "Amend" : "Commit"
+						}),
+						(0, react_jsx_runtime.jsxs)("label", {
+							style: {
+								color: SECONDARY,
+								display: "flex",
+								alignItems: "center",
+								gap: "4px"
+							},
+							children: [(0, react_jsx_runtime.jsx)("input", {
+								type: "checkbox",
+								checked: amend,
+								onChange: (event) => {
+									onAmend(event.target.checked);
+								}
+							}), "amend"]
+						}),
+						(0, react_jsx_runtime.jsx)("span", {
+							style: {
+								color: TERTIARY,
+								marginLeft: "auto"
+							},
+							children: "Ctrl+Enter"
+						})
+					]
 				})]
 			});
 		}
@@ -5927,11 +6336,16 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		* @param props - the session, the session store and the host bridge.
 		* @returns the panel body.
 		*/
-		function GitPanel({ sessionId, useSessions, gitStatus, gitPing }) {
+		function GitPanel({ sessionId, useSessions, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }) {
 			const [outcome, setOutcome] = react.useState(null);
 			const [probe, setProbe] = react.useState(null);
 			const [attempt, setAttempt] = react.useState(0);
 			const [hovered, setHovered] = react.useState(void 0);
+			const [message, setMessage] = react.useState("");
+			const [amend, setAmend] = react.useState(false);
+			const [busy, setBusy] = react.useState(false);
+			const [notice, setNotice] = react.useState(null);
+			const [pendingDiscard, setPendingDiscard] = react.useState(null);
 			const restored = react.useRef(null);
 			if (restored.current === null) restored.current = readCollapsed(sessionId);
 			const [collapsedGroups, setCollapsedGroups] = react.useState(new Set(restored.current.groups));
@@ -5939,7 +6353,11 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			const bridge = react.useRef({});
 			bridge.current = {
 				gitStatus,
-				gitPing
+				gitPing,
+				gitStage,
+				gitUnstage,
+				gitDiscard,
+				gitCommit
 			};
 			const requestRoot = (useSessions === void 0 || sessionId === void 0 ? void 0 : useSessions((state) => state?.byId?.[sessionId]?.cwd)) ?? "";
 			react.useEffect(() => {
@@ -5978,6 +6396,31 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 				collapsedGroups,
 				collapsedDirs
 			]);
+			/** Run one mutation, report what it said, and re-read the status. */
+			const mutate = (run) => {
+				setBusy(true);
+				setNotice(null);
+				run(new AbortController().signal).then((result) => {
+					setBusy(false);
+					setNotice(result);
+					setAttempt((value) => value + 1);
+				}, (error) => {
+					setBusy(false);
+					setNotice({
+						ok: false,
+						detail: error instanceof Error ? error.message : String(error)
+					});
+					setAttempt((value) => value + 1);
+				});
+			};
+			/** Ask before discarding, then discard with the confirmation the host requires. */
+			const confirmDiscard = () => {
+				const pending = pendingDiscard;
+				const discard = bridge.current.gitDiscard;
+				setPendingDiscard(null);
+				if (pending === null || discard === void 0) return;
+				mutate((signal) => discard(requestRoot, pending.tracked, pending.untracked, true, signal));
+			};
 			/** Toggle one group's expansion. */
 			const toggleGroup = (title) => {
 				setCollapsedGroups((current) => {
@@ -5996,15 +6439,56 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					return next;
 				});
 			};
-			const total = outcome !== null && !("unavailable" in outcome) ? outcome.staged.length + outcome.unstaged.length + outcome.untracked.length + outcome.conflicted.length : 0;
+			const status = outcome !== null && !("unavailable" in outcome) && outcome.isRepo ? outcome : null;
+			const total = status === null ? 0 : status.staged.length + status.unstaged.length + status.untracked.length + status.conflicted.length;
+			/** The hover actions one row offers, depending on the group it sits in. */
+			const actionsFor = (change) => {
+				const stage = bridge.current.gitStage;
+				const unstage = bridge.current.gitUnstage;
+				if (stage === void 0 || unstage === void 0) return [];
+				if (status !== null && status.staged.includes(change)) return [{
+					title: "Unstage",
+					icon: _deepseek_ai_dsh_client_ui_primitives.IconCloseOutlineRegular,
+					run: () => {
+						mutate((signal) => unstage(requestRoot, [change.path], signal));
+					}
+				}];
+				const untracked = status !== null && status.untracked.includes(change);
+				return [{
+					title: "Stage",
+					icon: _deepseek_ai_dsh_client_ui_primitives.IconPlusOutlineRegular,
+					run: () => {
+						mutate((signal) => stage(requestRoot, [change.path], signal));
+					}
+				}, {
+					title: untracked ? "Delete file" : "Discard changes",
+					icon: _deepseek_ai_dsh_client_ui_primitives.IconTrashOutlineRegular,
+					run: () => {
+						setPendingDiscard(untracked ? {
+							tracked: [],
+							untracked: [change.path]
+						} : {
+							tracked: [change.path],
+							untracked: []
+						});
+					}
+				}];
+			};
 			const groupProps = {
 				collapsedGroups,
 				onToggleGroup: toggleGroup,
 				collapsedDirs,
 				onToggleDir: toggleDir,
 				hovered,
-				onHover: setHovered
+				onHover: setHovered,
+				actionsFor
 			};
+			const bulkFor = (paths, label, run) => ({
+				label,
+				run: () => {
+					run(paths);
+				}
+			});
 			return (0, react_jsx_runtime.jsxs)("div", {
 				style: {
 					padding: "10px 12px",
@@ -6018,15 +6502,91 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							justifyContent: "space-between",
 							gap: "8px"
 						},
-						children: [outcome !== null && !("unavailable" in outcome) && outcome.isRepo ? (0, react_jsx_runtime.jsx)(BranchLine, { status: outcome }) : (0, react_jsx_runtime.jsx)("span", {
+						children: [status === null ? (0, react_jsx_runtime.jsx)("span", {
 							style: { fontWeight: 600 },
 							children: "Git"
-						}), (0, react_jsx_runtime.jsx)(Action, {
+						}) : (0, react_jsx_runtime.jsx)(BranchLine, { status }), (0, react_jsx_runtime.jsx)(Action, {
 							label: "Refresh",
 							onClick: () => {
 								setAttempt((value) => value + 1);
 							}
 						})]
+					}),
+					status === null ? null : (0, react_jsx_runtime.jsx)(CommitBox, {
+						message,
+						amend,
+						busy,
+						onMessage: setMessage,
+						onAmend: setAmend,
+						onCommit: () => {
+							const commit = bridge.current.gitCommit;
+							if (commit === void 0) return;
+							const text = message;
+							mutate(async (signal) => {
+								const result = await commit(requestRoot, text, amend, signal);
+								if (result.ok) {
+									setMessage("");
+									setAmend(false);
+								}
+								return result;
+							});
+						}
+					}),
+					notice === null ? null : (0, react_jsx_runtime.jsx)("div", {
+						style: {
+							color: notice.ok ? "var(--dsw-alias-state-success-primary)" : "var(--dsw-alias-state-error-primary)",
+							paddingTop: "6px"
+						},
+						children: notice.detail
+					}),
+					pendingDiscard === null ? null : (0, react_jsx_runtime.jsxs)("div", {
+						style: {
+							background: "var(--dsw-alias-bg-layer-2)",
+							border: "1px solid var(--dsw-alias-border-l3)",
+							borderRadius: "4px",
+							display: "flex",
+							alignItems: "center",
+							gap: "8px",
+							marginTop: "6px",
+							padding: "4px 6px"
+						},
+						children: [
+							(0, react_jsx_runtime.jsx)("span", {
+								style: { color: "var(--dsw-alias-state-warn-label)" },
+								children: `Discard ${String(pendingDiscard.tracked.length + pendingDiscard.untracked.length)} change(s)? This cannot be undone.`
+							}),
+							(0, react_jsx_runtime.jsx)("button", {
+								type: "button",
+								onClick: confirmDiscard,
+								style: {
+									background: "var(--dsw-alias-state-error-primary)",
+									border: "none",
+									borderRadius: "4px",
+									color: "var(--dsw-alias-label-primary-inverted)",
+									cursor: "pointer",
+									font: "inherit",
+									marginLeft: "auto",
+									padding: "1px 8px"
+								},
+								children: "Discard"
+							}),
+							(0, react_jsx_runtime.jsx)("button", {
+								type: "button",
+								onClick: () => {
+									setPendingDiscard(null);
+								},
+								style: {
+									background: "transparent",
+									border: "1px solid var(--dsw-alias-border-l3)",
+									borderRadius: "4px",
+									color: "var(--dsw-alias-label-primary)",
+									cursor: "pointer",
+									font: "inherit",
+									padding: "1px 8px"
+								},
+								children: "Cancel"
+							})
+						]
 					}),
 					(0, react_jsx_runtime.jsx)("div", {
 						role: "tree",
@@ -6051,11 +6611,19 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							(0, react_jsx_runtime.jsx)(Group, {
 								title: "Staged changes",
 								changes: outcome.staged,
+								bulk: bulkFor(outcome.staged.map((change) => change.path), "Unstage all", (paths) => {
+									const unstage = bridge.current.gitUnstage;
+									if (unstage !== void 0) mutate((signal) => unstage(requestRoot, paths, signal));
+								}),
 								...groupProps
 							}),
 							(0, react_jsx_runtime.jsx)(Group, {
 								title: "Changes",
 								changes: outcome.unstaged,
+								bulk: bulkFor(outcome.unstaged.map((change) => change.path), "Stage all", (paths) => {
+									const stage = bridge.current.gitStage;
+									if (stage !== void 0) mutate((signal) => stage(requestRoot, paths, signal));
+								}),
 								...groupProps
 							}),
 							(0, react_jsx_runtime.jsx)(Group, {
@@ -6066,6 +6634,10 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 							(0, react_jsx_runtime.jsx)(Group, {
 								title: "Untracked",
 								changes: outcome.untracked,
+								bulk: bulkFor(outcome.untracked.map((change) => change.path), "Stage all", (paths) => {
+									const stage = bridge.current.gitStage;
+									if (stage !== void 0) mutate((signal) => stage(requestRoot, paths, signal));
+								}),
 								...groupProps
 							}),
 							total === 0 ? (0, react_jsx_runtime.jsx)("div", {
@@ -6167,7 +6739,15 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 			};
 			return (sessionId) => ({
 				status: (requestRoot, signal) => call((namespace) => namespace.status(sessionId, requestRoot, signal)),
-				ping: (requestRoot, signal) => call((namespace) => namespace.ping(sessionId, requestRoot, signal))
+				ping: (requestRoot, signal) => call((namespace) => namespace.ping(sessionId, requestRoot, signal)),
+				mutate: async (run, requestRoot, signal) => {
+					const result = await call((namespace) => run(namespace, requestRoot, signal));
+					if ("unavailable" in result) return {
+						ok: false,
+						detail: result.unavailable
+					};
+					return result;
+				}
 			});
 		}
 		/**
@@ -6200,7 +6780,11 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 					const host = hostFor(sessionId);
 					return {
 						gitStatus: (requestRoot, signal) => host.status(requestRoot, signal),
-						gitPing: (requestRoot, signal) => host.ping(requestRoot, signal)
+						gitPing: (requestRoot, signal) => host.ping(requestRoot, signal),
+						gitStage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.stage(sessionId, root, paths, inner), requestRoot, signal),
+						gitUnstage: (requestRoot, paths, signal) => host.mutate((namespace, root, inner) => namespace.unstage(sessionId, root, paths, inner), requestRoot, signal),
+						gitDiscard: (requestRoot, trackedPaths, untrackedPaths, confirmed, signal) => host.mutate((namespace, root, inner) => namespace.discard(sessionId, root, trackedPaths, untrackedPaths, confirmed, inner), requestRoot, signal),
+						gitCommit: (requestRoot, message, amend, signal) => host.mutate((namespace, root, inner) => namespace.commit(sessionId, root, message, amend, inner), requestRoot, signal)
 					};
 				}
 			}, GitBody)), "git-explorer: tab body");

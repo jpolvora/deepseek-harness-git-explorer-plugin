@@ -1,17 +1,18 @@
 /**
- * The Git panel body — the read-only Source Control view.
+ * The Git panel body — the Source Control view.
  *
- * Each group renders its changes as a directory tree, following the shape VS Code's
- * Source Control view uses: one row per (compacted) directory with a chevron, files
- * nested underneath with a file-type glyph, and the status letter right-aligned. The
- * grouping itself lives in `change-tree.ts` so it is unit-testable on its own.
+ * Groups render as directory trees (VS Code's shape): collapsible folders with compacted
+ * chains, file-type glyphs, right-aligned status letters. On top of the read-only view it
+ * offers the actions the screenshot asks for: hover stage/unstage/discard on a row,
+ * stage-all/unstage-all on a group, and a message box with Commit (Ctrl+Enter).
  *
- * Styling note: this file uses inline styles over the documented `--dsw-alias-*` tokens.
- * Moving to CSS Modules with the shipped primitives is a separate step, because plugin
- * CSS is inlined at build time and the markup has to change in one go.
+ * Destructive work is gated twice: the panel asks inline before calling, and the host
+ * refuses a discard that arrives without `confirmed`.
+ *
+ * Styling: inline styles over the documented `--dsw-alias-*` tokens, matching M1.
  */
 import * as React from 'react';
-import type { GitPingOutcome, GitStatusOutcome } from '../types.js';
+import type { GitMutationResult, GitPingOutcome, GitStatusOutcome } from '../types.js';
 /** The session list face the framework hands a session-scoped body. */
 type SessionsHook = <T>(select: (state: SessionListState) => T) => T;
 /** The slice of the client session store this panel reads. */
@@ -30,6 +31,14 @@ export interface GitBodyProps {
     gitStatus?: (requestRoot: string, signal: AbortSignal) => Promise<GitStatusOutcome>;
     /** The diagnostic probe, contributed through the same factory. */
     gitPing?: (requestRoot: string, signal: AbortSignal) => Promise<GitPingOutcome>;
+    /** Stage paths. */
+    gitStage?: (requestRoot: string, paths: string[], signal: AbortSignal) => Promise<GitMutationResult>;
+    /** Unstage paths, leaving the work tree untouched. */
+    gitUnstage?: (requestRoot: string, paths: string[], signal: AbortSignal) => Promise<GitMutationResult>;
+    /** Discard work-tree changes; `confirmed` must be true. */
+    gitDiscard?: (requestRoot: string, trackedPaths: string[], untrackedPaths: string[], confirmed: boolean, signal: AbortSignal) => Promise<GitMutationResult>;
+    /** Commit the index. */
+    gitCommit?: (requestRoot: string, message: string, amend: boolean, signal: AbortSignal) => Promise<GitMutationResult>;
 }
 /**
  * Render the panel.

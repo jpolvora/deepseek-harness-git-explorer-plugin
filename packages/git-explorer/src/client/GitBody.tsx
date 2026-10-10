@@ -1,28 +1,33 @@
 /**
- * The Git panel body — the read-only Source Control view.
+ * The Git panel body — the Source Control view.
  *
- * Each group renders its changes as a directory tree, following the shape VS Code's
- * Source Control view uses: one row per (compacted) directory with a chevron, files
- * nested underneath with a file-type glyph, and the status letter right-aligned. The
- * grouping itself lives in `change-tree.ts` so it is unit-testable on its own.
+ * Groups render as directory trees (VS Code's shape): collapsible folders with compacted
+ * chains, file-type glyphs, right-aligned status letters. On top of the read-only view it
+ * offers the actions the screenshot asks for: hover stage/unstage/discard on a row,
+ * stage-all/unstage-all on a group, and a message box with Commit (Ctrl+Enter).
  *
- * Styling note: this file uses inline styles over the documented `--dsw-alias-*` tokens.
- * Moving to CSS Modules with the shipped primitives is a separate step, because plugin
- * CSS is inlined at build time and the markup has to change in one go.
+ * Destructive work is gated twice: the panel asks inline before calling, and the host
+ * refuses a discard that arrives without `confirmed`.
+ *
+ * Styling: inline styles over the documented `--dsw-alias-*` tokens, matching M1.
  */
 import * as React from 'react'
 import {
   FileTypeIcon,
   IconChevronDownOutlineRegular,
   IconChevronRightOutlineRegular,
+  IconCloseOutlineRegular,
   IconFolderCloseRegular,
   IconFolderOpenRegular,
+  IconPlusOutlineRegular,
+  IconTrashOutlineRegular,
   classifyFileType,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import { buildChangeTree, type ChangeTreeNode } from './change-tree.js'
 import type {
   GitChange,
   GitFileStatus,
+  GitMutationResult,
   GitPingOutcome,
   GitStatusOutcome,
   GitStatusSummary,
@@ -46,6 +51,25 @@ export interface GitBodyProps {
   gitStatus?: (requestRoot: string, signal: AbortSignal) => Promise<GitStatusOutcome>
   /** The diagnostic probe, contributed through the same factory. */
   gitPing?: (requestRoot: string, signal: AbortSignal) => Promise<GitPingOutcome>
+  /** Stage paths. */
+  gitStage?: (requestRoot: string, paths: string[], signal: AbortSignal) => Promise<GitMutationResult>
+  /** Unstage paths, leaving the work tree untouched. */
+  gitUnstage?: (requestRoot: string, paths: string[], signal: AbortSignal) => Promise<GitMutationResult>
+  /** Discard work-tree changes; `confirmed` must be true. */
+  gitDiscard?: (
+    requestRoot: string,
+    trackedPaths: string[],
+    untrackedPaths: string[],
+    confirmed: boolean,
+    signal: AbortSignal,
+  ) => Promise<GitMutationResult>
+  /** Commit the index. */
+  gitCommit?: (
+    requestRoot: string,
+    message: string,
+    amend: boolean,
+    signal: AbortSignal,
+  ) => Promise<GitMutationResult>
 }
 
 /** How one status letter reads in the row badge. */
@@ -82,6 +106,13 @@ const INDENT_PX = 14
 /** The localStorage key holding this tab's collapsed groups and directories. */
 const COLLAPSE_KEY_PREFIX = 'dsh.git-explorer.collapsed.v1.'
 
+/** One hover action on a row. */
+interface RowAction {
+  title: string
+  icon: (props: { size?: number }) => React.ReactElement
+  run: () => void
+}
+
 /** One label/value diagnostic line. */
 function Row({ label, value }: { label: string; value: string }): React.ReactElement {
   return (
@@ -112,6 +143,31 @@ function rowStyle(depth: number, hovered: boolean): React.CSSProperties {
   }
 }
 
+/** A borderless icon control, sized for a tree row. */
+function IconAction({ title, icon: Icon, run }: RowAction): React.ReactElement {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      onClick={(event) => {
+        event.stopPropagation()
+        run()
+      }}
+      style={{
+        background: 'transparent',
+        border: 'none',
+        color: SECONDARY,
+        cursor: 'pointer',
+        display: 'flex',
+        padding: '0 2px',
+      }}
+    >
+      <Icon size={14} />
+    </button>
+  )
+}
+
 /** A directory row: chevron, folder glyph, compacted label. */
 function DirectoryRow({ node, depth, collapsed, onToggle }: {
   node: ChangeTreeNode
@@ -123,12 +179,7 @@ function DirectoryRow({ node, depth, collapsed, onToggle }: {
   const Chevron = isCollapsed ? IconChevronRightOutlineRegular : IconChevronDownOutlineRegular
   const Folder = isCollapsed ? IconFolderCloseRegular : IconFolderOpenRegular
   return (
-    <div
-      role="treeitem"
-      aria-expanded={!isCollapsed}
-      onClick={() => { onToggle(node.path) }}
-      style={rowStyle(depth, false)}
-    >
+    <div role="treeitem" aria-expanded={!isCollapsed} onClick={() => { onToggle(node.path) }} style={rowStyle(depth, false)}>
       <Chevron size={16} />
       <Folder size={16} />
       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{node.name}</span>
@@ -136,16 +187,16 @@ function DirectoryRow({ node, depth, collapsed, onToggle }: {
   )
 }
 
-/** A file row: glyph, name, right-aligned status letter. */
-function FileRow({ node, depth, hovered, onHover }: {
+/** A file row: glyph, name, right-aligned status letter, hover actions. */
+function FileRow({ node, depth, hovered, onHover, actions }: {
   node: ChangeTreeNode
   depth: number
   hovered: boolean
   onHover: (path: string | undefined) => void
+  actions: RowAction[]
 }): React.ReactElement {
   const change = node.change
   if (change === undefined) {
-    // Unreachable by construction; rendering the name beats rendering nothing.
     return <div style={rowStyle(depth, false)}><span>{node.name}</span></div>
   }
   return (
@@ -164,21 +215,26 @@ function FileRow({ node, depth, hovered, onHover }: {
       {change.origPath === undefined
         ? null
         : <span style={{ color: TERTIARY, flexShrink: 0 }}>{change.origPath.split('/').pop()}</span>}
-      <span style={{ color: STATUS_TONE[change.status], flexShrink: 0, paddingLeft: '6px' }}>
-        {STATUS_LETTER[change.status]}
-      </span>
+      {hovered
+        ? actions.map((action) => <IconAction key={action.title} {...action} />)
+        : (
+          <span style={{ color: STATUS_TONE[change.status], flexShrink: 0, paddingLeft: '6px' }}>
+            {STATUS_LETTER[change.status]}
+          </span>
+        )}
     </div>
   )
 }
 
 /** Rows for one level, recursing into directories that are expanded. */
-function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover }: {
+function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor }: {
   nodes: readonly ChangeTreeNode[]
   depth: number
   collapsed: ReadonlySet<string>
   onToggle: (path: string) => void
   hovered: string | undefined
   onHover: (path: string | undefined) => void
+  actionsFor: (change: GitChange) => RowAction[]
 }): React.ReactElement {
   return (
     <>
@@ -196,6 +252,7 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover }: {
                   onToggle={onToggle}
                   hovered={hovered}
                   onHover={onHover}
+                  actionsFor={actionsFor}
                 />
               )}
           </React.Fragment>
@@ -207,22 +264,25 @@ function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover }: {
             depth={depth}
             hovered={hovered === node.path}
             onHover={onHover}
+            actions={node.change === undefined ? [] : actionsFor(node.change)}
           />
         ))}
     </>
   )
 }
 
-/** One collapsible group with its count badge and tree. */
-function Group({ title, changes, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover }: {
+/** One collapsible group with its count badge, its bulk action and its tree. */
+function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor }: {
   title: string
   changes: readonly GitChange[]
+  bulk?: { label: string; run: () => void }
   collapsedGroups: ReadonlySet<string>
   onToggleGroup: (title: string) => void
   collapsedDirs: ReadonlySet<string>
   onToggleDir: (path: string) => void
   hovered: string | undefined
   onHover: (path: string | undefined) => void
+  actionsFor: (change: GitChange) => RowAction[]
 }): React.ReactElement | null {
   const tree = React.useMemo(() => buildChangeTree(changes), [changes])
   if (changes.length === 0) return null
@@ -234,15 +294,37 @@ function Group({ title, changes, collapsedGroups, onToggleGroup, collapsedDirs, 
         <Chevron size={16} />
         <span style={{ fontWeight: 600 }}>{title}</span>
         <span style={{
-          marginLeft: 'auto',
           background: 'var(--dsw-alias-bg-layer-3)',
           borderRadius: '8px',
           color: SECONDARY,
           fontSize: '0.85em',
+          marginLeft: '4px',
           padding: '0 6px',
         }}>
           {changes.length}
         </span>
+        {bulk === undefined
+          ? null
+          : (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation()
+                bulk.run()
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: SECONDARY,
+                cursor: 'pointer',
+                font: 'inherit',
+                marginLeft: 'auto',
+                padding: '0 2px',
+              }}
+            >
+              {bulk.label}
+            </button>
+          )}
       </div>
       {isCollapsed
         ? null
@@ -254,6 +336,7 @@ function Group({ title, changes, collapsedGroups, onToggleGroup, collapsedDirs, 
             onToggle={onToggleDir}
             hovered={hovered}
             onHover={onHover}
+            actionsFor={actionsFor}
           />
         )}
     </div>
@@ -275,6 +358,70 @@ function BranchLine({ status }: { status: GitStatusSummary }): React.ReactElemen
           : <span style={{ color: 'var(--dsw-alias-state-warn-label)' }}>{`${status.operation} in progress`}</span>}
       </div>
       {status.root === null ? null : <div style={{ color: TERTIARY, wordBreak: 'break-all' }}>{status.root}</div>}
+    </div>
+  )
+}
+
+/** The message box and its Commit control. */
+function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit }: {
+  message: string
+  amend: boolean
+  busy: boolean
+  onMessage: (value: string) => void
+  onAmend: (value: boolean) => void
+  onCommit: () => void
+}): React.ReactElement {
+  const ready = message.trim() !== '' && !busy
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px' }}>
+      <textarea
+        value={message}
+        placeholder="Message (Ctrl+Enter to commit)"
+        aria-label="Commit message"
+        rows={2}
+        onChange={(event) => { onMessage(event.target.value) }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault()
+            if (ready) onCommit()
+          }
+        }}
+        style={{
+          background: 'var(--dsw-alias-bg-layer-2)',
+          border: '1px solid var(--dsw-alias-border-l3)',
+          borderRadius: '4px',
+          color: 'inherit',
+          font: 'inherit',
+          padding: '4px 6px',
+          resize: 'vertical',
+          width: '100%',
+          boxSizing: 'border-box',
+        }}
+      />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button
+          type="button"
+          disabled={!ready}
+          onClick={onCommit}
+          style={{
+            background: ready ? 'var(--dsw-alias-state-business-primary)' : 'var(--dsw-alias-bg-layer-3)',
+            border: 'none',
+            borderRadius: '4px',
+            color: ready ? 'var(--dsw-alias-label-primary-inverted)' : SECONDARY,
+            cursor: ready ? 'pointer' : 'default',
+            font: 'inherit',
+            fontWeight: 600,
+            padding: '3px 12px',
+          }}
+        >
+          {busy ? 'Committing…' : amend ? 'Amend' : 'Commit'}
+        </button>
+        <label style={{ color: SECONDARY, display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <input type="checkbox" checked={amend} onChange={(event) => { onAmend(event.target.checked) }} />
+          amend
+        </label>
+        <span style={{ color: TERTIARY, marginLeft: 'auto' }}>Ctrl+Enter</span>
+      </div>
     </div>
   )
 }
@@ -368,21 +515,41 @@ export function GitBody(props: GitBodyProps): React.ReactElement {
  * @param props - the session, the session store and the host bridge.
  * @returns the panel body.
  */
-function GitPanel({ sessionId, useSessions, gitStatus, gitPing }: GitBodyProps): React.ReactElement {
+function GitPanel({
+  sessionId,
+  useSessions,
+  gitStatus,
+  gitPing,
+  gitStage,
+  gitUnstage,
+  gitDiscard,
+  gitCommit,
+}: GitBodyProps): React.ReactElement {
   const [outcome, setOutcome] = React.useState<GitStatusOutcome | null>(null)
   const [probe, setProbe] = React.useState<GitPingOutcome | null>(null)
   const [attempt, setAttempt] = React.useState(0)
   const [hovered, setHovered] = React.useState<string | undefined>(undefined)
+  const [message, setMessage] = React.useState('')
+  const [amend, setAmend] = React.useState(false)
+  const [busy, setBusy] = React.useState(false)
+  const [notice, setNotice] = React.useState<GitMutationResult | null>(null)
+  const [pendingDiscard, setPendingDiscard] = React.useState<{ tracked: string[]; untracked: string[] } | null>(null)
   const restored = React.useRef<{ groups: string[]; directories: string[] } | null>(null)
   if (restored.current === null) restored.current = readCollapsed(sessionId)
   const [collapsedGroups, setCollapsedGroups] = React.useState<ReadonlySet<string>>(new Set(restored.current.groups))
   const [collapsedDirs, setCollapsedDirs] = React.useState<ReadonlySet<string>>(new Set(restored.current.directories))
 
-  // The slot engine may hand a fresh business face on every render, so the callbacks
-  // are read through a ref: depending on their identity in the effect below would
-  // re-run the read on every render, and each state write would render again.
-  const bridge = React.useRef<{ gitStatus?: GitBodyProps['gitStatus']; gitPing?: GitBodyProps['gitPing'] }>({})
-  bridge.current = { gitStatus, gitPing }
+  // The slot engine may hand a fresh business face on every render, so the callbacks are
+  // read through a ref: depending on their identity in an effect would loop.
+  const bridge = React.useRef<{
+    gitStatus?: GitBodyProps['gitStatus']
+    gitPing?: GitBodyProps['gitPing']
+    gitStage?: GitBodyProps['gitStage']
+    gitUnstage?: GitBodyProps['gitUnstage']
+    gitDiscard?: GitBodyProps['gitDiscard']
+    gitCommit?: GitBodyProps['gitCommit']
+  }>({})
+  bridge.current = { gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit }
 
   // The client's own view of the session's working directory: the host prefers its own
   // Session lookup and uses this only when that lookup cannot answer.
@@ -435,6 +602,33 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing }: GitBodyProps):
     }
   }, [sessionId, collapsedGroups, collapsedDirs])
 
+  /** Run one mutation, report what it said, and re-read the status. */
+  const mutate = (run: (signal: AbortSignal) => Promise<GitMutationResult>): void => {
+    setBusy(true)
+    setNotice(null)
+    void run(new AbortController().signal).then(
+      (result) => {
+        setBusy(false)
+        setNotice(result)
+        setAttempt((value) => value + 1)
+      },
+      (error: unknown) => {
+        setBusy(false)
+        setNotice({ ok: false, detail: error instanceof Error ? error.message : String(error) })
+        setAttempt((value) => value + 1)
+      },
+    )
+  }
+
+  /** Ask before discarding, then discard with the confirmation the host requires. */
+  const confirmDiscard = (): void => {
+    const pending = pendingDiscard
+    const discard = bridge.current.gitDiscard
+    setPendingDiscard(null)
+    if (pending === null || discard === undefined) return
+    mutate((signal) => discard(requestRoot, pending.tracked, pending.untracked, true, signal))
+  }
+
   /** Toggle one group's expansion. */
   const toggleGroup = (title: string): void => {
     setCollapsedGroups((current) => {
@@ -454,9 +648,40 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing }: GitBodyProps):
     })
   }
 
-  const total = outcome !== null && !('unavailable' in outcome)
-    ? outcome.staged.length + outcome.unstaged.length + outcome.untracked.length + outcome.conflicted.length
-    : 0
+  const status = outcome !== null && !('unavailable' in outcome) && outcome.isRepo ? outcome : null
+  const total = status === null
+    ? 0
+    : status.staged.length + status.unstaged.length + status.untracked.length + status.conflicted.length
+
+  /** The hover actions one row offers, depending on the group it sits in. */
+  const actionsFor = (change: GitChange): RowAction[] => {
+    const stage = bridge.current.gitStage
+    const unstage = bridge.current.gitUnstage
+    if (stage === undefined || unstage === undefined) return []
+    const isStaged = status !== null && status.staged.includes(change)
+    if (isStaged) {
+      return [{
+        title: 'Unstage',
+        icon: IconCloseOutlineRegular,
+        run: () => { mutate((signal) => unstage(requestRoot, [change.path], signal)) },
+      }]
+    }
+    const untracked = status !== null && status.untracked.includes(change)
+    return [
+      {
+        title: 'Stage',
+        icon: IconPlusOutlineRegular,
+        run: () => { mutate((signal) => stage(requestRoot, [change.path], signal)) },
+      },
+      {
+        title: untracked ? 'Delete file' : 'Discard changes',
+        icon: IconTrashOutlineRegular,
+        run: () => {
+          setPendingDiscard(untracked ? { tracked: [], untracked: [change.path] } : { tracked: [change.path], untracked: [] })
+        },
+      },
+    ]
+  }
 
   const groupProps = {
     collapsedGroups,
@@ -465,16 +690,97 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing }: GitBodyProps):
     onToggleDir: toggleDir,
     hovered,
     onHover: setHovered,
+    actionsFor,
   }
+
+  const bulkFor = (paths: string[], label: string, run: (paths: string[]) => void): { label: string; run: () => void } => ({
+    label,
+    run: () => { run(paths) },
+  })
 
   return (
     <div style={{ padding: '10px 12px', lineHeight: 1.5 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-        {outcome !== null && !('unavailable' in outcome) && outcome.isRepo
-          ? <BranchLine status={outcome} />
-          : <span style={{ fontWeight: 600 }}>Git</span>}
+        {status === null ? <span style={{ fontWeight: 600 }}>Git</span> : <BranchLine status={status} />}
         <Action label="Refresh" onClick={() => { setAttempt((value) => value + 1) }} />
       </div>
+
+      {status === null ? null : (
+        <CommitBox
+          message={message}
+          amend={amend}
+          busy={busy}
+          onMessage={setMessage}
+          onAmend={setAmend}
+          onCommit={() => {
+            const commit = bridge.current.gitCommit
+            if (commit === undefined) return
+            const text = message
+            mutate(async (signal) => {
+              const result = await commit(requestRoot, text, amend, signal)
+              if (result.ok) {
+                setMessage('')
+                setAmend(false)
+              }
+              return result
+            })
+          }}
+        />
+      )}
+
+      {notice === null ? null : (
+        <div style={{ color: notice.ok ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-state-error-primary)', paddingTop: '6px' }}>
+          {notice.detail}
+        </div>
+      )}
+
+      {pendingDiscard === null ? null : (
+        <div style={{
+          background: 'var(--dsw-alias-bg-layer-2)',
+          border: '1px solid var(--dsw-alias-border-l3)',
+          borderRadius: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          marginTop: '6px',
+          padding: '4px 6px',
+        }}>
+          <span style={{ color: 'var(--dsw-alias-state-warn-label)' }}>
+            {`Discard ${String(pendingDiscard.tracked.length + pendingDiscard.untracked.length)} change(s)? This cannot be undone.`}
+          </span>
+          <button
+            type="button"
+            onClick={confirmDiscard}
+            style={{
+              background: 'var(--dsw-alias-state-error-primary)',
+              border: 'none',
+              borderRadius: '4px',
+              color: 'var(--dsw-alias-label-primary-inverted)',
+              cursor: 'pointer',
+              font: 'inherit',
+              marginLeft: 'auto',
+              padding: '1px 8px',
+            }}
+          >
+            Discard
+          </button>
+          <button
+            type="button"
+            onClick={() => { setPendingDiscard(null) }}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--dsw-alias-border-l3)',
+              borderRadius: '4px',
+              color: 'var(--dsw-alias-label-primary)',
+              cursor: 'pointer',
+              font: 'inherit',
+              padding: '1px 8px',
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
 
       <div role="tree" style={{ paddingTop: '4px' }}>
         {outcome === null
@@ -497,10 +803,34 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing }: GitBodyProps):
                         {`${String(outcome.conflicted.length)} conflicted file(s) need resolution`}
                       </div>
                     )}
-                  <Group title="Staged changes" changes={outcome.staged} {...groupProps} />
-                  <Group title="Changes" changes={outcome.unstaged} {...groupProps} />
+                  <Group
+                    title="Staged changes"
+                    changes={outcome.staged}
+                    bulk={bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
+                      const unstage = bridge.current.gitUnstage
+                      if (unstage !== undefined) mutate((signal) => unstage(requestRoot, paths, signal))
+                    })}
+                    {...groupProps}
+                  />
+                  <Group
+                    title="Changes"
+                    changes={outcome.unstaged}
+                    bulk={bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
+                      const stage = bridge.current.gitStage
+                      if (stage !== undefined) mutate((signal) => stage(requestRoot, paths, signal))
+                    })}
+                    {...groupProps}
+                  />
                   <Group title="Conflicted" changes={outcome.conflicted} {...groupProps} />
-                  <Group title="Untracked" changes={outcome.untracked} {...groupProps} />
+                  <Group
+                    title="Untracked"
+                    changes={outcome.untracked}
+                    bulk={bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
+                      const stage = bridge.current.gitStage
+                      if (stage !== undefined) mutate((signal) => stage(requestRoot, paths, signal))
+                    })}
+                    {...groupProps}
+                  />
                   {total === 0 ? <div style={{ color: SECONDARY }}>No changes — the working tree is clean.</div> : null}
                 </>
               )}

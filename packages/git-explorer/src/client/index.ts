@@ -27,6 +27,7 @@ import { TYPERT_REMOTE } from '@jpolv/dsh-git-explorer/remote'
 import {
   GIT_EXPLORER_ID,
   GIT_TAB_KIND,
+  type GitMutationResult,
   type GitPingOutcome,
   type GitPingResult,
   type GitStatusOutcome,
@@ -97,6 +98,23 @@ type RemoteEnvelope<T> =
 interface GitNamespace {
   status(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<RemoteEnvelope<GitStatusSummary>>
   ping(sessionId: string, requestRoot: string, signal: AbortSignal): Promise<RemoteEnvelope<GitPingResult>>
+  stage(sessionId: string, requestRoot: string, paths: string[], signal: AbortSignal): Promise<RemoteEnvelope<GitMutationResult>>
+  unstage(sessionId: string, requestRoot: string, paths: string[], signal: AbortSignal): Promise<RemoteEnvelope<GitMutationResult>>
+  discard(
+    sessionId: string,
+    requestRoot: string,
+    trackedPaths: string[],
+    untrackedPaths: string[],
+    confirmed: boolean,
+    signal: AbortSignal,
+  ): Promise<RemoteEnvelope<GitMutationResult>>
+  commit(
+    sessionId: string,
+    requestRoot: string,
+    message: string,
+    amend: boolean,
+    signal: AbortSignal,
+  ): Promise<RemoteEnvelope<GitMutationResult>>
 }
 
 const GUIDE_DESCRIPTION = 'Stage, commit and review working-tree changes.'
@@ -108,6 +126,12 @@ const BRIDGE_READY_TIMEOUT_MS = 3_000
 interface HostCalls {
   status(requestRoot: string, signal: AbortSignal): Promise<GitStatusOutcome>
   ping(requestRoot: string, signal: AbortSignal): Promise<GitPingOutcome>
+  /** Every mutation resolves the same way; the panel reports `detail` either way. */
+  mutate(
+    run: (namespace: GitNamespace, requestRoot: string, signal: AbortSignal) => Promise<RemoteEnvelope<GitMutationResult>>,
+    requestRoot: string,
+    signal: AbortSignal,
+  ): Promise<GitMutationResult>
 }
 
 /**
@@ -146,6 +170,13 @@ function hostCalls(ctx: Context): (sessionId: string) => HostCalls {
   return (sessionId) => ({
     status: (requestRoot, signal) => call((namespace) => namespace.status(sessionId, requestRoot, signal)),
     ping: (requestRoot, signal) => call((namespace) => namespace.ping(sessionId, requestRoot, signal)),
+    mutate: async (run, requestRoot, signal) => {
+      const result = await call((namespace) => run(namespace, requestRoot, signal))
+      // A mutation always answers with a payload (`ok` plus a line to show); only a
+      // transport failure arrives as the panel's `unavailable` shape.
+      if ('unavailable' in result) return { ok: false, detail: result.unavailable }
+      return result
+    },
   })
 }
 
@@ -188,6 +219,23 @@ export async function apply(ctx: Context): Promise<void> {
       return {
         gitStatus: (requestRoot: string, signal: AbortSignal) => host.status(requestRoot, signal),
         gitPing: (requestRoot: string, signal: AbortSignal) => host.ping(requestRoot, signal),
+        gitStage: (requestRoot: string, paths: string[], signal: AbortSignal) =>
+          host.mutate((namespace, root, inner) => namespace.stage(sessionId, root, paths, inner), requestRoot, signal),
+        gitUnstage: (requestRoot: string, paths: string[], signal: AbortSignal) =>
+          host.mutate((namespace, root, inner) => namespace.unstage(sessionId, root, paths, inner), requestRoot, signal),
+        gitDiscard: (
+          requestRoot: string,
+          trackedPaths: string[],
+          untrackedPaths: string[],
+          confirmed: boolean,
+          signal: AbortSignal,
+        ) => host.mutate(
+          (namespace, root, inner) => namespace.discard(sessionId, root, trackedPaths, untrackedPaths, confirmed, inner),
+          requestRoot,
+          signal,
+        ),
+        gitCommit: (requestRoot: string, message: string, amend: boolean, signal: AbortSignal) =>
+          host.mutate((namespace, root, inner) => namespace.commit(sessionId, root, message, amend, inner), requestRoot, signal),
       }
     },
   }, GitBody)), 'git-explorer: tab body')

@@ -33,6 +33,13 @@ export async function runGit(ctx, limits, options) {
     const outcome = await handle.done;
     const stdout = handle.collected.stdout?.readFrom(0);
     const stderr = handle.collected.stderr?.readFrom(0);
+    // `DSH_GIT_EXPLORER_DEBUG=1` traces every command the plugin runs, which is how a
+    // mutation that reports success without changing anything gets found.
+    if (process.env.DSH_GIT_EXPLORER_DEBUG === '1') {
+        console.error(`[git-explorer] cwd=${options.cwd} $ git ${options.args.join(' ')} -> ${String(outcome.exitCode ?? -1)}`);
+        if (stderr?.text !== undefined && stderr.text.trim() !== '')
+            console.error(`[git-explorer] stderr: ${stderr.text.trim()}`);
+    }
     return {
         // A command killed by a signal reports no exit code; surface it as a failure
         // so callers never mistake it for success.

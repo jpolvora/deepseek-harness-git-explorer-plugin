@@ -670,6 +670,41 @@ Tests: `tests/change-tree.test.ts` (8: nesting, ordering, compaction boundaries,
 
 **Verified in the running GUI**: nested folders with chevrons, file-type glyphs, compacted chains, right-aligned status letters, and click-to-collapse all behave as specified on this repository's 184 untracked files. Shipped as a client-only change (rebuild → copy bundle into the profile → page reload), with all 32 unit tests green.
 
+## 14. Mutations (M2): stage, unstage, discard, commit
+
+### 14.1 Host half
+
+| Verb | Command | Notes |
+|---|---|---|
+| `stage(sessionId, root, paths, signal)` | `git add -- <paths…>` | |
+| `unstage(…)` | `git restore --staged -- <paths…>` | leaves the work tree untouched |
+| `discard(…, trackedPaths, untrackedPaths, confirmed, signal)` | `git restore -- <paths…>` + `git clean -f -- <paths…>` | refused without `confirmed`; git spells tracked and untracked restoration differently |
+| `commit(…, message, amend, signal)` | `git commit [-‑amend] -F -` | the message travels on stdin, so quoting and length cannot bite; an empty message is refused |
+
+Every argv is built by a pure function in `src/git/mutations.ts` and every path list ends with `--`, so a file named like an option can never be read as one. `runMutation` folds git's refusal into `{ ok: false, detail }` — the panel shows git's own words rather than a generic error.
+
+### 14.2 Host-side acceptance outside the app
+
+`scripts/probe-mutations.mjs` builds a scratch repository, applies the plugin through a **real Cordis context**, and asserts the repository's actual state after each verb: stage → staged and no longer unstaged; unstage → reversed; discard without confirmation → refused; discard with confirmation → the work tree matches HEAD; untracked discard → the file is gone; empty message → refused; commit → HEAD advances and the tree is clean; amend → HEAD does not advance. **All checks pass.**
+
+One fixture lesson worth keeping: Git for Windows defaults to `core.autocrlf=true`, so a scratch repository written with LF files reports "modified" after a checkout that wrote CRLF — the harness now pins `core.autocrlf=false`, because that difference is the fixture's, not the verb's.
+
+### 14.3 Client half
+
+* **Message box** — a textarea with `Message (Ctrl+Enter to commit)`, an **amend** toggle, and a Commit button that is disabled until a message exists; Ctrl/Cmd+Enter commits, and the box clears on success.
+* **Row actions on hover** — stage (`+`), unstage (`×`) and discard (trash) replace the status letter while the pointer is on the row, matching the screenshot's affordance.
+* **Group actions** — `Stage all` on Changes and Untracked, `Unstage all` on Staged changes.
+* **Discard confirmation** — the row asks inline ("Discard N change(s)? This cannot be undone.") and only then calls the host with `confirmed: true`; the host refuses an unconfirmed discard independently, so the gate does not depend on the UI.
+* **Result line** — every mutation reports what it did, in green or red, and the panel re-reads the status afterwards.
+
+### 14.4 Tests
+
+39 tests, all passing: 16 parser (real git fixtures), 8 tree, 15 panel — the panel suite now covers committing a typed message, Ctrl+Enter, the empty-message refusal, bulk staging, single-row staging and unstaging, and the discard confirmation round-trip (including that the host is not called before the person confirms).
+
+### 14.5 Still open
+
+Sandbox confinement and approval for mutating verbs (M2.5): the panel gates destructive actions and the host requires `confirmed`, but the commands themselves are not yet run through `ctx.sandbox.confine` / `ctx.approval.request` when a session's policy is narrower than this one. Tracked in §7 as M6 alongside push/pull.
+
 ---
 
 ## Appendix A — research artifacts produced for this plan

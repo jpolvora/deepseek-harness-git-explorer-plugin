@@ -1,18 +1,19 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 /**
- * The Git panel body — the read-only Source Control view.
+ * The Git panel body — the Source Control view.
  *
- * Each group renders its changes as a directory tree, following the shape VS Code's
- * Source Control view uses: one row per (compacted) directory with a chevron, files
- * nested underneath with a file-type glyph, and the status letter right-aligned. The
- * grouping itself lives in `change-tree.ts` so it is unit-testable on its own.
+ * Groups render as directory trees (VS Code's shape): collapsible folders with compacted
+ * chains, file-type glyphs, right-aligned status letters. On top of the read-only view it
+ * offers the actions the screenshot asks for: hover stage/unstage/discard on a row,
+ * stage-all/unstage-all on a group, and a message box with Commit (Ctrl+Enter).
  *
- * Styling note: this file uses inline styles over the documented `--dsw-alias-*` tokens.
- * Moving to CSS Modules with the shipped primitives is a separate step, because plugin
- * CSS is inlined at build time and the markup has to change in one go.
+ * Destructive work is gated twice: the panel asks inline before calling, and the host
+ * refuses a discard that arrives without `confirmed`.
+ *
+ * Styling: inline styles over the documented `--dsw-alias-*` tokens, matching M1.
  */
 import * as React from 'react';
-import { FileTypeIcon, IconChevronDownOutlineRegular, IconChevronRightOutlineRegular, IconFolderCloseRegular, IconFolderOpenRegular, classifyFileType, } from '@deepseek-ai/dsh-client-ui-primitives';
+import { FileTypeIcon, IconChevronDownOutlineRegular, IconChevronRightOutlineRegular, IconCloseOutlineRegular, IconFolderCloseRegular, IconFolderOpenRegular, IconPlusOutlineRegular, IconTrashOutlineRegular, classifyFileType, } from '@deepseek-ai/dsh-client-ui-primitives';
 import { buildChangeTree } from './change-tree.js';
 /** How one status letter reads in the row badge. */
 const STATUS_LETTER = {
@@ -66,6 +67,20 @@ function rowStyle(depth, hovered) {
         boxSizing: 'border-box',
     };
 }
+/** A borderless icon control, sized for a tree row. */
+function IconAction({ title, icon: Icon, run }) {
+    return (_jsx("button", { type: "button", title: title, "aria-label": title, onClick: (event) => {
+            event.stopPropagation();
+            run();
+        }, style: {
+            background: 'transparent',
+            border: 'none',
+            color: SECONDARY,
+            cursor: 'pointer',
+            display: 'flex',
+            padding: '0 2px',
+        }, children: _jsx(Icon, { size: 14 }) }));
+}
 /** A directory row: chevron, folder glyph, compacted label. */
 function DirectoryRow({ node, depth, collapsed, onToggle }) {
     const isCollapsed = collapsed.has(node.path);
@@ -73,42 +88,56 @@ function DirectoryRow({ node, depth, collapsed, onToggle }) {
     const Folder = isCollapsed ? IconFolderCloseRegular : IconFolderOpenRegular;
     return (_jsxs("div", { role: "treeitem", "aria-expanded": !isCollapsed, onClick: () => { onToggle(node.path); }, style: rowStyle(depth, false), children: [_jsx(Chevron, { size: 16 }), _jsx(Folder, { size: 16 }), _jsx("span", { style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, children: node.name })] }));
 }
-/** A file row: glyph, name, right-aligned status letter. */
-function FileRow({ node, depth, hovered, onHover }) {
+/** A file row: glyph, name, right-aligned status letter, hover actions. */
+function FileRow({ node, depth, hovered, onHover, actions }) {
     const change = node.change;
     if (change === undefined) {
-        // Unreachable by construction; rendering the name beats rendering nothing.
         return _jsx("div", { style: rowStyle(depth, false), children: _jsx("span", { children: node.name }) });
     }
     return (_jsxs("div", { role: "treeitem", title: change.origPath === undefined ? change.path : `${change.origPath} → ${change.path}`, onMouseEnter: () => { onHover(change.path); }, onMouseLeave: () => { onHover(undefined); }, style: rowStyle(depth, hovered), children: [_jsx("span", { style: { width: 16, flexShrink: 0 } }), _jsx(FileTypeIcon, { kind: classifyFileType(node.name), size: 16 }), _jsx("span", { style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, children: node.name }), change.origPath === undefined
                 ? null
-                : _jsx("span", { style: { color: TERTIARY, flexShrink: 0 }, children: change.origPath.split('/').pop() }), _jsx("span", { style: { color: STATUS_TONE[change.status], flexShrink: 0, paddingLeft: '6px' }, children: STATUS_LETTER[change.status] })] }));
+                : _jsx("span", { style: { color: TERTIARY, flexShrink: 0 }, children: change.origPath.split('/').pop() }), hovered
+                ? actions.map((action) => _jsx(IconAction, { ...action }, action.title))
+                : (_jsx("span", { style: { color: STATUS_TONE[change.status], flexShrink: 0, paddingLeft: '6px' }, children: STATUS_LETTER[change.status] }))] }));
 }
 /** Rows for one level, recursing into directories that are expanded. */
-function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover }) {
+function TreeRows({ nodes, depth, collapsed, onToggle, hovered, onHover, actionsFor }) {
     return (_jsx(_Fragment, { children: nodes.map((node) => node.kind === 'directory'
             ? (_jsxs(React.Fragment, { children: [_jsx(DirectoryRow, { node: node, depth: depth, collapsed: collapsed, onToggle: onToggle }), collapsed.has(node.path)
                         ? null
-                        : (_jsx(TreeRows, { nodes: node.children, depth: depth + 1, collapsed: collapsed, onToggle: onToggle, hovered: hovered, onHover: onHover }))] }, `d:${node.path}`))
-            : (_jsx(FileRow, { node: node, depth: depth, hovered: hovered === node.path, onHover: onHover }, `f:${node.path}`))) }));
+                        : (_jsx(TreeRows, { nodes: node.children, depth: depth + 1, collapsed: collapsed, onToggle: onToggle, hovered: hovered, onHover: onHover, actionsFor: actionsFor }))] }, `d:${node.path}`))
+            : (_jsx(FileRow, { node: node, depth: depth, hovered: hovered === node.path, onHover: onHover, actions: node.change === undefined ? [] : actionsFor(node.change) }, `f:${node.path}`))) }));
 }
-/** One collapsible group with its count badge and tree. */
-function Group({ title, changes, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover }) {
+/** One collapsible group with its count badge, its bulk action and its tree. */
+function Group({ title, changes, bulk, collapsedGroups, onToggleGroup, collapsedDirs, onToggleDir, hovered, onHover, actionsFor }) {
     const tree = React.useMemo(() => buildChangeTree(changes), [changes]);
     if (changes.length === 0)
         return null;
     const isCollapsed = collapsedGroups.has(title);
     const Chevron = isCollapsed ? IconChevronRightOutlineRegular : IconChevronDownOutlineRegular;
     return (_jsxs("div", { style: { paddingTop: '6px' }, children: [_jsxs("div", { onClick: () => { onToggleGroup(title); }, style: { ...rowStyle(0, false), gap: '4px' }, children: [_jsx(Chevron, { size: 16 }), _jsx("span", { style: { fontWeight: 600 }, children: title }), _jsx("span", { style: {
-                            marginLeft: 'auto',
                             background: 'var(--dsw-alias-bg-layer-3)',
                             borderRadius: '8px',
                             color: SECONDARY,
                             fontSize: '0.85em',
+                            marginLeft: '4px',
                             padding: '0 6px',
-                        }, children: changes.length })] }), isCollapsed
+                        }, children: changes.length }), bulk === undefined
+                        ? null
+                        : (_jsx("button", { type: "button", onClick: (event) => {
+                                event.stopPropagation();
+                                bulk.run();
+                            }, style: {
+                                background: 'transparent',
+                                border: 'none',
+                                color: SECONDARY,
+                                cursor: 'pointer',
+                                font: 'inherit',
+                                marginLeft: 'auto',
+                                padding: '0 2px',
+                            }, children: bulk.label }))] }), isCollapsed
                 ? null
-                : (_jsx(TreeRows, { nodes: tree, depth: 1, collapsed: collapsedDirs, onToggle: onToggleDir, hovered: hovered, onHover: onHover }))] }));
+                : (_jsx(TreeRows, { nodes: tree, depth: 1, collapsed: collapsedDirs, onToggle: onToggleDir, hovered: hovered, onHover: onHover, actionsFor: actionsFor }))] }));
 }
 /** The branch line: branch name, tracking drift and the repository root. */
 function BranchLine({ status }) {
@@ -118,6 +147,36 @@ function BranchLine({ status }) {
                         : _jsx("span", { style: { color: SECONDARY }, children: `↑${String(status.ahead)} ↓${String(status.behind)}` }), status.operation === null
                         ? null
                         : _jsx("span", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${status.operation} in progress` })] }), status.root === null ? null : _jsx("div", { style: { color: TERTIARY, wordBreak: 'break-all' }, children: status.root })] }));
+}
+/** The message box and its Commit control. */
+function CommitBox({ message, amend, busy, onMessage, onAmend, onCommit }) {
+    const ready = message.trim() !== '' && !busy;
+    return (_jsxs("div", { style: { display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px' }, children: [_jsx("textarea", { value: message, placeholder: "Message (Ctrl+Enter to commit)", "aria-label": "Commit message", rows: 2, onChange: (event) => { onMessage(event.target.value); }, onKeyDown: (event) => {
+                    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+                        event.preventDefault();
+                        if (ready)
+                            onCommit();
+                    }
+                }, style: {
+                    background: 'var(--dsw-alias-bg-layer-2)',
+                    border: '1px solid var(--dsw-alias-border-l3)',
+                    borderRadius: '4px',
+                    color: 'inherit',
+                    font: 'inherit',
+                    padding: '4px 6px',
+                    resize: 'vertical',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                } }), _jsxs("div", { style: { display: 'flex', alignItems: 'center', gap: '8px' }, children: [_jsx("button", { type: "button", disabled: !ready, onClick: onCommit, style: {
+                            background: ready ? 'var(--dsw-alias-state-business-primary)' : 'var(--dsw-alias-bg-layer-3)',
+                            border: 'none',
+                            borderRadius: '4px',
+                            color: ready ? 'var(--dsw-alias-label-primary-inverted)' : SECONDARY,
+                            cursor: ready ? 'pointer' : 'default',
+                            font: 'inherit',
+                            fontWeight: 600,
+                            padding: '3px 12px',
+                        }, children: busy ? 'Committing…' : amend ? 'Amend' : 'Commit' }), _jsxs("label", { style: { color: SECONDARY, display: 'flex', alignItems: 'center', gap: '4px' }, children: [_jsx("input", { type: "checkbox", checked: amend, onChange: (event) => { onAmend(event.target.checked); } }), "amend"] }), _jsx("span", { style: { color: TERTIARY, marginLeft: 'auto' }, children: "Ctrl+Enter" })] })] }));
 }
 /** The panel's own small button, token-styled. */
 function Action({ label, onClick }) {
@@ -190,21 +249,25 @@ export function GitBody(props) {
  * @param props - the session, the session store and the host bridge.
  * @returns the panel body.
  */
-function GitPanel({ sessionId, useSessions, gitStatus, gitPing }) {
+function GitPanel({ sessionId, useSessions, gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit, }) {
     const [outcome, setOutcome] = React.useState(null);
     const [probe, setProbe] = React.useState(null);
     const [attempt, setAttempt] = React.useState(0);
     const [hovered, setHovered] = React.useState(undefined);
+    const [message, setMessage] = React.useState('');
+    const [amend, setAmend] = React.useState(false);
+    const [busy, setBusy] = React.useState(false);
+    const [notice, setNotice] = React.useState(null);
+    const [pendingDiscard, setPendingDiscard] = React.useState(null);
     const restored = React.useRef(null);
     if (restored.current === null)
         restored.current = readCollapsed(sessionId);
     const [collapsedGroups, setCollapsedGroups] = React.useState(new Set(restored.current.groups));
     const [collapsedDirs, setCollapsedDirs] = React.useState(new Set(restored.current.directories));
-    // The slot engine may hand a fresh business face on every render, so the callbacks
-    // are read through a ref: depending on their identity in the effect below would
-    // re-run the read on every render, and each state write would render again.
+    // The slot engine may hand a fresh business face on every render, so the callbacks are
+    // read through a ref: depending on their identity in an effect would loop.
     const bridge = React.useRef({});
-    bridge.current = { gitStatus, gitPing };
+    bridge.current = { gitStatus, gitPing, gitStage, gitUnstage, gitDiscard, gitCommit };
     // The client's own view of the session's working directory: the host prefers its own
     // Session lookup and uses this only when that lookup cannot answer.
     const sessionCwd = useSessions === undefined || sessionId === undefined
@@ -252,6 +315,29 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing }) {
             // Storage is best-effort; the panel keeps working in memory.
         }
     }, [sessionId, collapsedGroups, collapsedDirs]);
+    /** Run one mutation, report what it said, and re-read the status. */
+    const mutate = (run) => {
+        setBusy(true);
+        setNotice(null);
+        void run(new AbortController().signal).then((result) => {
+            setBusy(false);
+            setNotice(result);
+            setAttempt((value) => value + 1);
+        }, (error) => {
+            setBusy(false);
+            setNotice({ ok: false, detail: error instanceof Error ? error.message : String(error) });
+            setAttempt((value) => value + 1);
+        });
+    };
+    /** Ask before discarding, then discard with the confirmation the host requires. */
+    const confirmDiscard = () => {
+        const pending = pendingDiscard;
+        const discard = bridge.current.gitDiscard;
+        setPendingDiscard(null);
+        if (pending === null || discard === undefined)
+            return;
+        mutate((signal) => discard(requestRoot, pending.tracked, pending.untracked, true, signal));
+    };
     /** Toggle one group's expansion. */
     const toggleGroup = (title) => {
         setCollapsedGroups((current) => {
@@ -274,9 +360,40 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing }) {
             return next;
         });
     };
-    const total = outcome !== null && !('unavailable' in outcome)
-        ? outcome.staged.length + outcome.unstaged.length + outcome.untracked.length + outcome.conflicted.length
-        : 0;
+    const status = outcome !== null && !('unavailable' in outcome) && outcome.isRepo ? outcome : null;
+    const total = status === null
+        ? 0
+        : status.staged.length + status.unstaged.length + status.untracked.length + status.conflicted.length;
+    /** The hover actions one row offers, depending on the group it sits in. */
+    const actionsFor = (change) => {
+        const stage = bridge.current.gitStage;
+        const unstage = bridge.current.gitUnstage;
+        if (stage === undefined || unstage === undefined)
+            return [];
+        const isStaged = status !== null && status.staged.includes(change);
+        if (isStaged) {
+            return [{
+                    title: 'Unstage',
+                    icon: IconCloseOutlineRegular,
+                    run: () => { mutate((signal) => unstage(requestRoot, [change.path], signal)); },
+                }];
+        }
+        const untracked = status !== null && status.untracked.includes(change);
+        return [
+            {
+                title: 'Stage',
+                icon: IconPlusOutlineRegular,
+                run: () => { mutate((signal) => stage(requestRoot, [change.path], signal)); },
+            },
+            {
+                title: untracked ? 'Delete file' : 'Discard changes',
+                icon: IconTrashOutlineRegular,
+                run: () => {
+                    setPendingDiscard(untracked ? { tracked: [], untracked: [change.path] } : { tracked: [change.path], untracked: [] });
+                },
+            },
+        ];
+    };
     const groupProps = {
         collapsedGroups,
         onToggleGroup: toggleGroup,
@@ -284,10 +401,52 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing }) {
         onToggleDir: toggleDir,
         hovered,
         onHover: setHovered,
+        actionsFor,
     };
-    return (_jsxs("div", { style: { padding: '10px 12px', lineHeight: 1.5 }, children: [_jsxs("div", { style: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }, children: [outcome !== null && !('unavailable' in outcome) && outcome.isRepo
-                        ? _jsx(BranchLine, { status: outcome })
-                        : _jsx("span", { style: { fontWeight: 600 }, children: "Git" }), _jsx(Action, { label: "Refresh", onClick: () => { setAttempt((value) => value + 1); } })] }), _jsx("div", { role: "tree", style: { paddingTop: '4px' }, children: outcome === null
+    const bulkFor = (paths, label, run) => ({
+        label,
+        run: () => { run(paths); },
+    });
+    return (_jsxs("div", { style: { padding: '10px 12px', lineHeight: 1.5 }, children: [_jsxs("div", { style: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }, children: [status === null ? _jsx("span", { style: { fontWeight: 600 }, children: "Git" }) : _jsx(BranchLine, { status: status }), _jsx(Action, { label: "Refresh", onClick: () => { setAttempt((value) => value + 1); } })] }), status === null ? null : (_jsx(CommitBox, { message: message, amend: amend, busy: busy, onMessage: setMessage, onAmend: setAmend, onCommit: () => {
+                    const commit = bridge.current.gitCommit;
+                    if (commit === undefined)
+                        return;
+                    const text = message;
+                    mutate(async (signal) => {
+                        const result = await commit(requestRoot, text, amend, signal);
+                        if (result.ok) {
+                            setMessage('');
+                            setAmend(false);
+                        }
+                        return result;
+                    });
+                } })), notice === null ? null : (_jsx("div", { style: { color: notice.ok ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-state-error-primary)', paddingTop: '6px' }, children: notice.detail })), pendingDiscard === null ? null : (_jsxs("div", { style: {
+                    background: 'var(--dsw-alias-bg-layer-2)',
+                    border: '1px solid var(--dsw-alias-border-l3)',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginTop: '6px',
+                    padding: '4px 6px',
+                }, children: [_jsx("span", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `Discard ${String(pendingDiscard.tracked.length + pendingDiscard.untracked.length)} change(s)? This cannot be undone.` }), _jsx("button", { type: "button", onClick: confirmDiscard, style: {
+                            background: 'var(--dsw-alias-state-error-primary)',
+                            border: 'none',
+                            borderRadius: '4px',
+                            color: 'var(--dsw-alias-label-primary-inverted)',
+                            cursor: 'pointer',
+                            font: 'inherit',
+                            marginLeft: 'auto',
+                            padding: '1px 8px',
+                        }, children: "Discard" }), _jsx("button", { type: "button", onClick: () => { setPendingDiscard(null); }, style: {
+                            background: 'transparent',
+                            border: '1px solid var(--dsw-alias-border-l3)',
+                            borderRadius: '4px',
+                            color: 'var(--dsw-alias-label-primary)',
+                            cursor: 'pointer',
+                            font: 'inherit',
+                            padding: '1px 8px',
+                        }, children: "Cancel" })] })), _jsx("div", { role: "tree", style: { paddingTop: '4px' }, children: outcome === null
                     ? _jsx("div", { style: { color: SECONDARY }, children: "Reading the working tree\u2026" })
                     : 'unavailable' in outcome
                         ? _jsx("div", { style: { color: 'var(--dsw-alias-state-error-primary)' }, children: outcome.unavailable })
@@ -295,7 +454,19 @@ function GitPanel({ sessionId, useSessions, gitStatus, gitPing }) {
                             ? (_jsxs("div", { style: { color: SECONDARY }, children: ["Not a git repository.", outcome.note === '' ? null : _jsx("div", { style: { color: TERTIARY }, children: outcome.note })] }))
                             : (_jsxs(_Fragment, { children: [outcome.conflicted.length === 0
                                         ? null
-                                        : (_jsx("div", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${String(outcome.conflicted.length)} conflicted file(s) need resolution` })), _jsx(Group, { title: "Staged changes", changes: outcome.staged, ...groupProps }), _jsx(Group, { title: "Changes", changes: outcome.unstaged, ...groupProps }), _jsx(Group, { title: "Conflicted", changes: outcome.conflicted, ...groupProps }), _jsx(Group, { title: "Untracked", changes: outcome.untracked, ...groupProps }), total === 0 ? _jsx("div", { style: { color: SECONDARY }, children: "No changes \u2014 the working tree is clean." }) : null] })) }), _jsxs("div", { style: {
+                                        : (_jsx("div", { style: { color: 'var(--dsw-alias-state-warn-label)' }, children: `${String(outcome.conflicted.length)} conflicted file(s) need resolution` })), _jsx(Group, { title: "Staged changes", changes: outcome.staged, bulk: bulkFor(outcome.staged.map((change) => change.path), 'Unstage all', (paths) => {
+                                            const unstage = bridge.current.gitUnstage;
+                                            if (unstage !== undefined)
+                                                mutate((signal) => unstage(requestRoot, paths, signal));
+                                        }), ...groupProps }), _jsx(Group, { title: "Changes", changes: outcome.unstaged, bulk: bulkFor(outcome.unstaged.map((change) => change.path), 'Stage all', (paths) => {
+                                            const stage = bridge.current.gitStage;
+                                            if (stage !== undefined)
+                                                mutate((signal) => stage(requestRoot, paths, signal));
+                                        }), ...groupProps }), _jsx(Group, { title: "Conflicted", changes: outcome.conflicted, ...groupProps }), _jsx(Group, { title: "Untracked", changes: outcome.untracked, bulk: bulkFor(outcome.untracked.map((change) => change.path), 'Stage all', (paths) => {
+                                            const stage = bridge.current.gitStage;
+                                            if (stage !== undefined)
+                                                mutate((signal) => stage(requestRoot, paths, signal));
+                                        }), ...groupProps }), total === 0 ? _jsx("div", { style: { color: SECONDARY }, children: "No changes \u2014 the working tree is clean." }) : null] })) }), _jsxs("div", { style: {
                     paddingTop: '10px',
                     marginTop: '10px',
                     borderTop: '1px solid var(--dsw-alias-border-l3)',
