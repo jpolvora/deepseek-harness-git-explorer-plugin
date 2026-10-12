@@ -102,6 +102,10 @@
 /* ---- the tree ------------------------------------------------------------ */
 
 .treeTop {
+  /* Tree rows follow the native Files viewer: the secondary content tier
+   * (13px fallback), so the change list reads at the same size. */
+  font-size: var(--dsh-content-font-size-secondary, 13px);
+  line-height: 1.5;
   padding-top: 4px;
 }
 
